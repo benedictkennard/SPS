@@ -1,8 +1,8 @@
 SELECT DISTINCT Dest, Distance FROM Flights ORDER BY Distance DESC LIMIT 1;
 
-SELECT DISTINCT Engines FROM planes ORDER BY Engines
-	SELECT Engines, MAX(Seats) FROM Planes GROUP BY Engines
-	SELECT DISTINCT Engines, Seats, Model FROM Planes WHERE Engines=1 AND Seats=16 OR Engines=2 AND Seats=400 OR Engines=3 AND Seats=379 OR Engines=4 AND Seats=450 ORDER BY Engines, Model
+SELECT DISTINCT Engines FROM planes ORDER BY Engines;
+SELECT Engines, MAX(Seats) FROM Planes GROUP BY Engines;
+SELECT DISTINCT Engines, Seats, Model FROM Planes WHERE Engines=1 AND Seats=16 OR Engines=2 AND Seats=400 OR Engines=3 AND Seats=379 OR Engines=4 AND Seats=450 ORDER BY Engines, Model;
 
 SELECT COUNT(*) FROM Flights;
 
