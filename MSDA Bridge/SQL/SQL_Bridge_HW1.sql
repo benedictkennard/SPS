@@ -34,7 +34,7 @@ LIMIT 5;
 
 SELECT Carrier, COUNT(*) 
 FROM Flights 
-WHERE Distance > 1000 
+WHERE Distance >= 1000 
 GROUP BY Carrier 
 ORDER BY COUNT(*) DESC 
 LIMIT 5;
