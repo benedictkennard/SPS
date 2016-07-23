@@ -39,5 +39,6 @@ GROUP BY Carrier
 ORDER BY COUNT(*) DESC 
 LIMIT 5;
 
+-- What and where was the maximum wind gust encountered?
 SELECT ROUND(MAX(wind_gust),2), Origin 
 FROM Weather;
