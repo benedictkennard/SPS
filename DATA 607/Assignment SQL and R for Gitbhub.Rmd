@@ -121,7 +121,7 @@ ratings <- rate(1, 5); ratings
 Connect to MySQL. Create "Movies" database. Load movies, friends, and ratings into the database.
 
 ```{r echo=FALSE, results="hide", warning=FALSE}
-connection <- dbConnect(MySQL(), user="root", password="1010")
+connection <- dbConnect(MySQL(), user="REDACTED", password="REDACTED")
 ```
 ```{r}
 dbSendQuery(connection, "CREATE USER 'RMySQL' IDENTIFIED BY '123456';" )
@@ -177,7 +177,7 @@ dbSendQuery(connection, 'DROP TABLE tbl_Movies;')
 dbSendQuery(connection, 'DROP SCHEMA Movies;')
 ```
 ```{r echo=FALSE, results="hide", warning=FALSE, message=FALSE}
-connection <- dbConnect(MySQL(), user="root", password="1010")
+connection <- dbConnect(MySQL(), user="REDACTED", password="REDACTED")
 ```
 ```{r}
 dbSendQuery(connection, "REVOKE ALL ON *.* FROM 'RMySQL' ;")
