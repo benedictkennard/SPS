@@ -1,0 +1,187 @@
+---
+title: "Assignment - SQL and R"
+author: "Jose Zuniga"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment Instructions
+
+Choose six recent popular movies. Ask at least five people that you know (friends, family, classmates, imaginary friends) to rate each movie that they have seen on a scale of 1 to 5. Take the results (observations) and store them in a SQL database. Load the information into an R dataframe. Your deliverables should include your SQL scripts and your R Markdown code, posted to GitHub.
+
+This is by design a very open ended assignment. A variety of reasonable approaches are acceptable. You can (and should) blank out your SQL password if your solution requires it; otherwise, full credit requires that your code is "reproducible," with the assumption that I have the same database server and R software.
+
+## [Metacritic](www.metacritic.com/)
+
+Metacritic is a website that aggregates reviews of music albums, games, movies, TV shows, DVDs, and formerly, books. For each product, a numerical score from each review is obtained and the total is averaged. It was created and founded by Jason Dietz, Marc Doyle, and Julie Doyle Roberts. [Source](http://www.metacritic.com/browse/movies/score/metascore/year/filtered)
+
+## Scape Web Page
+
+Choosing top movies as rated by Metacritic. A while loop is necessary because for this website, getURL returns just the headers with "Error 429 Slow down" the majority times it is queried. A 30-second pause is built in every 500 tries because sometimes pausing for a bit helps.
+
+```{r}
+library(XML)
+library(RCurl)
+library(RMySQL)
+```
+```{r cache=TRUE}
+scrape <- function(url) {
+  webpage = ""; n = 0
+  options(warn = -1)
+  while (nchar(webpage)<1000) {
+    webpage <- getURL(url, isHTTP = T)
+    n = n + 1
+    if (n %% 500 == 0) { 
+      Sys.sleep(30)
+      }
+  }
+  options(warn = 0)
+  return(webpage)
+}
+
+url <- "http://www.metacritic.com/browse/movies/score/metascore/year/filtered"
+raw <- scrape(url); nchar(raw)
+
+```
+
+## Clean Data
+
+Choosing top six movies to extract from the raw data scraped from Metacritic.
+
+```{r}
+clean <- function(raw, m) {
+    data <- htmlParse(raw)
+    nodes <- c("product_item row_num", "product_item product_title", 
+               "metascore_w small movie positive", "product_item product_date")
+    n = length(nodes)
+    movies <- matrix(NA, nrow=m, ncol=n)
+    for (i in 1:m) {
+    for (j in 1:n) {
+      x <- getNodeSet(data, paste0("//div[@class='", nodes[j], "']"))[[i]]
+      x <- gsub("\\n|\\.|<a.*\">|</a>", "", as(x, "character"))
+      loc <- gregexpr(">.*?</", x)
+      a <- loc[[1]][1] + 1
+      b <- loc[[1]][1] + attr(loc[[1]],"match.length") - 3
+      x <- substr(x, start = a, stop = b) 
+      movies[i,j] <- gsub("^\\s+|\\s+$", "", x)
+    }
+  }
+  popular = data.frame(movies, stringsAsFactors = F)
+  popular[,1] <- as.integer(popular[,1])
+  popular[,3] <- as.integer(popular[,3])
+  month <- substr(movies[,4],0,3)
+  day <- gsub("\\s", "0", gsub(",", "", substr(movies[ ,4], nchar(movies[,4])-7, nchar(movies[,4]) - 5)))
+  year <- substr(movies[,4], nchar(movies[,4]) - 3, nchar(movies[ ,4]))
+  popular[,4] <- as.Date(paste0(day,month,year), "%d%B%Y")
+  colnames(popular) <- c("Movie_Rank","Movie_Title","MetaScore","Release_Date")
+  return(popular)
+}
+
+popular <- clean(raw, 6); popular
+```
+Interesting note: Some of the highest rated movies on the site have future release dates. This must be do to a small sample --potentially made up of people involved with, and therefore biased toward, the movie-- being used to represent the population.
+
+## Imaginary Friend's and their Ratings
+
+Makes a list of five friends then produces a list of random ratings from one to six. The number six accounts for instances where movies were not watched by the individual and is therefore replaced with "NA" in the final step of the function.
+
+```{r}
+imagine <- function(f) {
+  friends <- data.frame(cbind(seq(1:5), NA))
+  friends[ ,2] <- LETTERS[1:f]
+  colnames(friends) <- c("Friend_Rank", "Friend_Name")   
+  return(friends)
+}
+
+rate <- function(min, max) {
+  m = length(popular[,1])
+  f = length(friends[,1])
+  ratings <- array(NA, dim=c(m,f))
+  set.seed(11217)
+  for (i in 1:m){
+    for (j in 1:f) {
+      score <- ceiling(runif(1, min - 1, max + 1))
+      if (score <= max) { ratings[i, j] <- score }
+    }
+  }
+  ratings <- cbind(as.numeric(row(ratings)), as.numeric(col(ratings)),as.numeric(ratings))
+  ratings <- data.frame(subset(ratings, complete.cases(ratings)))
+  colnames(ratings) <- c("Movie_Rank", "Friend_Rank", "Rating")
+  return(ratings)
+}
+
+friends <- imagine(5); friends
+ratings <- rate(1, 5); ratings
+```
+
+# Store Results in SQL Database
+
+Connect to MySQL. Create "Movies" database. Load movies, friends, and ratings into the database.
+
+```{r echo=FALSE, results="hide", warning=FALSE}
+connection <- dbConnect(MySQL(), user="REDACTED", password="REDACTED")
+```
+```{r}
+dbSendQuery(connection, "CREATE USER 'RMySQL' IDENTIFIED BY '123456';" )
+dbSendQuery(connection, "GRANT ALL ON *.* TO 'RMySQL';")
+connection <- dbConnect(MySQL(), user="RMySQL", password="123456")
+
+dbSendQuery(connection, 'CREATE SCHEMA IF NOT EXISTS Movies;')
+dbSendQuery(connection, 'USE Movies;')
+dbSendQuery(connection, 'DROP TABLE IF EXISTS tbl_Movies;')
+dbSendQuery(connection, 'DROP TABLE IF EXISTS tbl_Friends;')
+dbSendQuery(connection, 'DROP TABLE IF EXISTS tbl_Ratings;')
+
+dbWriteTable(connection, "tbl_Movies", popular, append = TRUE, row.names = FALSE)
+dbSendQuery(connection, "ALTER TABLE tbl_Movies
+                         MODIFY COLUMN Movie_Rank INT NOT NULL,
+                         MODIFY COLUMN Movie_Title VARCHAR(30) NOT NULL,
+                         MODIFY COLUMN MetaScore INT NOT NULL,
+                         MODIFY COLUMN Release_Date DATE NOT NULL,
+                         ADD PRIMARY KEY (Movie_Rank);")
+
+dbWriteTable(connection, "tbl_Friends", friends, append = TRUE, row.names = FALSE)
+dbSendQuery(connection, "ALTER TABLE tbl_Friends
+                         MODIFY COLUMN Friend_Rank INT NOT NULL,
+                         MODIFY COLUMN Friend_Name VARCHAR(30) NOT NULL,
+                         ADD PRIMARY KEY (Friend_Rank);")
+
+dbWriteTable(connection, "tbl_Ratings", ratings, append = TRUE, row.names = FALSE)
+dbSendQuery(connection, "ALTER TABLE tbl_Ratings
+                         MODIFY COLUMN Rating INT NOT NULL,
+                         MODIFY COLUMN Movie_Rank INT NOT NULL,
+                         MODIFY COLUMN Friend_Rank INT NOT NULL,
+                         ADD FOREIGN KEY (Movie_Rank) REFERENCES tbl_Movies (Movie_Rank),
+                         ADD FOREIGN KEY (Friend_Rank) REFERENCES tbl_Friends (Friend_Rank),
+                         ADD PRIMARY KEY (Movie_Rank, Friend_Rank);")
+
+```
+
+# Run Query from SQL Database
+
+Queries of MySQL tables displays data as a dataframe in R.
+
+```{r}
+dbGetQuery(connection, "SELECT Movie_Title, Metascore, Release_Date, Friend_Name, Rating
+                        FROM movies.tbl_Movies AS M
+                        CROSS JOIN movies.tbl_Friends AS F
+                        LEFT JOIN movies.tbl_Ratings AS R
+                        ON R.Movie_Rank = M.Movie_Rank AND F.Friend_Rank = R.Friend_Rank
+                        ORDER BY M.Movie_Rank, F.Friend_Rank;")
+
+dbSendQuery(connection, 'DROP TABLE tbl_Ratings;')
+dbSendQuery(connection, 'DROP TABLE tbl_Friends;')
+dbSendQuery(connection, 'DROP TABLE tbl_Movies;')
+dbSendQuery(connection, 'DROP SCHEMA Movies;')
+```
+```{r echo=FALSE, results="hide", warning=FALSE, message=FALSE}
+connection <- dbConnect(MySQL(), user="REDACTED", password="REDACTED")
+```
+```{r}
+dbSendQuery(connection, "REVOKE ALL ON *.* FROM 'RMySQL' ;")
+dbSendQuery(connection, "DROP USER 'RMySQL' ;")
+dbDisconnect(connection)
+```

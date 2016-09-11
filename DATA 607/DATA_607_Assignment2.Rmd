@@ -1,0 +1,129 @@
+---
+title: "Assignment - Regular Expressions"
+author: "Jose Zuniga"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment Instructions
+
+Please deliver links to an R Markdown file (in GitHub and rpubs.com) with solutions to problems 3 and 4 from chapter 8 of
+Automated Data Collection in R. Problem 9 is extra credit. You may work in a small group, but please submit separately with
+names of all group participants in your submission.
+
+## Chapter 8, Problem 3
+
+Copy the introductory example. The vector **name** stores the extracted names. 
+
+```{r}
+library(stringr)
+raw.data <- paste("555-1239Moe Szyslak(636) 555-0113Burns, C. ",
+                  "Montgomery555 -6542Rev. Timothy Lovejoy555 8904Ned ",
+                  "Flanders636-555-3226Simpson, Homer5553642Dr. Julius Hibbert")
+name <- unlist(str_extract_all(raw.data, "[[:alpha:]., ]{2,}"))
+name
+```
+
+(a) Use the tools of this chapter to rearrange the vector so that all elements conform to the standard **first_name** **last_name**.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; First normal form requires that different types of information are not mixed within one column. Therefore, the first name and last name were split up into two columns. ^i^ The first step is optional. It changes Mr. Burns' first name from an initial to the full name. The next part finds words that begin after a punctuation, removes the punctuation, and uses those post-punctuation names as first names in the cases where they are found. In cases where they are not found, the first word is used as the first name. The next part uses words that are either at the end of the string or before a punctuation as last names, and then deletes the punctuations. After all this the results are displayed as a data frame.
+
+```{r warning=FALSE}
+first_name <- str_replace(name, "C.", "Charles")
+first_name <- str_extract(first_name, "[[:punct:]]\\s[[:alpha:]]+")
+first_name <- str_extract(first_name, "[[:alpha:]]+")
+first_name[is.na(first_name)] <- str_extract(name, "[[:alpha:]]+")[is.na(first_name)]
+last_name <- str_extract(name,"[[:alpha:]]+($|,)")
+last_name <- str_extract(last_name,"[[:alpha:]]+")
+data.frame(first_name, last_name)
+
+```
+
+(b) Construct a logical vector indicating whether a character has a title (i.e., Rev. and Dr.).
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The search looks for words that are two to three characters long and with a punctuation.
+```{r}
+str_detect(name, "[[:alpha:]]{2,3}[.]")
+```
+
+(c) Construct a logical vector indicating whether a character has a second name.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; First the titles are removed using (b) above. Then number of words (names) are counted. Last, the logical values testing whether or not there are more than 2 words (names) are assigned to a vector.
+```{r}
+second_name <- str_replace(name, "[[:alpha:]]{2,3}[.]", "")
+second_name <- str_count(second_name, "\\w+")
+second_name <- second_name > 2; second_name
+```
+
+### References
+
+^i^ Automated data collection with R a practical guide to web scraping and text mining.  Page 171. Simon Munzert. John Wiley & Sons Inc. 2015
+
+## Chapter 8, Problem 4
+
+Describe the types of strings that conform to the following regular expressions and construct an example that is matched by the regular expression.
+
+(a) [0-9]+\\$
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vectors containing strings with any number of continuous digits followed by a dollar sign at the end.
+```{r}
+a <- c("asdad  0123456789$")
+unlist(str_extract_all(a, "[0-9]+\\$"))
+```
+
+(b) \\b[a-z]{1,4}\\b
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vectors containing strings with one to four continuous lowercase letters from $a$ to $z$ surrounded by word edges (beginnings and end of words).
+```{r}
+b <- c("one two three four five six seven eight nine ten")
+unlist(str_extract_all(b, "\\b[a-z]{1,4}\\b"))
+```
+
+(c) .*?\\.txt$
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vectors containing strings that end in **.txt** no matter what, if anything, precedes the **.txt**.
+```{r}
+c <- c("characters,  spaces, filename: example.txt")
+unlist(str_extract_all(c, ".*?\\.txt$"))
+```
+
+(d) \\d{2}/\\d{2}/\\d{4}
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vectors containing strings that have a pattern of two digits, a forward slash, two more digits, another forward slash, and then four digits.
+```{r}
+d <- c("12/34/5678 1234/56/789")
+unlist(str_extract_all(d, "\\d{2}/\\d{2}/\\d{4}"))
+```
+
+(e) <(.+?)>.+?</\\1>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vectors containing strings with any type of HTML tag. The back reference removes the outer HTML tags.
+```{r}
+e <- c("<!DOCTYPE html><html><body>Hello World</body></html></html>")
+unlist(str_extract_all(e, "<(.+?)>.+?</\\1>"))
+```
+
+## Chapter 8, Problem 9
+
+The following code hides a secret message. Crack it with R and regular expressions. Hint: Some of the characters are more revealing than others! The code snippet is also available in the materials at www.r-datacollection.com.
+
+> clcopCow1zmstc0d87wnkig7OvdicpNuggvhryn92Gjuwczi8hqrfpRxs5Aj5dwpn0Tanwo      
+> Uwisdij7Lj8kpf03AT5Idr3coc0bt7yczjatOaootj55t3Nj3ne6c4Sfek.r1w1YwwojigO      
+> d6vrfUrbz2.2bkAnbhzgv4R9i05zEcrop.wAgnb.SqoU65fPa1otfb7wEm24k6t3sR9zqe5      
+> fy89n6Nd5t9kc4fE905gmc4Rgxo5nhDk!gr ^ii^
+
+```{r}
+secret <- paste("clcopCow1zmstc0d87wnkig7OvdicpNuggvhryn92Gjuwczi8hqrfpRxs5Aj5dwpn0Tanwo",
+                "Uwisdij7Lj8kpf03AT5Idr3coc0bt7yczjatOaootj55t3Nj3ne6c4Sfek.r1w1YwwojigO",
+                "d6vrfUrbz2.2bkAnbhzgv4R9i05zEcrop.wAgnb.SqoU65fPa1otfb7wEm24k6t3sR9zqe5",
+                "fy89n6Nd5t9kc4fE905gmc4Rgxo5nhDk!gr")
+message <- unlist(str_extract_all(secret, "[[:upper:].]{1,}"))
+message <- str_replace_all(paste(message, collapse = ''), "[.]", " "); message
+```
+
+### References
+
+^ii^ http://stackoverflow.com/questions/35542346/r-using-regmatches-to-extract-certain-characters
