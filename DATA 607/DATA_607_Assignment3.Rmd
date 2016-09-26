@@ -1,0 +1,94 @@
+---
+title: "Assignment - Tidying and Transforming Data"
+author: "Jose Zuniga"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment Instructions
+
+The chart below describes arrival delays for two airlines across five destinations. Your task is to: Create a .CSV file (or optionally, a MySQL database!) that includes all of the information below. You're encouraged to use a "wide" structure similar to how the information appears below, so that you can practice tidying and transformations. Read the information from your .CSV file into R, and use *tidyr* and *dplyr* as needed to tidy and transform your data. Perform analysis to compare the arrival delays for the two airlines. Your should include narrative descriptions of your data cleanup work, analysis, and conclusions.
+
+## Arrival Delays
+
+                  Los Angeles Phoenix San Diego San Francisco Seattle
+------- --------- ----------- ------- --------- ------------- ------- 
+ALASKA   On Time         497     221       212           503    1841  
+         Delayed          62      12        20           102     305  
+AM WEST  On Time         694    4840       383           320     201  
+         Delayed         117     415        65           129      61  
+
+(1) Create a .CSV file that includes all of the information above. You're encouraged to use a "wide" structure similar to how the information appears above, so that you can practice tidying and transformations.
+```{r eval=FALSE}
+csv <- rbind(c(NA, NA, "Los Angeles", "Phoenix", "San Diego", "San Francisco", "Seattle"),
+             c("ALASKA", "On Time", 497, 221, 212, 503, 1841),
+             c(NA, "Delayed", 62, 12, 20, 102, 305),
+             c("AM WEST", "On Time", 694, 4840, 383, 320, 201),
+             c(NA, "Delayed", 117, 415, 65, 129, 61))
+
+write.table(csv, file = "DATA_607_Assignment3.csv", sep = ",", col.names=F, row.names=F)
+```
+
+(2) Read the information from your .CSV file into R, and use *tidyr* and *dplyr* as needed to tidy and transform your data.
+```{r message=F}
+wide_data <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/",
+                             "master/DATA%20607/DATA_607_Assignment3.csv"), 
+                             stringsAsFactors = F); wide_data
+library(tidyr)
+library(dplyr)
+
+long_data <- wide_data %>%
+mutate(Airlines1 = NA., Airlines2=lag(NA.)) %>% 
+mutate(Airline = coalesce(Airlines1,Airlines2), Status = NA..1)  %>%
+gather("Destination", "Flights", 3:7) %>% 
+select(Airline:Flights) %>% 
+arrange(Airline, desc(Status), Destination); long_data
+```
+The [data](https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20607/DATA_607_Assignment3.csv) are first pulled from GitHub in a "wide" structure format. Then then data is converted into a "long" structure using *tidyr* and *dplyr*. The **mutate** function is used to duplicate the first column twice (once with the cells shifted down). The **mutate** function is then used again with **coalesce** to combine the new columns into one column without null values. The **gather** function transforms the data from its crosstab appearance to a more normalized format. Finally, the **select** function is used to query the columns we want in the final "long" structure. Last, the **filter** function is used to split the data into the two groups that will be compared.
+
+(3) Perform analysis to compare the arrival delays for the two airlines.
+```{r}
+Performance <- long_data %>%
+  group_by(Airline) %>%
+  mutate(A_Total = sum(Flights)) %>% 
+  group_by(Airline, Status) %>%
+  mutate(S_Total = sum(Flights), A_Perf = S_Total / A_Total) %>% 
+  group_by(Airline, Destination) %>%
+  mutate(D_Total = sum(Flights), D_Perf = Flights / D_Total)
+
+# Alaska Airlines and AM West Overall Performance
+data.frame(Performance[c(1,10,11,20), c(1,2,7)])
+
+# Alaska Airlines and AM West by Destination
+Perf_by_Dest <- data.frame(Performance %>%
+  filter(Status == "On Time") %>% 
+  group_by(Destination) %>% 
+  unite(temp, D_Total, D_Perf) %>%
+  spread(Status, temp) %>%
+  select(Destination, Airline, On_Time = `On Time`) %>% 
+  spread(Airline, On_Time) %>%
+  separate(ALASKA, into=c("Flights.AL", "Perf.AL"), sep = "_", convert=T) %>% 
+  separate(`AM WEST`, into=c("Flights.AM", "Perf.AM"), sep = "_", convert=T) %>% 
+  mutate(Difference = Perf.AL - Perf.AM)  %>% 
+  arrange(Destination)); Perf_by_Dest
+```
+First the functions **group_by** and **mutate** are used multiple times on the data in order to calculate and append aggregate values to the data set. The data for each airline are then  summarized by arrival status ("*On Time*", "*Delayed*"). Then the data are manipulated as follows in order to allow for comparisons:
+
+ + **filter** is used to extract only *On Time* data. 
+ + **group_by** is used to view the data by destination.
+ + **unite** is used to combine two columns into one.
+ + **spread** is used to flatten the data on united column.
+ + **select** is used to narrow the data and rename the united column.
+ + **spread** is used to flatten the data further airline.
+ + **separate** is used twice to split the united column into four.
+ + **mutate** is used to add a calculated column to the data.
+ + **arrange** is used to sort the data.
+
+After all this, the summarized comparison of performance for each airline at each destination is displayed.
+
+(4) Conclusions.
+
+Alaska Airlines' `r Performance[1,5]` flights were on-time `r paste0(round(100*Performance[1,7],2), "%")` of the time. AM West's (acquired by American Airlines) `r Performance[11,5]` flights were on-time `r paste0(round(100*Performance[11,7],2), "%")` of the time. The pattern persists even when looking at individual destinations. Yet for some destinations the difference in performance is larger than others. Compare Phoenix with the smallest performance difference of `r Perf_by_Dest[2,6]` and San Francisco with the largest performance difference of `r Perf_by_Dest[4,6]`. A cursory review appears to indicate--holding all else equal-- that Alaska Airlines performs better when a fewer number of flights are involved and that AM West performs better when larger number of flights are involved. Correlating performance on the number of flights, the data appear to support this conclusion with $r = `r cor(Perf_by_Dest[[2]], Perf_by_Dest[[3]])`$ for Alaska Airlines and $r = `r cor(Perf_by_Dest[[4]], Perf_by_Dest[[5]])`$ for AM West.
