@@ -1,0 +1,295 @@
+---
+title: "Project - Preparing Datasets for Analysis"
+author: "Jose Zuniga"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Project Instructions
+
+The goal of this assignment is to give you practice in preparing different datasets for downstream analysis work. Your task is to choose any three of the "wide" datasets identified in the Week [5] Discussion items. You may use your own dataset. For each of the three chosen datasets: Create a .CSV file (or optionally, a MySQL database!) that includes all of the information included in the dataset. You're encouraged to use a "wide" structure similar to how the information appears in the discussion item, so that you can practice tidying and transformations. Read the information from your .CSV file into R, and use tidyr and dplyr as needed to tidy and transform your data [Most of your grade will be based on this step!]. Perform the analysis requested in the discussion item. 
+
+```{r  message=F}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+```
+
+## (1) Data Set 1
+
+**Contributor**: Jose Zuniga
+
+[**Source**](http://www.databasejournal.com/features/mysql/article.php/3861886/Tips-for-Simplifying-Crosstab-Query-Statements.htm): Tips for Simplifying Crosstab Query Statements, Rob Gravelle, Database Journal, 2010.
+
+**Analysis**: Compare monthly citizenship applications for the given regions.
+
+Month     REGION 1 REGION 2 REGION 3 REGION 4 REGION 5 TOTAL
+--------- -------- -------- -------- -------- -------- -------- 
+April	    13        33      76        2       47        171
+May	      17	      55	    209       1	      143       425
+June	    8	        63	    221       1	      127       420
+July	    13	      104	    240       6	      123       486
+August	  18      	121     274       9	      111       533
+September	25      	160	    239       2       88        514
+October	  9       	88	    295       2	      127       521
+November	2        	86	    292       2       120       502
+December	1       	128	    232       6       155       522
+TOTAL     106       838     2078      31      1041      4094
+
+### (1.1)  Create  .CSV file with data and "wide" structure of information in dataset.
+```{r eval=FALSE}
+csv1 <- rbind(c("Month", "REGION 1", "REGION 2", 
+                "REGION 3", "REGION 4", "REGION 5", "TOTAL"),
+              c("April", 13, 33, 76, 2, 47, 171),
+              c("May", 17, 55, 209, 1, 143, 425),
+              c("June",	8, 63, 221, 1, 127, 420),
+              c("July", 13, 104, 240, 6, 123, 486),
+              c("August", 18, 121, 274, 9, 111, 533),
+              c("September", 25, 160, 239, 2, 88, 514),
+              c("October", 9, 88, 295, 2, 127, 521),
+              c("November", 2, 86, 292, 2, 120, 502),
+              c("December", 1, 128, 232, 6, 155, 522),
+              c("TOTAL", 106, 838, 2078, 31, 1041, 4094))
+
+write.table(csv1, file = "DATA_607_Project2_1.csv", sep = ",", col.names=F, row.names=F)
+```
+
+### (1.2) Read the information from the .CSV file into R. 
+```{r}
+wide_data1 <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/",
+                             "master/DATA%20607/DATA_607_Project2_1.csv"), 
+                             stringsAsFactors = F)
+```
+
+### (1.3) Use *tidyr* and *dplyr* to tidy and transform the data.
+```{r}
+long_data1 <- wide_data1 %>% 
+  gather(Region, Amount, 2:6) %>% 
+  mutate(Contribution = Amount / TOTAL, 
+         Month = match(Month, month.name),
+         Region = substr(Region, 8, 8)) %>% 
+  select(-TOTAL) %>% 
+  filter(Month != "NA"); head(long_data1)
+```
+
+### (1.4) Perform the analysis requested by the contributor.
+```{r}
+long_data1 %>%
+  group_by(Region) %>%
+  summarise(Region_Sum = sum(Amount))
+long_data1 %>%
+  group_by(Month) %>%
+  summarise(Month_Sum = sum(Amount))
+ggplot(long_data1, aes(x=Region, y=Amount, fill=Region)) + 
+  geom_bar(width = 1, stat = "identity") + 
+  labs(title = "Applications by Region", y = "Applications")
+long_data1 %>% select(-4) %>% spread(Month, Amount)
+ggplot(long_data1, aes(x=as.character(Month), y=Amount, fill=Region)) + 
+  geom_bar(width = 0.9, stat = "identity") +
+  ggtitle("Monthly Applications by Region")  + 
+  xlab("Month") + ylab("Applications")
+```
+
+### (1.5) Conclusions.
+
+Visual analysis presents the citizenship application data in a format that is even easier to digest than the original table. The monthly contribution of Region 4 which is represented by the color blue is almost unnoticeable. We see quite the opposite with the contribution of Region 3 which shows its monthly dominance in green. The other benefit of this final visualization is that the distribution of the aggregate number of applications per month can be seen in the heights of the bars.
+
+***
+
+## (2) Data Set 2
+
+**Contributor**: Yifei Li 
+
+[**Source**](https://ramnathv.github.io/pycon2014-r/explore/tidy.html):  Reshape, Ramnath Vaidyanathan, Introduction to R, 2013.
+
+**Analysis**: The correlation between religious groups and income distribution.
+
+religion  <$10k $10-20k $20-30k $30-40k $40-50k $50-75k $75-100k  $100-150k >150k
+--------- ----- ------- ------- ------- ------- ------- --------  --------- ----- 
+Agnostic  27    34	    60	    81    	76      137     122     	109       84
+Atheist   12    27    	37    	52    	35      70    	73    	  59      	74
+Buddhist  27    21    	30    	34    	33    	58    	62      	39      	53
+Catholic  418   617   	732   	670   	638   	1116  	949     	792     	633
+
+### (2.1)  Create  .CSV file with data and "wide" structure of information in dataset.
+```{r eval=FALSE}
+csv2 <- rbind(c("religion", "<$10k", "$10-20k", "$20-30k", "$30-40k", 
+                "$50-75k", "$40-50k", "$75-100k", "$100-150k", ">150k"),
+              c("Agnostic", 27, 34, 60, 81, 76, 137, 122, 109, 84),
+              c("Atheist", 12, 27, 37, 52, 35, 70, 73, 59, 74),
+              c("Buddhist", 27, 21, 30, 34, 33, 58, 62, 39, 53),
+              c("Catholic",418, 617, 732, 670, 638, 1116, 949, 792, 633))
+
+write.table(csv2, file = "DATA_607_Project2_2.csv", sep = ",", col.names=F, row.names=F)
+```
+
+### (2.2) Read the information from the .CSV file into R.
+```{r message=F}
+wide_data2 <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/",
+                             "master/DATA%20607/DATA_607_Project2_2.csv"), 
+                             stringsAsFactors = F)
+```
+
+### (2.3) Use *tidyr* and *dplyr* to tidy and transform the data.
+```{r}
+long_data2 <- wide_data2 %>% 
+  mutate(Religion = religion) %>% 
+  gather(Income, Amount, 2:10) %>% 
+  mutate(Income = gsub("\\.", "-", Income),
+         Income = gsub("X--", "\\<\\$", Income),
+         Income = gsub("X-", "\\$", Income),
+         Income = sub("\\$150k", "\\>\\$150k", Income)) %>%
+  group_by(Religion) %>% 
+  mutate(Income_Level = seq_along(Income), # For sorting
+         Total = sum(Amount),
+         Frequency = Amount / Total) %>% 
+  group_by(Income_Level) %>% 
+  mutate(Freq_Sum = cumsum(Frequency)) %>% 
+  select(2,5,3,4,7,8) %>% ungroup(); head(long_data2)
+```
+
+### (2.4) Perform the analysis requested by the contributor.
+```{r}
+long_data2 %>%
+  group_by(Religion) %>%
+  summarise(n = sum(Amount))
+long_data2 %>%
+  group_by(Income_Level, Income) %>%
+  summarise(Income_Sum = sum(Amount))
+ggplot(long_data2, aes(x=paste(Income_Level, "\n", Income), y=Frequency, fill=Religion)) + 
+  geom_bar(width = 0.9, stat = "identity") +
+  geom_text(aes(label = round(Frequency,2), y=Freq_Sum-Frequency/2), size = 3) +
+  ggtitle("Income Level by Religion")  + 
+  xlab("Income Levels") + ylab("Cumulative Sum of Member Frequency")
+chi_table2 <- long_data2 %>%
+  select(1,3,4) %>%
+  spread(Income, Amount) %>%
+  select(2:10)
+chisq.test(chi_table2)
+```
+
+### (2.5) Conclusions.
+
+Assuming the data were gathered through simple random sampling, set the null hypothesis to independence between Religion and Income, and the alternate hypothesis to a relationship between Religion and Income. Failure to reject the null hypothesis will be assessed on a $p$-value of $0.01$ such that $H_{ 0 }: p\le 0.05; H_{ A }: p>0.05$. Given two categorical variables from a single population, the Chi-Square test for independence is applied to determine whether there is a significant association between the two variables.^i^ The test results indicate the existence of a $p$-value $=`r chisq.test(chi_table2)$p.value`<0.01$ indicating that the probability of observing a sample statistic as extreme as the test statistic is extremely low; therefore the null hypothesis is rejected.^ii^ The data supports the conclusion that there is a relationship between Religion and Income.
+
+***
+
+## (3) Data Set 3
+
+**Contributor**: Marco Siqueira Campos
+
+[**Source**](http://www.pewforum.org/religious-landscape-study/income-distribution/):  Religious Landscape Study, Hadley Wicham, Pew Research Center, 2016.
+
+**Analysis**: Income by religion.
+
+---------------------------------------------------------------------------------
+Religious                         Less than $30,000-  $50,000-  $100,000  Sample
+tradition                         $30,000   $49,999   $99,999   or more   Size
+--------------------------------- --------- --------  --------  --------  -------
+Buddhist                          36%	      18%	      32%	      13%	      233
+
+Catholic          	              36%	      19%       26%       19%       6,137
+
+Evangelical Protestant            35%       22%       28%       14%       7,462
+
+Hindu	                            17%	      13%       34%       36%       172
+
+Historically Black Protestant     53%       22%       17%       8%        1,704
+
+Jehovah's Witness	                48%       25%       22%       4%        208
+
+Jewish	                          16%       15%       24%       44%       708
+
+Mainline Protestant	              29%       20%       28%       23%       5,208
+
+Mormon	                          27%       20%       33%       20%       594
+
+Muslim	                          34%       17%       29%       20%       205
+
+Orthodox Christian                18%       17%       36%       29%       155
+
+Unaffiliated (religious "nones")  33%       20%       26%       21%       6,790
+---------------------------------------------------------------------------------
+
+### (3.1)  Create  .CSV file with data and "wide" structure of information in dataset.
+```{r eval=FALSE}
+csv3 <- rbind(c("Religious tradition", "Less than $30,000", "$30,000-$49,999", 
+                "$50,000-$99,999", "$100,000 or more", "Sample Size"),
+             c("Buddhist", '36%', '18%', '32%', '13%', '233'),
+             c("Catholic", '36%', '19%', '26%', '19%', '6,137'),
+             c("Evangelical Protestant", '35%', '22%', '28%', '14%', '7,462'),
+             c("Hindu", '17%', '13%', '34%', '36%', '172'),
+             c("Historically Black Protestant", '53%', '22%', '17%', '8%', '1,704'),
+             c("Jehovah's Witness", '48%', '25%', '22%', '4%', '208'),
+             c("Jewish", '16%', '15%', '24%', '44%', '708'),
+             c("Mainline Protestant", '29%', '20%', '28%', '23%', '5,208'),
+             c("Mormon", '27%', '20%', '33%', '20%', '594'),
+             c("Muslim", '34%', '17%', '29%', '20%', '205'),
+             c("Orthodox Christian", '18%', '17%', '36%', '29%', '155'),
+             c("Unaffiliated (religious 'nones')", '33%', '20%', '26%', '21%', '6,790'))
+
+write.table(csv3, file = "DATA_607_Project2_3.csv", sep = ",", col.names=F, row.names=F)
+```
+
+### (3.2) Read the information from the .CSV file into R.
+```{r message=F}
+wide_data3 <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/",
+                              "master/DATA%20607/DATA_607_Project2_3.csv"), 
+                              stringsAsFactors = F)
+```
+
+
+### (3.3) Use *tidyr* and *dplyr* to tidy and transform the data.
+```{r}
+long_data3 <- wide_data3 %>% 
+  unite(temp, Religious.tradition, Sample.Size) %>%
+  gather(Income, Frequency, 2:5) %>%
+  separate(temp, into=c("Religion", "Amount"), sep = "_", convert=T) %>% 
+  mutate(Frequency = as.numeric(gsub("%", "", Frequency)) / 100,
+         Amount = round(as.integer(sub(",", "", Amount)) * Frequency, 0),
+         Income = gsub("L.+n\\.{2}", "\\<\\$", Income),
+         Income = gsub("\\.o.+e", "\\+", Income),
+         Income = gsub("\\.{2}", "-\\$", Income),
+         Income = gsub("X\\.", "\\$", Income),
+         Income = gsub("\\.", ",", Income)) %>% 
+  group_by(Religion) %>% 
+  mutate(Income_Level = seq_along(Income)) %>%  # To sort ggplot x-axis
+  group_by(Income) %>% 
+  mutate(Freq_Sum = cumsum(Frequency)) %>% 
+  ungroup() %>% select(1,5,3,2,4,6); head(long_data3)
+```
+
+### (3.4) Perform the analysis requested by the contributor.
+
+Since Data given in terms of frequency, there are some unavoidable discrepancies due to rounding.
+```{r}
+long_data3 %>%
+  group_by(Religion) %>%
+  summarise(n = sum(Amount))
+long_data3 %>%
+  group_by(Income_Level, Income) %>%
+  summarise(Income_Sum = sum(Amount))
+ggplot(long_data3, aes(x=paste(Income_Level, "\n", Income), y=Frequency, fill=Religion)) + 
+  geom_bar(width = 0.9, stat = "identity") +
+  geom_text(aes(label = round(Frequency,2), y=Freq_Sum-Frequency/2), size = 3) +
+  ggtitle("Income Level by Religion")  + 
+  xlab("Income Levels") + ylab("Cumulative Sum of Member Frequency")
+chi_table3 <- long_data3 %>%
+  select(1,3,4) %>%
+  spread(Income, Amount) %>%
+  select(2:5)
+chisq.test(chi_table3)
+```
+
+### (3.5) Conclusions.
+
+Assuming the data were gathered through simple random sampling, set the null hypothesis to independence between Religion and Income, and the alternate hypothesis to a relationship between Religion and Income. Failure to reject the null hypothesis will be assessed on a $p$-value of $0.01$ such that $H_{ 0 }: p\le 0.05; H_{ A }: p>0.05$. Given two categorical variables from a single population, the Chi-Square test for independence is applied to determine whether there is a significant association between the two variables.^i^ The test results indicate the existence of a $p$-value $=`r chisq.test(chi_table3)$p.value`<0.01$ indicating that the probability of observing a sample statistic as extreme as the test statistic is extremely low; therefore the null hypothesis is rejected.^ii^ The data supports the conclusion that there is a relationship between Religion and Income.
+
+## References
+
+^i^ http://www.ats.ucla.edu/stat/mult_pkg/whatstat/default.htm
+
+^ii^ http://stattrek.com/chi-square-test/independence.aspx?Tutorial=AP
