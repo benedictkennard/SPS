@@ -1,39 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<subject>Mathematics
-    <book>
-        <title>Applied Linear Statistical Models</title>
-        <publisher>McGraw Hill</publisher>
-        <isbn>9780073108742</isbn>
-        <pages>1396</pages>
-        <author>Michael Kutner</author>
-        <author>William Li</author>
-        <author>Christopher Nachtsheim</author>
-        <author>John Neter</author>
-        <attribute>Exercises</attribute>
-        <attribute>Illustrations</attribute>
-        <attribute>Readability</attribute>
-    </book>
-    <book>
-        <title>Mathematical Proofs: A Transition to Advanced Mathematics</title>
-        <publisher>Pearson</publisher>
-        <isbn>9780321390530</isbn>
-        <pages>365</pages>
-        <author>Gary Chartrand</author>
-        <author>Ping Zhang</author>
-        <author>Albert Polimeni</author>
-        <attribute>Exercises</attribute>
-        <attribute>Readability</attribute>
-    </book>
-    <book>
-        <title>Mathematical Statistics with Resampling and R</title>
-        <publisher>Wiley</publisher>
-        <isbn>9781118029855</isbn>
-        <pages>418</pages>
-        <author>Laura Chihara</author>
-        <author>Tim Hesterberg</author>
-        <attribute>Exercises</attribute>
-        <attribute>Illustrations</attribute>
-        <attribute>Readability</attribute>
-    </book>
-</subject> 
+<textbooks>
+    <area id="1">
+        <subject>Mathematics</subject>
+            <book id="1">
+                <title>Applied Linear Statistical Models</title>
+                <publisher>McGraw Hill</publisher>
+                <isbn>9780073108742</isbn>
+                <pages>1396</pages>
+                <author id="1">Michael Kutner</author>
+                <author id="2">William Li</author>
+                <author id="3">Christopher Nachtsheim</author>
+                <author id="4">John Neter</author>
+                <attribute id="1">Exercises</attribute>
+                <attribute id="2">Illustrations</attribute>
+                <attribute id="3">Readability</attribute>
+            </book>
+            <book id="2">
+                <title>Mathematical Proofs: A Transition to Advanced Mathematics</title>
+                <publisher>Pearson</publisher>
+                <isbn>9780321390530</isbn>
+                <pages>365</pages>
+                <author id="1">Gary Chartrand</author>
+                <author id="2">Ping Zhang</author>
+                <author id="3">Albert Polimeni</author>
+                <attribute id="1">Exercises</attribute>
+                <attribute id="2">Readability</attribute>
+            </book>
+            <book id="3">
+                <title>Mathematical Statistics with Resampling and R</title>
+                <publisher>Wiley</publisher>
+                <isbn>9781118029855</isbn>
+                <pages>418</pages>
+                <author id="1">Laura Chihara</author>
+                <author id="2">Tim Hesterberg</author>
+                <attribute id="1">Exercises</attribute>
+                <attribute id="2">Illustrations</attribute>
+                <attribute id="3">Readability</attribute>
+            </book>
+    </area>
+</textbooks>
