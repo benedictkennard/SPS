@@ -1,0 +1,256 @@
+---
+title: "Assignment - Working with XML and JSON in R"
+author: "Jose Zuniga"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '2'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Assignment Instructions
+
+Pick three of your favorite books on one of your favorite subjects. At least one of the books should have more than one author. For each book, include the title, authors, and two or three other attributes that you find interesting. Take the information that you've selected about these three books, and separately create three files which store the book's information in HTML (using an html table), XML, and JSON formats (e.g. "books.html", "books.xml", and "books.json"). Create each of these files "by hand" unless you're already very comfortable with the file formats. Your deliverable is the three source files and the R code.
+
+Write R code, using your packages of choice, to load the information from each of the three sources into separate R data frames. Are the three data frames identical?
+
+# Favorite Textbooks
+
+--------------------------------------------------------------------------------------------------------------
+Subject       Title                   Author                  Publisher   ISBN            Pages Attributes
+------------- ----------------------- ----------------------- ----------- --------------- ----- --------------
+Mathematics   Applied Linear          Michael Kutner,         McGraw Hill 9780073108742   1396  Exercises, 
+              Statistical Models      William Li,                                               Illustrations,
+                                      Christopher Nachtsheim,                                   Readability
+                                      John Neter
+
+Mathematics   Mathematical Proofs:    Gary Chartrand,         Pearson     9780321390530   365   Exercises, 
+              A Transition to         Ping Zhang,                                               Readability
+              Advanced Mathematics    Albert Polimeni
+
+Mathematics   Mathematical Statistics Laura Chihara,          Wiley       9781118029855   418   Exercises,
+              with Resampling and R   Tim Hesterberg                                            Illustrations,
+                                                                                                Readability
+--------------------------------------------------------------------------------------------------------------
+
+```{r message=FALSE}
+library(httr)
+library(XML)
+library(jsonlite)
+```
+# HTML Format
+
+Web scraping, less structured. An HTML table is defined with the **\<table\>** tag. Each table row is defined with the **\<tr\>** tag. A table header is defined with the **\<th\>** tag. By default, table headings are bold and centered. A table data/cell is defined with the **\<td\>** tag.
+
+## Store Data in [HTML](http://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20607/books.html)
+
+    <table>
+      <tr>
+        <th>Subject</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Publisher</th>
+        <th>ISBN</th>
+        <th>Pages</th>
+        <th>Attributes</th>
+      </tr>
+      <tr>
+        <td>Mathematics</td>
+        <td>Applied Linear Statistical Models</td>
+        <td>Michael Kutner, William Li, Christopher Nachtsheim, John Neter</td>
+        <td>McGraw Hill</td>
+        <td>9780073108742</td>
+        <td>1396</td>
+        <td>Exercises, Illustrations, Readability</td>
+      </tr>
+      <tr>
+        <td>Mathematics</td>
+        <td>Mathematical Proofs: A Transition to Advanced Mathematics</td>
+        <td>Gary Chartrand, Ping Zhang, Albert Polimeni</td>
+        <td>Pearson</td>
+        <td>9780321390530</td>
+        <td>365</td>
+        <td>Exercises, Readability</td>
+      </tr>
+      <tr>
+        <td>Mathematics</td>
+        <td>Mathematical Statistics with Resampling and R</td>
+        <td>Laura Chihara, Tim Hesterberg</td>
+        <td>Wiley</td>
+        <td>9781118029855</td>
+        <td>418</td>
+        <td>Exercises, Illustrations, Readability</td>
+      </tr>
+    </table>
+
+## Load HTML into R 
+    
+```{r}
+html <- "https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20607/books.html"
+html <- GET(html)
+html <- rawToChar(html$content)
+html <- htmlParse(html)
+html <- readHTMLTable(html)
+HTML <- data.frame(html)
+```
+
+## References
+
+^i^ http://www.w3schools.com/html/html_tables.asp
+
+^ii^ http://www.w3schools.com/html/tryit.asp?filename=tryhtml%5Ftable%5Fintro
+
+# XML Format
+
+Web API, more structured. XML stands for EXtensible Markup Language. XML does not DO anything. XML is just information wrapped in tags. Someone must write a piece of software to send, receive, store, or display it. XML and HTML were designed with different goals. XML was designed to carry data - with focus on what data is. HTML was designed to display data - with focus on how data looks. XML tags are not predefined like HTML tags are. Many computer systems contain data in incompatible formats. Exchanging data between incompatible systems (or upgraded systems) is a time-consuming task for web developers. Large amounts of data must be converted, and incompatible data is often lost. XML stores data in plain text format. This provides a software- and hardware-independent way of storing, transporting, and sharing data. XML also makes it easier to expand or upgrade to new operating systems, new applications, or new browsers, without losing data.
+
+## Store Data in [XML](http://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20607/books.xml)
+
+    <textbooks>
+        <area id="1">
+            <subject>Mathematics</subject>
+                <book id="1">
+                    <title>Applied Linear Statistical Models</title>
+                    <publisher>McGraw Hill</publisher>
+                    <isbn>9780073108742</isbn>
+                    <pages>1396</pages>
+                    <author id="1">Michael Kutner</author>
+                    <author id="2">William Li</author>
+                    <author id="3">Christopher Nachtsheim</author>
+                    <author id="4">John Neter</author>
+                    <attribute id="1">Exercises</attribute>
+                    <attribute id="2">Illustrations</attribute>
+                    <attribute id="3">Readability</attribute>
+                </book>
+                <book id="2">
+                    <title>Mathematical Proofs: A Transition to Advanced Mathematics</title>
+                    <publisher>Pearson</publisher>
+                    <isbn>9780321390530</isbn>
+                    <pages>365</pages>
+                    <author id="1">Gary Chartrand</author>
+                    <author id="2">Ping Zhang</author>
+                    <author id="3">Albert Polimeni</author>
+                    <attribute id="1">Exercises</attribute>
+                    <attribute id="2">Readability</attribute>
+                </book>
+                <book id="3">
+                    <title>Mathematical Statistics with Resampling and R</title>
+                    <publisher>Wiley</publisher>
+                    <isbn>9781118029855</isbn>
+                    <pages>418</pages>
+                    <author id="1">Laura Chihara</author>
+                    <author id="2">Tim Hesterberg</author>
+                    <attribute id="1">Exercises</attribute>
+                    <attribute id="2">Illustrations</attribute>
+                    <attribute id="3">Readability</attribute>
+                </book>
+        </area>
+    </textbooks>
+    
+## Load XML into R
+```{r}
+xml <- "https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20607/books.xml"
+xml <- GET(xml)
+xml <- rawToChar(xml$content)
+xml <- xmlParse(xml)
+xml <- xmlToList(xml)
+XML <- data.frame(xml)
+```
+
+## References
+
+^iii^ http://www.w3schools.com/xml/default.asp
+
+^iv^ http://beautifytools.com/html-to-xml-converter.php
+
+# JSON Format
+
+Web API, more structured. JSON stands for JavaScript Object Notation. The JSON format is syntactically identical to the code for creating JavaScript objects. Because of this similarity, instead of using a parser (like XML does), a JavaScript program can use standard JavaScript functions to convert JSON data into native JavaScript objects. XML has to be parsed with an XML parser. JSON can be parsed by a standard JavaScript function. For AJAX applications, JSON is faster and easier than XML.
+
+## Store Data in [JSON](http://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20607/books.json)
+
+    {"Mathematics": 
+        {"book": [
+            {
+                "title": "Applied Linear Statistical Models",
+                "publisher": "McGraw Hill",
+                "isbn": "9780073108742",
+                "pages": "1396",
+                "author": [
+                    "Michael Kutner",
+                    "William Li",
+                    "Christopher Nachtsheim",
+                    "John Neter"
+                ],
+                "attribute": [
+                    "Exercises",
+                    "Illustrations",
+                    "Readability"
+                ]
+            },
+            {
+               "title": "Mathematical Proofs: A Transition to Advanced Mathematics",
+                "publisher": "Pearson",
+                "isbn": "9780321390530",
+                "pages": "365",
+                "author": [
+                    "Gary Chartrand",
+                    "Ping Zhang",
+                    "Albert Polimeni"
+                ],
+                "attribute": [
+                    "Exercises",
+                    "Readability"
+                ]
+            },
+            {
+                "title": "Mathematical Statistics with Resampling and R",
+                "publisher": "Wiley",
+                "isbn": "9781118029855",
+                "pages": "418",
+                "author": [
+                    "Laura Chihara",
+                    "Tim Hesterberg"
+                ],
+                "attribute": [
+                    "Exercises",
+                    "Illustrations",
+                    "Readability"
+                 ]
+            }
+        ]}
+    }
+
+## Load JSON into R
+```{r}
+json <- "https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20607/books.json"
+json <- GET(json)
+json <- rawToChar(json$content)
+json <- fromJSON(json)
+JSON <- data.frame(json)
+```
+
+## References
+
+^v^ http://www.w3schools.com/js/js%5Fjson%5Fintro.asp
+
+^vi^ http://beautifytools.com/html-to-json-converter.php
+
+^vii^ http://beautifytools.com/xml-to-json-converter.php
+
+# View Data Frames
+
+```{r}
+HTML
+XML
+JSON
+```
+
+# Comparison
+
+The data frames are not identical. According to *Automated Data Collection with R*:
+
+> XML and other data exchange formats like JSON can store much more complicated data structures. This is what makes them so powerful for data exchange over the Web. Forcing such structures into one common data frame comes at a certain cost-complicated data transformation tasks or the loss of information. xmlToDataFrame() is not an almighty function to achieve the task for which it is named. Rather, we are typically forced to develop and apply own extraction functions.
