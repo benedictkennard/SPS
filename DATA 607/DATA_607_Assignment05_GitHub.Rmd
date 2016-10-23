@@ -1,0 +1,68 @@
+---
+title: "Assignment - Web APIs"
+author: "Jose Zuniga"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '2'
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Assignment Instructions
+
+The New York Times web site provides a rich set of APIs, as described here: http://developer.nytimes.com/docs
+
+You'll need to start by signing up for an API key. Your task is to choose one of the New York Times APIs, construct an interface in R to read in the JSON data, and transform it to an R dataframe.
+
+# Article Search API
+
+With the New York Times [Article Search API](http://developer.nytimes.com/article_search_v2.json), you can search New York Times articles from September 18, 1851 to today, retrieving headlines, abstracts, lead paragraphs, links to associated multimedia, and other article metadata. Note: In URI examples and field names, italics indicate placeholders for variables or values. Brackets [ ] indicate optional items. Parentheses ( ) are not a convention-- when URIs include parentheses, interpret them literally. 
+
+**Note:** The value of *page* corresponds to a set of $10$ results. For example, *page* $=0$ correspondents to records $0$ to $9$; and *page* $=1$ correspondents to records $10$ to $19$. Also, ach API is limited to $1,000$ calls per day, and $5$ calls per second.
+```{r echo=FALSE}
+Hidden_API_Key <- "XXXXXXXXXXXX"
+```
+```{r cache=TRUE}
+library(httr)
+library(jsonlite)
+
+query <- "CUNY School of Professional Studies"
+results <- 500
+
+NYT_Articles <- function(query, results) {
+  NYT <- data <- {}
+  set <- 0:(results / 10 - 1)
+  for (i in 1:max(set)) {
+    url <- paste0("https://api.nytimes.com/svc/search/v2/articlesearch.json?q=",
+                  gsub(" ", "\\+", query), "&page=", i,"&api-key=", Hidden_API_Key)
+    json <- GET(url)
+    json <- rawToChar(json$content)
+    json <- fromJSON(json, simplifyVector = TRUE)
+    if (length(json$response[[2]]) ==0 ) { break }
+    data <- data.frame(json)
+    data[,12] <- data[,12][1]
+    data <- data[,c(4:8,12,14,16,17,20,22)]
+    NYT <- data.frame(rbind(NYT, data))
+    if (i %% 5) { Sys.sleep(2) }
+  }
+  colnames(NYT) <- gsub("\\.1", "", colnames(NYT))
+  colnames(NYT) <- gsub("\\w+\\.", "", colnames(NYT))
+  return(NYT)
+}
+NYT <- NYT_Articles(query, results)
+t(head(NYT, 1))
+```
+
+# References
+
+http://developer.nytimes.com/article_search_v2.json#/README
+
+http://web.stanford.edu/~cengel/cgi-bin/anthrospace/scraping-new-york-times-articles-with-r [(cached)](http://webcache.googleusercontent.com/search?q=cache:-Kr1l1uZr34J:web.stanford.edu/~cengel/cgi-bin/anthrospace/scraping-new-york-times-articles-with-r+&cd=2&hl=en&ct=clnk&gl=us)
+
+http://web.stanford.edu/~cengel/cgi-bin/anthrospace/wp-content/uploads/2009/09/scrapeNYT_API2.txt
