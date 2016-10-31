@@ -1,0 +1,182 @@
+---
+title: "Assignment - Document Classification"
+author: "Jose Zuniga"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '2'
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Assignment Instructions
+
+It can be useful to be able to classify new "test" documents using already classified "training" documents.  A common example is using a corpus of labeled spam and ham (non-spam) e-mails to predict whether or not a new document is spam.  
+
+For this project, you can start with a spam/ham dataset, then predict the class of new documents (either withheld from the training dataset or from another source such as your own spam folder). One example corpus:  https://spamassassin.apache.org/publiccorpus/
+
+```{r message=F}
+library(tm)
+library(RCurl)
+library(dplyr)
+library(stringr)
+library(SnowballC)
+library(wordcloud)
+library(RTextTools)
+```
+
+# Obtain Dataset
+
+The spam and ham datasets from [Apache SpamAssassin Project](https://spamassassin.apache.org/publiccorpus/) had to be unzipped twice manually. The files were then manually uploaded to GitHub before being read into **R**. 
+```{r cache=T}
+base_url <- "https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20607/spamham/"
+cmds_spam <- read.table(paste0(base_url, "spam_2/cmds"), 
+            quote="\"", comment.char="", stringsAsFactors = F)[ , 3]
+cmds_ham <- read.table(paste0(base_url, "easy_ham/cmds"), 
+            quote="\"", comment.char="", stringsAsFactors = F)[ , 3]
+
+spam <- ham <- character()
+for (i in 1:max(length(cmds_spam), length(cmds_ham))) {
+  url_ham <- paste0(base_url,"easy_ham/",cmds_ham[i])
+  url_spam <- paste0(base_url,"spam_2/",cmds_spam[i])  
+  if (url.exists(url_ham))  { ham  <- append(getURL(url_ham), ham)   }
+  if (url.exists(url_spam)) { spam <- append(getURL(url_spam), spam) }
+}
+```
+The file names did not have an simple pattern to loop through. Each unzipped folder however, did contain a **cmds** file which outlines the file names in their respective folder. The file names are contained in the  third column. There is a gap in the sequence numbers of the files which requires use of the **url.exists()** function as a check.
+
+# Clean Data Obtained
+```{r cache=T}
+ham <- ham %>% 
+  str_replace_all("<.*?>", " html_tag ") %>% str_replace_all("([^[:alnum:]]){5,}", " ") %>% 
+  str_replace_all("[[:alnum:].-_]+@{1}([[:alnum:].-_]+){2,5}", " email_address ") %>%
+  str_replace_all("(https?:\\/\\/)?([[:alnum:].-_])+\\.([[:alnum:].-_/])+", " clickable_link ")
+spam <- spam %>% 
+  str_replace_all("<.*?>", " html_tag ") %>% str_replace_all("([^[:alnum:]]){5,}", " ") %>% 
+  str_replace_all("[[:alnum:].-_]+@{1}([[:alnum:].-_]+){2,5}", " email_address ") %>%
+  str_replace_all("(https?:\\/\\/)?([[:alnum:].-_])+\\.([[:alnum:].-_/])+", " clickable_link ")
+ham <- paste(ham %>% str_extract_all("(Subject: ).*") %>% str_replace_all("Subject: ", ""),
+  ham %>% str_extract("(\n\n)(.*\n)+" ) %>% str_replace_all("\n", " "))
+spam <- paste(spam %>% str_extract_all("(Subject: ).*") %>% str_replace_all("Subject: ", ""),
+  spam %>% str_extract("(\n\n)(.*\n)+" ) %>% str_replace_all("\n", " "))
+ham <- iconv(ham, from = "latin1", to = "UTF-8")
+spam <- iconv(spam, from = "latin1", to = "UTF-8")
+```
+HTML tags, email addresses, and hyperlinks appear frequently in varying forms throughout every document. In order to get counts of how many times they appear in a message, they have been generalized to html\_tag, email\_address, and clickable\_link; respectively. Last, the subject and body of the messages are extracted, and Latin characters removed.
+
+# Read Data into Term Document Matrix
+
+A document-term matrix or term-document matrix is a mathematical matrix that describes the frequency of terms that occur in a collection of documents. In a document-term matrix, rows correspond to documents in the collection and columns correspond to terms.
+
+## Create Corpus and Classify
+```{r}
+corpus_ham <- ham %>% VectorSource() %>% Corpus()
+  meta(corpus_ham, "Spam") <- 0
+corpus_spam <- spam %>% VectorSource() %>% Corpus()
+  meta(corpus_spam, "Spam") <- 1
+(corpus <- c(corpus_spam, corpus_ham))
+```
+A corpus is the central element for text operations in the **tm** package. The text is first wrapped in a **VectorSource()** function call. This specifies that the corpus is being created from text which is stored in a character vector. A  corpus is then created by calling the **Corpus()** function. The **meta()** function adds meta information to the text.
+
+```{r}
+par(mfrow = c(1, 2))
+wordcloud(corpus_ham, scale=c(4,0.5), 
+          max.words=100, 
+          random.order=FALSE, 
+          rot.per=0.35, 
+          use.r.layout=FALSE, 
+          colors=brewer.pal(8, "Dark2"))
+title(main="Ham Messages")
+wordcloud(corpus_spam, scale=c(4,0.5), 
+          max.words=100, 
+          random.order=FALSE, 
+          rot.per=0.35, 
+          use.r.layout=FALSE, 
+          colors=brewer.pal(8, "Dark2"))
+title(main="Spam Messages")
+```
+
+## Create Term Document Matrix
+```{r cache=T}
+(tdm <- corpus %>% 
+  tm_map(removePunctuation) %>% tm_map(removeNumbers) %>%
+  tm_map(removeWords, words = stopwords("en")) %>% 
+  tm_map(content_transformer(tolower)) %>%
+  tm_map(stemDocument) %>% DocumentTermMatrix() %>% 
+  removeSparseTerms(1 - (10 / length(corpus))))
+```
+The following are removed from the corpus in preparation for conversion into a term document matrix: punctuations, numbers, stop words (the most common words in a language that appear quite frequently in all text). Removal of stop words is performed more in order to increase computational performance and less in order to improve the estimation procedures. All text is also converted to lower case and all terms are reduced to their stem. This operation reduces the terms in documents to their stem so that words that have the same root can be combined. Many statistical analyses of text will perform a stemming of terms prior to the estimation. After the term document matrix is set, sparse terms that appear in ten documents or less are removed.
+
+# Supervised Learning Techniques
+
+The supervised in the term reflects the commonality of classifiers in this class that some pre-coded data are used to estimate membership of non-classified documents. The pre-coded data are called the training dataset. The major advantage of supervised classifiers is that they provide researchers with the opportunity to specify a classification scheme of their choosing.
+
+## Estimation Using Three Supervised Classifiers
+```{r cache=T}
+classes <- unlist(meta(corpus, "Spam"))
+a <- length(corpus_spam) * 2; b <- length(corpus)
+container <- create_container(tdm, labels = classes,
+  trainSize = 1:a, testSize = (a + 1):b, virgin = F)
+svm <- classify_model(container, train_model(container, "SVM"))
+tree <- classify_model(container, train_model(container, "TREE"))
+maxent <- classify_model(container, train_model(container, "MAXENT"))
+```
+**Support Vector Machine (SVM)** is currently one of the most well-known and most commonly applied classifiers in supervised learning. The SVM employs a spatial representation of the data. SVMs fit vectors between the document features that best separate the documents into the various groups. Specifically, vectors are selected in a way that they maximize the space between the groups. After the estimation new documents are classified by checking on which sides of the vectors the features of unlabeled documents come to lie.
+
+The **Random Forest** classifier creates multiple decision trees and takes the most frequently predicted membership category of many decision trees as the classification that is most likely to be accurate. A single decision tree consists of several layers that consecutively ask whether a particular feature is present or absent in a document. The random forest classifier is an extension of the decision tree in that it generates multiple decision trees and makes predictions based on the most frequent prediction from the various decision trees.
+
+The **maximum Entropy** classifier is analogous to the multinomial logit model which is a generalization of the logit model. The logit model predicts the probability of belonging to one of two categories. The multinomial logit model generalizes this model to a situation where the dependent variable has more than two categories. 
+
+## Evaluation of Three Supervised Classifiers
+```{r}
+cbind("LABEL" = 0, 
+      "SVM_PROB" = head(svm)[ , 2], 
+      "TREE_PROB" = head(tree)[ , 2], 
+      "MAXENTROPY_PROB" =head(maxent)[ , 2])
+labels <- data.frame(
+  correct_label = classes[(a + 1):b],
+  svm = as.character(svm[ , 1]),
+  tree = as.character(tree[ , 1]),
+  maxent = as.character(maxent[ , 1]),
+  stringAsFactors = F)
+svm_perf <- table(labels[ , 1] == labels[ , 2])
+tree_perf <- table(labels[ , 1] == labels[ , 3])
+maxent_perf <- table(labels[ , 1] == labels[ , 4])
+prop.table(svm_perf)
+prop.table(tree_perf)
+prop.table(maxent_perf)
+```
+The maximum entropy classifier correctly classified `r maxent_perf[[2]]` out of `r b - (a + 1) + 1`, or about `r round(prop.table(maxent_perf)[2], 4) * 100`% of the documents correctly. The SVM fared just a little worse and got `r svm_perf[[2]]` out of `r b - (a + 1) + 1`, or about `r round(prop.table(svm_perf)[2], 4) * 100`% of the documents right. The worst classifier in this application is the random forest classifier, which correctly estimates the publishing organization in merely `r tree_perf[[2]]` or `r round(prop.table(tree_perf)[2], 4) * 100`% of the `r b - (a + 1) + 1` cases.
+
+```{r}
+par(mfrow = c(1,2))
+pie(table(rep(T, b - (a + 1) + 1)), main = "Real Spam", col = c("blue", "red"))
+pie(maxent_perf, main = "Maximum Entropy", col = c("red", "blue"))
+pie(svm_perf, main = "SVM", col = c("red", "blue"))
+pie(tree_perf, main = "Random Forest", col = c("red", "blue"))
+```
+
+# References
+
+Automated Data Collection with R [2015] 
+
+http://online.b1.org/online
+
+http://www.convertfiles.com/
+
+https://www.youtube.com/watch?v=6IzhRaSePKU
+
+https://spamassassin.apache.org/publiccorpus/
+
+https://en.wikipedia.org/wiki/Document-term_matrix
+
+http://stackoverflow.com/questions/25551514/termdocumentmatrix-errors-in-r
+
+http://www.exegetic.biz/blog/2013/09/text-mining-the-complete-works-of-william-shakespeare/
+
+https://www.r-bloggers.com/text-mining-the-complete-works-of-william-shakespeare/
