@@ -4,10 +4,10 @@ author: "Jose Zuniga"
 output:
   html_document:
     toc: yes
-    toc_depth: '2'
+    toc_depth: '3'
   pdf_document:
     toc: yes
-    toc_depth: '2'
+    toc_depth: '3'
 ---
 
 ```{r setup, include=FALSE}
@@ -74,7 +74,7 @@ HTML tags, email addresses, and hyperlinks appear frequently in varying forms th
 A document-term matrix or term-document matrix is a mathematical matrix that describes the frequency of terms that occur in a collection of documents. In a document-term matrix, rows correspond to documents in the collection and columns correspond to terms.
 
 ## Create Corpus and Classify
-```{r}
+```{r cache=T}
 corpus_ham <- ham %>% VectorSource() %>% Corpus()
   meta(corpus_ham, "Spam") <- 0
 corpus_spam <- spam %>% VectorSource() %>% Corpus()
@@ -83,7 +83,7 @@ corpus_spam <- spam %>% VectorSource() %>% Corpus()
 ```
 A corpus is the central element for text operations in the **tm** package. The text is first wrapped in a **VectorSource()** function call. This specifies that the corpus is being created from text which is stored in a character vector. A  corpus is then created by calling the **Corpus()** function. The **meta()** function adds meta information to the text.
 
-```{r}
+```{r cache=T}
 par(mfrow = c(1, 2))
 wordcloud(corpus_ham, scale=c(4,0.5), 
           max.words=100, 
@@ -116,7 +116,7 @@ The following are removed from the corpus in preparation for conversion into a t
 
 The supervised in the term reflects the commonality of classifiers in this class that some pre-coded data are used to estimate membership of non-classified documents. The pre-coded data are called the training dataset. The major advantage of supervised classifiers is that they provide researchers with the opportunity to specify a classification scheme of their choosing.
 
-## Estimation Using Three Supervised Classifiers
+## Estimation Using Different Supervised Classifiers
 ```{r cache=T}
 classes <- unlist(meta(corpus, "Spam"))
 a <- length(corpus_spam) * 2; b <- length(corpus)
@@ -124,6 +124,7 @@ container <- create_container(tdm, labels = classes,
   trainSize = 1:a, testSize = (a + 1):b, virgin = F)
 svm <- classify_model(container, train_model(container, "SVM"))
 tree <- classify_model(container, train_model(container, "TREE"))
+forest <- classify_model(container, train_model(container, "RF"))
 maxent <- classify_model(container, train_model(container, "MAXENT"))
 ```
 **Support Vector Machine (SVM)** is currently one of the most well-known and most commonly applied classifiers in supervised learning. The SVM employs a spatial representation of the data. SVMs fit vectors between the document features that best separate the documents into the various groups. Specifically, vectors are selected in a way that they maximize the space between the groups. After the estimation new documents are classified by checking on which sides of the vectors the features of unlabeled documents come to lie.
@@ -132,51 +133,140 @@ The **Random Forest** classifier creates multiple decision trees and takes the m
 
 The **maximum Entropy** classifier is analogous to the multinomial logit model which is a generalization of the logit model. The logit model predicts the probability of belonging to one of two categories. The multinomial logit model generalizes this model to a situation where the dependent variable has more than two categories. 
 
-## Evaluation of Three Supervised Classifiers
+### Other Supervised Classifiers
+
+The **RTextTools** packagein **R** includes the following nine algorithms for ensemble classification:
+  
+  + **SVM**: Support Vector Machine
+  + **SLDA**: Supervised Latent Dirichlet Allocation
+  + **BOOSTING**: Boosting (Machine Learning)
+  + **BAGGING**: Bagging (Bootstrap Aggregating)
+  + **RF**: Random Forests
+  + **GLMNET**:  Net Regularized Generalized Linear Model
+  + **TREE**: Decision Trees
+  + **NNET**: Neural Networks
+  + **MAXENT**: Maximum Entropy
+
+## Evaluation of Supervised Classifiers Applied
 ```{r}
 cbind("LABEL" = 0, 
       "SVM_PROB" = head(svm)[ , 2], 
       "TREE_PROB" = head(tree)[ , 2], 
+      "RANDFOREST_PROB" = head(forest)[ , 2], 
       "MAXENTROPY_PROB" =head(maxent)[ , 2])
 labels <- data.frame(
   correct_label = classes[(a + 1):b],
   svm = as.character(svm[ , 1]),
   tree = as.character(tree[ , 1]),
+  forest = as.character(forest[ , 1]),
   maxent = as.character(maxent[ , 1]),
   stringAsFactors = F)
 svm_perf <- table(labels[ , 1] == labels[ , 2])
 tree_perf <- table(labels[ , 1] == labels[ , 3])
-maxent_perf <- table(labels[ , 1] == labels[ , 4])
+forest_perf <- table(labels[ , 1] == labels[ , 4])
+maxent_perf <- table(labels[ , 1] == labels[ , 5])
 prop.table(svm_perf)
 prop.table(tree_perf)
+prop.table(forest_perf)
 prop.table(maxent_perf)
 ```
-The maximum entropy classifier correctly classified `r maxent_perf[[2]]` out of `r b - (a + 1) + 1`, or about `r round(prop.table(maxent_perf)[2], 4) * 100`% of the documents correctly. The SVM fared just a little worse and got `r svm_perf[[2]]` out of `r b - (a + 1) + 1`, or about `r round(prop.table(svm_perf)[2], 4) * 100`% of the documents right. The worst classifier in this application is the random forest classifier, which correctly estimates the publishing organization in merely `r tree_perf[[2]]` or `r round(prop.table(tree_perf)[2], 4) * 100`% of the `r b - (a + 1) + 1` cases.
+The maximum entropy classifier correctly classified `r maxent_perf[[2]]` out of `r b - (a + 1) + 1`, or about `r round(prop.table(maxent_perf)[2], 4) * 100`% of the documents correctly. The Random Forest fared just a little worse and got `r forest_perf[[2]]` out of `r b - (a + 1) + 1`, or about `r round(prop.table(forest_perf)[2], 4) * 100`% of the documents right. In third was the SVM that got `r svm_perf[[2]]` out of `r b - (a + 1) + 1`, or about `r round(prop.table(svm_perf)[2], 4) * 100`% of the documents correct. The worst classifier in this application is the decision tree classifier, which correctly estimates the publishing organization in merely `r tree_perf[[2]]` or `r round(prop.table(tree_perf)[2], 4) * 100`% of the `r b - (a + 1) + 1` cases.
 
 ```{r}
 par(mfrow = c(1,2))
-pie(table(rep(T, b - (a + 1) + 1)), main = "Real Spam", col = c("blue", "red"))
 pie(maxent_perf, main = "Maximum Entropy", col = c("red", "blue"))
+pie(forest_perf, main = "Random Forest", col = c("red", "blue"))
 pie(svm_perf, main = "SVM", col = c("red", "blue"))
-pie(tree_perf, main = "Random Forest", col = c("red", "blue"))
+pie(tree_perf, main = "Decision Tree", col = c("red", "blue"))
 ```
 
-# References
+# Dictionary-Based Sentiment Analysis
 
-Automated Data Collection with R [2015] 
+The simplest way to score the sentiment of a text is to count the positively and negatively charged terms in a document. The [dictionary](https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html#lexicon) that is provided by Hu and Liu (2004) and Liu et al. (2005) consists of two lists of several thousand terms that reveal the sentiment orientation of a text.
+
+## Load and Clean Dictionaries
+```{r}
+pos <- readLines("https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20607/positive-words.txt")
+pos <- pos[36:length(pos)]
+pos <- stemDocument(pos, language = "english")
+pos <- pos[!duplicated(pos)]
+neg <- readLines("https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20607/negative-words.txt")
+neg <- neg[36:length(neg)]
+neg <- stemDocument(neg, language = "english")
+neg <- neg[!duplicated(neg)]
+```
+The files are loaded and irrelevant introductory lines are discarded. The lists are then stemed and duplicates discarded.
+
+## Compute Sentiments
+
+In an ordinary term-document matrix, the frequency of the terms in the texts would be displayed in the cells. Here each term is counted only once by adding the control option weighting, regardless of the frequency with which it appears in the text. The textbook argues that the simple presence or absence of the terms in the texts is a more robust summary indicator of the sentiment orientation of the texts.
+
+### Sentiments in Ham
+
+```{r  cache=T}
+tdm_ham <- corpus_ham %>% 
+  tm_map(removePunctuation) %>% tm_map(removeNumbers) %>%
+  tm_map(removeWords, words = stopwords("en")) %>% 
+  tm_map(content_transformer(tolower)) %>%
+  tm_map(stemDocument) %>% 
+  TermDocumentMatrix(control = list(weighting = weightBin)) %>% 
+  removeSparseTerms(1 - (10 / length(corpus_ham)))
+pos_ham <- apply(tdm_ham[rownames(tdm_ham) %in% pos, ], 2, sum)
+neg_ham <- apply(tdm_ham[rownames(tdm_ham) %in% neg, ], 2, sum)
+sentiment_diff_ham <- pos_ham - neg_ham
+sentiment_diff_ham[sentiment_diff_ham == 0] <- NA
+(count_ham <- data.frame(pos = sum(pos_ham), neg = sum(neg_ham)))
+(sentiment_ham <- summary(sentiment_diff_ham))
+```
+The ham contains `r format(count_ham$pos, scientific = F)` postive and `r format(count_ham$neg, scientific = F)` negative terms. The mean message is positive with `r sentiment_ham[[4]]` positive words on average. The most positive text contains a net of `r sentiment_ham[[6]]` positive terms and the least positive text contains a net of `r sentiment_ham[[1]]` positive terms. Such variance highlights  the obstacle of extreme variation in the length of the messages.
+```{r}
+range(nchar(corpus_ham))
+```
+
+### Sentiments in Spam
+
+```{r}
+tdm_spam <- corpus_spam %>% 
+  tm_map(removePunctuation) %>% tm_map(removeNumbers) %>%
+  tm_map(removeWords, words = stopwords("en")) %>% 
+  tm_map(content_transformer(tolower)) %>%
+  tm_map(stemDocument) %>% 
+  TermDocumentMatrix(control = list(weighting = weightBin)) %>% 
+  removeSparseTerms(1 - (10 / length(corpus_spam)))
+pos_spam <- apply(tdm_spam[rownames(tdm_spam) %in% pos, ], 2, sum)
+neg_spam <- apply(tdm_spam[rownames(tdm_spam) %in% neg, ], 2, sum)
+sentiment_diff_spam <- pos_spam - neg_spam
+sentiment_diff_spam[sentiment_diff_spam == 0] <- NA
+(count_spam <- data.frame(pos = sum(pos_spam), neg = sum(neg_spam)))
+(sentiment_spam <- summary(sentiment_diff_spam))
+```
+The ham contains `r format(count_spam$pos, scientific = F)` postive and `r format(count_spam$neg, scientific = F)` negative terms. The mean message is positive with `r sentiment_spam[[4]]` positive words on average. The most positive text contains a net of `r sentiment_spam[[6]]` positive terms and the least positive text contains a net of `r sentiment_spam[[1]]` positive terms. Such variance highlights the obstacle of extreme variation in the length of the messages.
+```{r}
+range(nchar(corpus_spam))
+```
+
+## Conclusion
+
+Spam is `r round(count_spam$pos / sum(count_spam), 4) * 100`% postive while ham is `r round(count_ham$pos / sum(count_ham), 4) * 100`% positive. Given that spam tends to be marketing, this finding seems to follow intuitions rather appropriately. It is surprising however to see that an overall positive sentiment prevails in ham since ham is generally just standard communication.
+
+# References
 
 http://online.b1.org/online
 
 http://www.convertfiles.com/
 
-https://www.youtube.com/watch?v=6IzhRaSePKU
-
 https://spamassassin.apache.org/publiccorpus/
 
+https://www.youtube.com/watch?v=6IzhRaSePKU
+
 https://en.wikipedia.org/wiki/Document-term_matrix
+
+https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html
 
 http://stackoverflow.com/questions/25551514/termdocumentmatrix-errors-in-r
 
 http://www.exegetic.biz/blog/2013/09/text-mining-the-complete-works-of-william-shakespeare/
 
 https://www.r-bloggers.com/text-mining-the-complete-works-of-william-shakespeare/
+
+Automated Data Collection with R [2015] 
