@@ -1,0 +1,23 @@
+"Cause","YEAR","tdeath","DeathRate"
+"Assault (Homicide)",2000,711,8.9
+"Assault (Homicide)",2001,669,8.3
+"Assault (Homicide)",2002,612,7.6
+"Assault (Homicide)",2003,654,8.1
+"Assault (Homicide)",2004,597,7.4
+"Assault (Homicide)",2005,578,7.2
+"Assault (Homicide)",2006,624,7.8
+"Assault (Homicide)",2007,513,6.4
+"Assault (Homicide)",2008,556,6.8
+"Assault (Homicide)",2009,496,6.1
+"Assault (Homicide)",2010,547,6.6
+"Assault (Homicide)",2011,528,6.4
+"Assault (Homicide)",2012,440,5.3
+"Assault (Homicide)",2013,341,4.1
+"Assault (Homicide)",2014,353,4.2
+
+Data downloaded: 02NOV16:17:58
+
+Rates based on small numbers (RSE > 30) as well as aggregate counts less than 5 have been suppressed in downloaded data
+
+Source: Bureau of Vital Statistics, New York City Department of Health and Mental Hygiene
+
