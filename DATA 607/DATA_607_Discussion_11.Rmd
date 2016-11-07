@@ -6,14 +6,19 @@ https://cloud.google.com/prediction/docs/scenarios#purchaseprediction
 1.  Scenario Design analysis:  
 
   a.  Who are your target users? Businesses.
+  
   b.  What are their key goals? Increase sales.
+  
   c.  How can you help them achieve their goals? Analyze purchase history of customers.
+  
   d.  Does it makes sense to perform scenario design twice, once for the organization and once for the organization's customers? Yes. This is a service for businesses that must ultimately be tailored for each company's respective customers.
   
 2.  Attempt to reverse engineer what you can about the site, from the site interface and any available information that you can find on the Internet or elsewhere. 
 
   a.  Create training data with n features: For example: The number of times the customer has bought fancy dessert cheese; a value of 1 if the customer has ever bought wine, and 0 if not; the number of times the customer has bought beer; etc.)
+  
   b.  Model Purchase Behavior through correlations
+  
   c.  Deploy model to predict purchases
 
 3.  Include specific recommendations about how to improve the site's recommendation capabilities going forward. 
