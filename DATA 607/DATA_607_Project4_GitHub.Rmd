@@ -1,0 +1,125 @@
+---
+title: "Project - NoSQL Migration"
+author: "Jose Zuniga"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+  html_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Project Instructions
+
+Take information from a relational database and migrate it to a NoSQL database. The relational database can be the *flights* database, the *tb* database, the *data skills* database from Project 3, or any another database. The NoSQL database can be *MongoDB*, *Neo4j*, or any another NoSQL database. The migration process needs to be reproducible. `R` code is encouraged, but not required. Also briefly describe the advantages and disadvantages of storing the data in a relational database versus a NoSQL database.
+
+# Pull Data from Relational Database
+
+```{r echo=FALSE}
+MySQL_Username <- "XXXXXXXXXX"
+MySQL_Password <- "XXXXXXXXXX"
+```
+```{r message=FALSE, warning=FALSE}
+library(RMySQL)
+```
+```{r cache=TRUE}
+connection <- dbConnect(MySQL(), user=MySQL_Username, password=MySQL_Password)
+dbSendQuery(connection, 'USE Flights;')
+Airlines <- dbGetQuery(connection, "SELECT * FROM Airlines;")
+Airports <- dbGetQuery(connection, "SELECT * FROM Airports;")
+Flights <- dbGetQuery(connection, "SELECT * FROM Flights;")
+Planes <- dbGetQuery(connection, "SELECT * FROM Planes;")
+Weather <- dbGetQuery(connection, "SELECT * FROM Weather;")
+dbDisconnect(connection)
+```
+
+# Function to Convert Data to JSON
+
+```{r message=FALSE, warning=FALSE}
+library(jsonlite)
+```
+```{r}
+convert <- function(x){
+  JSON <- toJSON(x)
+  JSON <- gsub("\\[", "{", JSON)
+  JSON <- gsub("\\]", "}", JSON)
+  JSON <- as.character(JSON)
+  return(JSON)
+}
+```
+
+# Migrate to NoSQL Database
+```{r message=FALSE, warning=FALSE}
+library(RMongo)
+```
+```{r}
+connection <- mongoDbConnect("Flights", host = "localhost", port = 27017)
+dbInsertDocument(connection, 'Airlines', convert(Airlines))
+dbInsertDocument(connection, 'Airports', convert(Airports))
+dbInsertDocument(connection, 'Flights', convert(Flights))
+dbInsertDocument(connection, 'Planes', convert(Planes))
+dbInsertDocument(connection, 'Weather', convert(Weather))
+dbShowCollections(connection)
+dbGetQuery(connection, "Airlines", "")
+dbGetQuery(connection, "Airports", "")
+dbGetQuery(connection, "Flights", "")
+dbGetQuery(connection, "Planes", "")
+dbGetQuery(connection, "Weather", "")
+dbRemoveQuery(connection, 'Airlines', convert(Airlines))
+dbRemoveQuery(connection, 'Airports', convert(Airports))
+dbRemoveQuery(connection, 'Flights', convert(Flights))
+dbRemoveQuery(connection, 'Planes', convert(Planes))
+dbRemoveQuery(connection, 'Weather', convert(Weather))
+dbGetQuery(connection, "Airlines", "")
+dbGetQuery(connection, "Airports", "")
+dbGetQuery(connection, "Flights", "")
+dbGetQuery(connection, "Planes", "")
+dbGetQuery(connection, "Weather", "")
+dbDisconnect(connection)
+```
+
+# Comparison
+
+<center>**Column-based versus Row-based Storage**</center>
+<center><br>![](http://1.bp.blogspot.com/-6jBw9eigO3c/URSBQh1WmMI/AAAAAAAAAXI/RVqNWUGQ35U/s640/sharding-comparison.png)<br><br></center>
+
+|RDBMS                                |NoSQL                              |
+|:-----------------------------------:|:---------------------------------:|
+|MySQL, Postgres, Oracle Database     |MongoDB, Cassandra, HBase, Neo4j   |
+|Relational schema                    |Schema-free                        |
+|Strong Consistency                   |Strong/Eventual Consistency        |
+|Stores individual records            |Storage model Varies               |
+|Scalable reads                       |Scalable writes/reads              |
+|Custom high-availability (Vertical)  |Auto high-availability (Horizontal)|
+|Flexible queries (SQL)               |Limited queries (APIs)             |
+|Closed/open source                   |Open source                        |
+|Supports transactions                |Transactions may be limited        |
+|ACID                                 |BASE                               |
+
+Most NoSQL databases are designed more for performance than data integrity. NoSQL databases do not have a relational schema like the standard RDMS. This has an impact on the consistency of the NoSQL databases. RDMS data is stored as individual records, but NoSQL databases have various models including models that "do away with the table-and-row model altogether" which can help boost performance. NoSQL databases are better for data that requires a lot of reads and writes. NoSQL databases automatically provide auto high-availability and disaster recovery by auto-sharding (partitioning) across many server instances. NoSQL databases have very limited query abilities however. The open-source development model of NoSQL can be considered both an advantage and disadvantage with arguments for reach being outside the scope of this comparison. Lastly, update transactions can be limited in NoSQL databases. 
+
+<center>**Different Data Storage Models**</center>
+<center>![](https://kvaes.files.wordpress.com/2015/01/1401269083847.jpg)</center>
+
+# References
+
+https://www.mongodb.com/nosql-inline
+
+http://dataconomy.com/sql-vs-nosql-need-know/
+
+https://www.devbridge.com/articles/benefits-of-nosql/
+
+https://cran.r-project.org/web/packages/RMongo/RMongo.pdf
+
+http://www.slideshare.net/nurulferdous/nosql-is-it-for-you
+
+http://stackoverflow.com/questions/25550711/convert-data-frame-to-json
+
+http://www.browniethoughts.com/2013/02/nosql-databases-introduction.html
+
+https://kvaes.wordpress.com/2015/01/21/database-variants-explained-sql-or-nosql-is-that-really-the-question/
