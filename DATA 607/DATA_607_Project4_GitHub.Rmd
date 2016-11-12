@@ -21,8 +21,10 @@ Take information from a relational database and migrate it to a NoSQL database. 
 # Pull Data from Relational Database
 
 ```{r echo=FALSE}
-MySQL_Username <- "XXXXXXXXXX"
-MySQL_Password <- "XXXXXXXXXX"
+MySQL_Username <- "XXXXXXXX"
+MySQL_Password <- "XXXXXXXX"
+op <- options()
+options(max.print=10)
 ```
 ```{r message=FALSE, warning=FALSE}
 library(RMySQL)
@@ -38,49 +40,68 @@ Weather <- dbGetQuery(connection, "SELECT * FROM Weather;")
 dbDisconnect(connection)
 ```
 
-# Function to Convert Data to JSON
-
-```{r message=FALSE, warning=FALSE}
-library(jsonlite)
-```
-```{r}
-convert <- function(x){
-  JSON <- toJSON(x)
-  JSON <- gsub("\\[", "{", JSON)
-  JSON <- gsub("\\]", "}", JSON)
-  JSON <- as.character(JSON)
-  return(JSON)
-}
-```
-
 # Migrate to NoSQL Database
+
+## MongoDB
+
+The **mongolite** package is more efficient than the **RMongo** package which requires conversion to `JSON`, string manipulation, and several lines of additional code using the below functions:
+
+    library(jsonlite)
+    library(RMongo)
+    convert <- function(x){
+      JSON <- toJSON(x)
+      JSON <- gsub("\\[", "{", JSON)
+      JSON <- gsub("\\]", "}", JSON)
+      JSON <- as.character(JSON)
+      return(JSON)
+    }
+    mongodb <- mongoDbConnect("Flights", host = "localhost", port = 27017)
+    dbInsertDocument(mongodb, 'Table', convert(Table))
+    dbShowCollections(mongodb)
+    dbGetQuery(mongodb, "Table", "{}")
+    dbRemoveQuery(mongodb, 'Table', convert(Table))\
+    dbDisconnect(mongodb)
+
+An empty query filter document ({}) selects all documents in the collection.
 ```{r message=FALSE, warning=FALSE}
-library(RMongo)
+library(mongolite)
 ```
 ```{r}
-connection <- mongoDbConnect("Flights", host = "localhost", port = 27017)
-dbInsertDocument(connection, 'Airlines', convert(Airlines))
-dbInsertDocument(connection, 'Airports', convert(Airports))
-dbInsertDocument(connection, 'Flights', convert(Flights))
-dbInsertDocument(connection, 'Planes', convert(Planes))
-dbInsertDocument(connection, 'Weather', convert(Weather))
-dbShowCollections(connection)
-dbGetQuery(connection, "Airlines", "")
-dbGetQuery(connection, "Airports", "")
-dbGetQuery(connection, "Flights", "")
-dbGetQuery(connection, "Planes", "")
-dbGetQuery(connection, "Weather", "")
-dbRemoveQuery(connection, 'Airlines', convert(Airlines))
-dbRemoveQuery(connection, 'Airports', convert(Airports))
-dbRemoveQuery(connection, 'Flights', convert(Flights))
-dbRemoveQuery(connection, 'Planes', convert(Planes))
-dbRemoveQuery(connection, 'Weather', convert(Weather))
-dbGetQuery(connection, "Airlines", "")
-dbGetQuery(connection, "Airports", "")
-dbGetQuery(connection, "Flights", "")
-dbGetQuery(connection, "Planes", "")
-dbGetQuery(connection, "Weather", "")
-dbDisconnect(connection)
+mongodb <- mongo(collection = "Flights")
+mongodb$insert(Airlines)
+mongodb$insert(Airports)
+mongodb$insert(Flights)
+mongodb$insert(Planes)
+mongodb$insert(Weather)
+mongodb$count()
+mongodb$drop()
+mongodb$count()
+rm(mongodb)
+```
+The connection through **mongolite** automatically disconnects when the connection is removed.
+
+## Neo4j
+
+A *Neo4j* database must be up and running in order to use **RNeo4j**. The **RNeo4j** `createNode` function returns a "collections containing mixed types cannot be stored in properties" error when nulls exist in the data. The function `unmix` changes nulls to the string "`NA`" as a work around. The *Flights* table is rather large with `r nrow(Flights)` rows and returns either a "Server error: (500) Internal Server Error" or a "Java heap space" error due the memory constraints on this machine. The function has been limited to the first $10^5$ rows for the sake of this assignment.
+```{r message=FALSE, warning=FALSE}
+library(RNeo4j)
+# system('"C:/Program Files/Neo4j CE 3.0.7/bin/neo4j-ce.exe"')
+unmix <- function(x) { x[is.na(x)] <- "NA"; return(x) }
+```
+```{r}
+graph = startGraph("http://localhost:7474/db/data/")
+clear(graph, input = FALSE)
+createNode(graph, "Airlines", unmix(Airlines))
+createNode(graph, "Airports", unmix(Airports))
+createNode(graph, "Flights", unmix(Flights[1:10^5, ]))
+createNode(graph, "Planes", unmix(Planes))
+createNode(graph, "Weather", unmix(Weather))
+options(op)
+(query <- cypher(graph, "MATCH (n) RETURN COUNT(n)"))
+clear(graph, input = FALSE)
+```
+```{r echo=FALSE}
+options(op)
 ```
 
 # Comparison
@@ -115,6 +136,16 @@ http://dataconomy.com/sql-vs-nosql-need-know/
 https://www.devbridge.com/articles/benefits-of-nosql/
 
 https://cran.r-project.org/web/packages/RMongo/RMongo.pdf
+
+https://docs.mongodb.com/v3.2/tutorial/query-documents/
+
+https://neo4j.com/developer/r/
+
+https://neo4j.com/blog/upload-last-fm-data-neo4j-rneo4j-transactional-endpoint/
+
+http://stackoverflow.com/questions/25295590/how-to-create-nodes-in-rneo4j-using-vectors-or-dataframes
+
+http://stackoverflow.com/questions/25530538/java-heap-space-error-neo4j
 
 http://www.slideshare.net/nurulferdous/nosql-is-it-for-you
 
