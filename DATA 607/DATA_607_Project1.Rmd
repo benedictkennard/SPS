@@ -25,8 +25,8 @@ If you have questions about the meaning of the data or the results, please post 
 ### (1) Import Data into R
 
 ```{r}
-tournamentinfo <- read.csv(paste0("C:/Users/josez/Google Drive/Education/Masters",
-                                  "/SPS/DATA 607/tournamentinfo.txt"), header=F)
+tournamentinfo <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123",
+                                  "/SPS/master/DATA%20607/tournamentinfo.txt"), header=F)
 head(tournamentinfo)
 ```
 The [raw data](https://github.com/jzuniga123/SPS/blob/master/DATA%20607/tournamentinfo.txt) has hyphens across every $(3n+1)th$ row to serparate the data for each subject which is written across both the $(3n+2)th$ row and the $(3n+3)th$ row.
@@ -71,6 +71,14 @@ csv <- data.frame(P_Name, P_State, P_Points, P_PreRating, O_PreRating); csv
 
 ### (7) Export Data to CSV File
 ```{r eval=FALSE}
-write.table(csv, file = "DATA_607_Project1.csv", sep = ",", col.names = T)
+write.table(csv, file = "DATA_607_Project1.csv", sep = ",", col.names = T, row.names = F)
 ```
 A copy of the exported .csv file can be found [here](https://github.com/jzuniga123/SPS/blob/master/DATA%20607/DATA_607_Project1.csv).
+
+## Data Dictionary
+
+* Pair Num for our purposes is just an ID number.  In "tournament scheduling" software, it would be used to communicate next round pairings -- "1" plays White vs. "8", etc.
+* RTG (Pre->Post) is the rating before the event, and the rating after the event, with the delta based on performance (based on score and strength of opponents).  This is based on a formula by a Minnesota statistician named Arpad Elo, and has been used to rank professional tennis players, and human resource job candidates.  You should use the pre-rating (1794 for Gary Hua) in the assignment. Gary gained 23 points, a good result.
+* ON means Ontario (State or province code).
+* N:2 indicates the player's current highest norm attained (e.g. master, expert, class A, like martial arts belts: Black, Brown, etc.)
+* W/B indicates whether player was assigned to play White (moves first) or Black in that game.
