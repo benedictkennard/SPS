@@ -1,18 +1,18 @@
 Category,Sub_Category,Description,First Atlantic,Dayton Beach,Dayton Towers,Ryerson Towers,Stryckers Bay,Luna Park,Northside Gardens,Rosedale Gardens,Franklin Plaza
-Grounds,Apartments,Residential,202,1144,1752,326,234,1573,41,406,1633
-Grounds,Apartments,Professional,0,4,0,2,0,0,0,0,0
-Grounds,Apartments,Rent-free Staff,1,3,6,1,1,1,0,1,2
-Grounds,Apartments,Other,0,0,0,0,0,2,0,0,0
-Grounds,Space,Professional,0,0,3,0,0,0,0,0,0
-Grounds,Space,Commercial,0,0,1,0,9,9,0,0,26
-Units,Rooms,Residential,884,5486,7334,1455.5,1067.5,7328.5,169.5,1878,7349
-Units,Rooms,Professional,0,0,0,6,0,0,0,0,0
-Units,Rooms,Rent-free Staff,2.5,0,36,5,0,3.5,0,5.6,9
-Units,Rooms,Other,0,0,0,0,0,6,0,0,0
-Units,Rooms,Average Rent,265.5,182.39,174.95,172.42,179.51,224.77,129.64,154.81,227.7
 Grounds,Buildings,Number of Buildings,2,5,7,1,1,5,8,4,14
-Grounds,Elevators,Number of Elevators,4,15,25,4,4,15,0,8,28
-Grounds,Staff,Total Staff,7,24,43,9,12,46,0,10,78
+Grounds,Buildings,Number of Elevators,4,15,25,4,4,15,0,8,28
+Grounds,Buildings,Total Staff,7,24,43,9,12,46,0,10,78
+Grounds,Units,Residential Units,202,1144,1752,326,234,1573,41,406,1633
+Grounds,Units,Professional Units,0,4,0,2,0,0,0,0,0
+Grounds,Units,Rent-free Staff Units,1,3,6,1,1,1,0,1,2
+Grounds,Units,Other Units,0,0,0,0,0,2,0,0,0
+Grounds,Units,Professional Space,0,0,3,0,0,0,0,0,0
+Grounds,Units,Commercial Space,0,0,1,0,9,9,0,0,26
+Units,Rooms,Residential Rooms,884,5486,7334,1455.5,1067.5,7328.5,169.5,1878,7349
+Units,Rooms,Professional Rooms,0,0,0,6,0,0,0,0,0
+Units,Rooms,Rent-free Staff Rooms,2.5,0,36,5,0,3.5,0,5.6,9
+Units,Rooms,Other Rooms,0,0,0,0,0,6,0,0,0
+Units,Rooms,Average  Room Rent,265.5,182.39,174.95,172.42,179.51,224.77,129.64,154.81,227.7
 Income,Gross Residential Rents,Gross Residential Rents,2598619,12006767,15337797,3011520,2300311,19295434,263692,3488797,19672798
 Income,Surcharge Retention,Surcharge Retention,138052,169245,420652,118248,184213,0,0,0,225793
 Income,Other Income,Professional Apts,0,19756,0,45630,0,0,0,0,0
