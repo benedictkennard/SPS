@@ -1,89 +1,89 @@
-Category,Sub_Category,Description,First Atlantic,Dayton Beach,Dayton Towers,Ryerson Towers,Stryckers Bay,Luna Park,Northside Gardens,Rosedale Gardens,Franklin Plaza
-Units,Apartments,Residential,202,1144,1752,326,234,1573,41,406,1633
-Units,Apartments,Professional,0,4,0,2,0,0,0,0,0
-Units,Apartments,Rent-free Staff,1,3,6,1,1,1,0,1,2
-Units,Apartments,Other,0,0,0,0,0,2,0,0,0
-Units,Space,Professional,0,0,3,0,0,0,0,0,0
-Units,Space,Commercial,0,0,1,0,9,9,0,0,26
-Units,Rooms,Residential,884,5486,7334,1455.5,1067.5,7328.5,169.5,1878,7349
-Units,Rooms,Professional,0,0,0,6,0,0,0,0,0
-Units,Rooms,Rent-free Staff,2.5,0,36,5,0,3.5,0,5.6,9
-Units,Rooms,Other,0,0,0,0,0,6,0,0,0
-Grounds,Buildings,Number of Buildings,2,5,7,1,1,5,8,4,14
-Grounds,Elevators,Number of Elevators,4,15,25,4,4,15,0,8,28
-Grounds,Staff,Total Staff,7,24,43,9,12,46,0,10,78
-Income,Gross Residential Rents,Gross Residential Rents," $2,598,619.00 "," $12,006,767.00 "," $15,337,797.00 "," $3,011,520.00 "," $2,300,311.00 "," $19,295,434.00 "," $263,692.00 "," $3,488,797.00 "," $19,672,798.00 "
-Income,Surcharge Retention,Surcharge Retention," $138,052.00 "," $169,245.00 "," $420,652.00 "," $118,248.00 "," $184,213.00 ", $-   , $-   , $-   ," $225,793.00 "
-Income,Other Income,Professional Apts, $-   ," $19,756.00 ", $-   ," $45,630.00 ", $-   , $-   , $-   , $-   , $-   
-Income,Other Income,Commercial Spaces, $-   , $-   ," $96,631.00 ", $-   ," $719,624.00 "," $197,801.00 ", $-   , $-   ," $2,089,293.00 "
-Income,Other Income,Garage," $44,716.00 "," $242,417.00 ", $-   , $-   ," $191,026.00 ", $-   , $-   , $-   , $-   
-Income,Other Income,Parking Spaces, $-   , $-   ," $435,147.00 "," $61,200.00 ", $-   ," $316,032.00 "," $6,000.00 "," $87,920.00 "," $151,206.00 "
-Income,Other Income,Community Rooms," $6,300.00 ", $-   , $-   ," $11,700.00 "," $2,350.00 ", $-   , $-   , $-   ," $35,100.00 "
-Income,Other Income,Swimming Pool, $-   , $-   ," $101,356.00 ", $-   , $-   , $-   , $-   , $-   , $-   
-Income,Other Income,Air Conditioner," $28,365.00 "," $185,172.00 "," $406,585.00 "," $32,237.00 ", $-   ," $436,508.00 ", $-   ," $67,856.00 "," $233,775.00 "
-Income,Other Income,Washing Machines, $-   , $-   , $-   , $156.00 , $-   , $-   , $-   , $-   , $-   
-Income,Other Income,Laundry Rooms," $27,825.00 "," $86,400.00 "," $207,000.00 "," $25,200.00 "," $16,250.00 "," $97,440.00 ", $-   , $-   ," $62,600.00 "
-Income,Other Income,Other Vending Machines, $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Income,Other Income,Tenant Television, $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   ," $8,370.00 "
-Income,Other Income,Roof Rentals, $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Income,Other Income,Interest on Investments, $-   ," $10,538.00 "," $111,462.00 ", $-   ," $5,169.00 "," $49,443.00 ", $-   ," $31,925.00 "," $3,772.00 "
-Income,Other Income,Miscellaneous Income," $9,863.00 "," $83,054.00 ", $-   ," $14,170.00 ", $-   ," $69,015.00 "," $6,851.00 "," $26,914.00 "," $493,463.00 "
-Income,Other Income,Application Fees," $9,448.00 ", $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Income,Other Income,Late Fees, $-   ," $29,056.00 "," $149,528.00 ", $-   ," $30,920.00 ", $-   , $-   , $-   , $-   
-Income,Other Income,Assessments, $-   ," $29,056.00 "," $149,528.00 "," $188,579.00 ", $-   ," $143,925.00 ", $-   ," $89,974.00 ", $-   
-Income,Other Income,Storage, $-   , $-   , $-   , $-   ," $19,220.00 ", $-   , $-   ," $4,218.00 ", $-   
-Income,Other Income,Tenant Reimbursements, $-   , $-   , $-   , $-   ," $50,223.00 ", $-   , $-   , $-   , $-   
-Income,Other Income,Other Tenant Charges, $-   ," $29,056.00 "," $149,528.00 "," $87,869.00 ", $-   ," $143,971.00 ", $-   ," $72,931.00 "," $118,199.00 "
-Income,Other Income,Federal Subsidy," $528,068.00 ", $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Income,Other Income,Rent Revenue," $122,439.00 ", $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Income,Vacancy/Loss,Vacancy/Loss, $(640.00)," $(158,364.00)"," $(25,565.00)"," $(40,928.00)"," $(18,581.00)"," $(45,617.00)"," $(8,901.00)"," $(51,679.00)", $-   
-Expenses,Operating Expenses,Supplies," $49,094.00 "," $379,442.00 "," $703,578.00 "," $155,212.00 "," $44,779.00 "," $371,253.00 "," $2,740.00 "," $187,717.00 "," $524,714.00 "
-Expenses,Operating Expenses,Exterminator," $13,795.00 "," $43,953.00 "," $69,571.00 "," $19,206.00 "," $28,275.00 "," $98,148.00 "," $2,419.00 "," $40,829.00 "," $42,411.00 "
-Expenses,Operating Expenses,Permits, $-   ," $7,046.00 ", $-   , $-   , $-   , $-   , $404.00 , $-   , $-   
-Expenses,Operating Expenses,Painting and Decorating," $96,048.00 ", $-   ," $30,400.00 "," $109,001.00 ", $-   , $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Landscaping, $-   ," $92,474.00 "," $174,039.00 "," $10,343.00 ", $-   ," $114,506.00 "," $4,005.00 "," $50,198.00 ", $-   
-Expenses,Operating Expenses,Plumbing," $138,880.00 "," $187,864.00 "," $21,662.00 "," $135,004.00 "," $28,911.00 "," $1,410,409.00 "," $33,102.00 "," $20,023.00 "," $101,136.00 "
-Expenses,Operating Expenses,Electrical, $597.00 , $-   ," $333,842.00 "," $22,543.00 "," $7,475.00 "," $479,276.00 ", $-   , $-   ," $34,296.00 "
-Expenses,Operating Expenses,Pool, $-   , $-   ," $179,822.00 ", $-   , $-   , $-   , $-   , $-   ," $52,278.00 "
-Expenses,Operating Expenses,Heating," $14,221.00 "," $57,145.00 "," $45,330.00 "," $92,873.00 "," $14,456.00 ", $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Snow Removal, $-   ," $43,918.00 ", $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Roof," $8,341.00 ", $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Carpentry, $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Uniforms, $-   ," $3,671.00 ", $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Violations, $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Garage," $28,716.00 ", $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Intercom, $-   ," $29,070.00 ", $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Other, $-   ," $283,025.00 "," $165,798.00 "," $89,159.00 "," $41,866.00 "," $121,202.00 "," $6,481.00 "," $178,632.00 "," $485,424.00 "
-Expenses,Operating Expenses,Shareholder Reimbursement, $-   ," $283,025.00 "," $(90,990.00)", $-   , $-   , $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Elevator Contract," $17,320.00 ", $-   , $-   , $-   ," $25,976.00 "," $100,126.00 ", $-   ," $39,974.00 "," $254,588.00 "
-Expenses,Operating Expenses,Elevator Repairs," $13,894.00 "," $101,477.00 "," $466,584.00 "," $37,778.00 ", $82.00 ," $349,193.00 ", $-   , $240.00 ," $310,696.00 "
-Expenses,Operating Expenses,Maintenance Salaries," $219,603.00 "," $1,338,500.00 "," $2,493,324.00 "," $421,298.00 "," $809,558.00 "," $1,004,645.00 ", $-   ," $108,803.00 "," $2,639,430.00 "
-Expenses,Operating Expenses,Security Salaries, $-   , $-   , $-   , $-   , $-   , $-   , $-   ," $64,528.00 "," $1,136,976.00 "
-Expenses,Operating Expenses,Office Salaries, $-   , $-   , $-   ," $27,058.00 ", $-   , $-   , $-   ," $69,077.00 ", $-   
-Expenses,Operating Expenses,Super Rent Free Unit, $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Other Salaries," $64,078.00 ", $-   , $-   , $-   , $-   ," $1,260,583.00 ", $-   ," $225,394.00 ", $-   
-Expenses,Operating Expenses,Workers Comp, $-   , $-   ," $145,638.00 ", $-   , $-   , $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Payroll Taxes," $27,221.00 "," $131,195.00 ", $-   ," $42,759.00 "," $76,190.00 "," $176,720.00 ", $-   ," $36,858.00 "," $335,526.00 "
-Expenses,Operating Expenses,Employee Benefits," $127,020.00 "," $443,224.00 "," $1,221,654.00 "," $162,612.00 "," $290,169.00 "," $869,770.00 ", $-   ," $114,943.00 "," $1,405,405.00 "
-Expenses,Operating Expenses,Security Contract," $154,831.00 "," $604,432.00 "," $741,886.00 "," $195,258.00 ", $-   ," $765,393.00 ", $-   ," $210,463.00 ", $-   
-Expenses,Operating Expenses,Legal," $32,630.00 "," $217,276.00 "," $193,644.00 "," $38,423.00 "," $51,565.00 "," $397,126.00 "," $26,836.00 "," $65,391.00 "," $122,172.00 "
-Expenses,Operating Expenses,Accounting," $32,602.00 "," $38,325.00 ", $-   ," $14,000.00 "," $18,148.00 "," $48,709.00 "," $10,000.00 "," $22,322.00 "," $28,351.00 "
-Expenses,Operating Expenses,Management Fee," $120,700.00 "," $428,820.00 "," $580,540.00 "," $109,000.00 "," $94,188.00 "," $366,454.00 "," $18,500.00 "," $101,228.00 "," $637,324.00 "
-Expenses,Operating Expenses,Insurance," $79,555.00 "," $1,416,239.00 "," $820,553.00 "," $179,551.00 "," $135,274.00 "," $1,454,929.00 "," $19,923.00 "," $155,120.00 "," $1,108,229.00 "
-Expenses,Operating Expenses,Office Expenses," $72,366.00 "," $292,774.00 "," $116,390.00 "," $51,507.00 "," $3,546.00 "," $103,425.00 "," $2,637.00 "," $77,614.00 "," $103,865.00 "
-Expenses,Operating Expenses,Professional fees," $15,286.00 ", $-   , $-   , $-   , $-   , $-   , $-   , $-   ," $60,128.00 "
-Expenses,Operating Expenses,Corporate Taxes, $-   , $-   , $-   , $-   ," $188,194.00 ", $-   , $-   , $-   , $-   
-Expenses,Operating Expenses,Other, $-   , $-   ," $43,132.00 "," $90,285.00 "," $94,071.00 ", $-   , $-   , $-   ," $14,036.00 "
-Expenses,Utility Costs,Heating Gas, $-   ," $1,577,282.00 "," $1,189,736.00 "," $287,610.00 ", $-   ," $1,318,298.00 "," $7,311.00 ", $-   ," $4,119,641.00 "
-Expenses,Utility Costs,Heating Oil," $298,250.00 ", $-   , $-   ," $64,734.00 ", $-   ," $471,139.00 ", $-   , $-   , $-   
-Expenses,Utility Costs,Heating Steam, $-   , $-   , $-   , $-   ," $434,181.00 ", $-   , $-   ," $270,000.00 ", $-   
-Expenses,Utility Costs,Electricity," $476,241.00 "," $1,309,929.00 "," $1,692,164.00 "," $436,640.00 "," $259,768.00 "," $2,040,805.00 ", $-   ," $717,185.00 "," $2,287,096.00 "
-Expenses,Utility Costs,Gas," $19,961.00 "," $61,234.00 "," $97,593.00 "," $16,671.00 "," $12,650.00 ", $-   , $-   , $-   ," $105,600.00 "
-Expenses,Utility Costs,Water and Sewer," $189,786.00 "," $1,085,664.00 "," $1,281,076.00 "," $202,327.00 "," $243,598.00 "," $1,489,296.00 "," $28,194.00 "," $384,295.00 "," $1,510,733.00 "
-Expenses,Real Estate Taxes,Real Estate Taxes," $141,081.00 "," $975,092.00 "," $1,112,959.00 "," $240,949.00 "," $371,149.00 "," $1,491,059.00 "," $21,494.00 "," $236,992.00 "," $1,738,383.00 "
-Expenses,Interest and Amortization,Mitchell-Lama Debt Service," $652,029.00 ", $-   ," $1,095,386.00 ", $-   , $-   , $-   ," $31,071.00 ", $-   , $-   
-Expenses,Interest and Amortization,Article 8A Loan Debt Service," $120,368.00 ", $-   , $-   ," $161,976.00 ", $-   , $-   ," $58,128.00 "," $190,722.00 ", $-   
-Expenses,Interest and Amortization,Other Debt Service, $-   ," $1,967,734.00 ", $-   ," $273,276.00 "," $371,149.00 "," $4,473,792.00 "," $2,025.00 "," $442,753.00 "," $229,286.00 "
-Expenses,Actual Allocation to Reserves,Capital Repair and Replacement Reserve," $23,600.00 "," $58,367.00 ", $-   , $-   ," $15,592.00 "," $300,000.00 ", $-   ," $86,400.00 "," $3,706,645.00 "
-Expenses,Actual Allocation to Reserves,Contingency," $100,000.00 ", $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   
-Expenses,Actual Allocation to Reserves,Working Capital, $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   , $-   
+Category,Sub_Category,Description,First Atlantic,Dayton Beach,Dayton Towers,Ryerson Towers,Stryckers Bay,Luna Park,Northside Gardens,Rosedale Gardens,Franklin Plaza,,,,,,,,
+Units,Apartments,Residential,202.00,1144.00,1752.00,326.00,234.00,1573.00,41.00,406.00,1633.00,,,,,,,,
+Units,Apartments,Professional,0.00,4.00,0.00,2.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Units,Apartments,Rent-free Staff,1.00,3.00,6.00,1.00,1.00,1.00,0.00,1.00,2.00,,,,,,,,
+Units,Apartments,Other,0.00,0.00,0.00,0.00,0.00,2.00,0.00,0.00,0.00,,,,,,,,
+Units,Space,Professional,0.00,0.00,3.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Units,Space,Commercial,0.00,0.00,1.00,0.00,9.00,9.00,0.00,0.00,26.00,,,,,,,,
+Units,Rooms,Residential,884.00,5486.00,7334.00,1455.50,1067.50,7328.50,169.50,1878.00,7349.00,,,,,,,,
+Units,Rooms,Professional,0.00,0.00,0.00,6.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Units,Rooms,Rent-free Staff,2.50,0.00,36.00,5.00,0.00,3.50,0.00,5.60,9.00,,,,,,,,
+Units,Rooms,Other,0.00,0.00,0.00,0.00,0.00,6.00,0.00,0.00,0.00,,,,,,,,
+Grounds,Buildings,Number of Buildings,2.00,5.00,7.00,1.00,1.00,5.00,8.00,4.00,14.00,,,,,,,,
+Grounds,Elevators,Number of Elevators,4.00,15.00,25.00,4.00,4.00,15.00,0.00,8.00,28.00,,,,,,,,
+Grounds,Staff,Total Staff,7.00,24.00,43.00,9.00,12.00,46.00,0.00,10.00,78.00,,,,,,,,
+Income,Gross Residential Rents,Gross Residential Rents,2598619.00,12006767.00,15337797.00,3011520.00,2300311.00,19295434.00,263692.00,3488797.00,19672798.00,,,,,,,,
+Income,Surcharge Retention,Surcharge Retention,138052.00,169245.00,420652.00,118248.00,184213.00,0.00,0.00,0.00,225793.00,,,,,,,,
+Income,Other Income,Professional Apts,0.00,19756.00,0.00,45630.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Income,Other Income,Commercial Spaces,0.00,0.00,96631.00,0.00,719624.00,197801.00,0.00,0.00,2089293.00,,,,,,,,
+Income,Other Income,Garage,44716.00,242417.00,0.00,0.00,191026.00,0.00,0.00,0.00,0.00,,,,,,,,
+Income,Other Income,Parking Spaces,0.00,0.00,435147.00,61200.00,0.00,316032.00,6000.00,87920.00,151206.00,,,,,,,,
+Income,Other Income,Community Rooms,6300.00,0.00,0.00,11700.00,2350.00,0.00,0.00,0.00,35100.00,,,,,,,,
+Income,Other Income,Swimming Pool,0.00,0.00,101356.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Income,Other Income,Air Conditioner,28365.00,185172.00,406585.00,32237.00,0.00,436508.00,0.00,67856.00,233775.00,,,,,,,,
+Income,Other Income,Washing Machines,0.00,0.00,0.00,156.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Income,Other Income,Laundry Rooms,27825.00,86400.00,207000.00,25200.00,16250.00,97440.00,0.00,0.00,62600.00,,,,,,,,
+Income,Other Income,Other Vending Machines,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Income,Other Income,Tenant Television,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,8370.00,,,,,,,,
+Income,Other Income,Roof Rentals,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Income,Other Income,Interest on Investments,0.00,10538.00,111462.00,0.00,5169.00,49443.00,0.00,31925.00,3772.00,,,,,,,,
+Income,Other Income,Miscellaneous Income,9863.00,83054.00,0.00,14170.00,0.00,69015.00,6851.00,26914.00,493463.00,,,,,,,,
+Income,Other Income,Application Fees,9448.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Income,Other Income,Late Fees,0.00,29056.00,149528.00,0.00,30920.00,0.00,0.00,0.00,0.00,,,,,,,,
+Income,Other Income,Assessments,0.00,29056.00,149528.00,188579.00,0.00,143925.00,0.00,89974.00,0.00,,,,,,,,
+Income,Other Income,Storage,0.00,0.00,0.00,0.00,19220.00,0.00,0.00,4218.00,0.00,,,,,,,,
+Income,Other Income,Tenant Reimbursements,0.00,0.00,0.00,0.00,50223.00,0.00,0.00,0.00,0.00,,,,,,,,
+Income,Other Income,Other Tenant Charges,0.00,29056.00,149528.00,87869.00,0.00,143971.00,0.00,72931.00,118199.00,,,,,,,,
+Income,Other Income,Federal Subsidy,528068.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Income,Other Income,Rent Revenue,122439.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Income,Vacancy/Loss,Vacancy/Loss,-640.00,-158364.00,-25565.00,-40928.00,-18581.00,-45617.00,-8901.00,-51679.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Supplies,49094.00,379442.00,703578.00,155212.00,44779.00,371253.00,2740.00,187717.00,524714.00,,,,,,,,
+Expenses,Operating Expenses,Exterminator,13795.00,43953.00,69571.00,19206.00,28275.00,98148.00,2419.00,40829.00,42411.00,,,,,,,,
+Expenses,Operating Expenses,Permits,0.00,7046.00,0.00,0.00,0.00,0.00,404.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Painting and Decorating,96048.00,0.00,30400.00,109001.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Landscaping,0.00,92474.00,174039.00,10343.00,0.00,114506.00,4005.00,50198.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Plumbing,138880.00,187864.00,21662.00,135004.00,28911.00,1410409.00,33102.00,20023.00,101136.00,,,,,,,,
+Expenses,Operating Expenses,Electrical,597.00,0.00,333842.00,22543.00,7475.00,479276.00,0.00,0.00,34296.00,,,,,,,,
+Expenses,Operating Expenses,Pool,0.00,0.00,179822.00,0.00,0.00,0.00,0.00,0.00,52278.00,,,,,,,,
+Expenses,Operating Expenses,Heating,14221.00,57145.00,45330.00,92873.00,14456.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Snow Removal,0.00,43918.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Roof,8341.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Carpentry,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Uniforms,0.00,3671.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Violations,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Garage,28716.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Intercom,0.00,29070.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Other,0.00,283025.00,165798.00,89159.00,41866.00,121202.00,6481.00,178632.00,485424.00,,,,,,,,
+Expenses,Operating Expenses,Shareholder Reimbursement,0.00,283025.00,-90990.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Elevator Contract,17320.00,0.00,0.00,0.00,25976.00,100126.00,0.00,39974.00,254588.00,,,,,,,,
+Expenses,Operating Expenses,Elevator Repairs,13894.00,101477.00,466584.00,37778.00,82.00,349193.00,0.00,240.00,310696.00,,,,,,,,
+Expenses,Operating Expenses,Maintenance Salaries,219603.00,1338500.00,2493324.00,421298.00,809558.00,1004645.00,0.00,108803.00,2639430.00,,,,,,,,
+Expenses,Operating Expenses,Security Salaries,0.00,0.00,0.00,0.00,0.00,0.00,0.00,64528.00,1136976.00,,,,,,,,
+Expenses,Operating Expenses,Office Salaries,0.00,0.00,0.00,27058.00,0.00,0.00,0.00,69077.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Super Rent Free Unit,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Other Salaries,64078.00,0.00,0.00,0.00,0.00,1260583.00,0.00,225394.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Workers Comp,0.00,0.00,145638.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Payroll Taxes,27221.00,131195.00,0.00,42759.00,76190.00,176720.00,0.00,36858.00,335526.00,,,,,,,,
+Expenses,Operating Expenses,Employee Benefits,127020.00,443224.00,1221654.00,162612.00,290169.00,869770.00,0.00,114943.00,1405405.00,,,,,,,,
+Expenses,Operating Expenses,Security Contract,154831.00,604432.00,741886.00,195258.00,0.00,765393.00,0.00,210463.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Legal,32630.00,217276.00,193644.00,38423.00,51565.00,397126.00,26836.00,65391.00,122172.00,,,,,,,,
+Expenses,Operating Expenses,Accounting,32602.00,38325.00,0.00,14000.00,18148.00,48709.00,10000.00,22322.00,28351.00,,,,,,,,
+Expenses,Operating Expenses,Management Fee,120700.00,428820.00,580540.00,109000.00,94188.00,366454.00,18500.00,101228.00,637324.00,,,,,,,,
+Expenses,Operating Expenses,Insurance,79555.00,1416239.00,820553.00,179551.00,135274.00,1454929.00,19923.00,155120.00,1108229.00,,,,,,,,
+Expenses,Operating Expenses,Office Expenses,72366.00,292774.00,116390.00,51507.00,3546.00,103425.00,2637.00,77614.00,103865.00,,,,,,,,
+Expenses,Operating Expenses,Professional fees,15286.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,60128.00,,,,,,,,
+Expenses,Operating Expenses,Corporate Taxes,0.00,0.00,0.00,0.00,188194.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Operating Expenses,Other,0.00,0.00,43132.00,90285.00,94071.00,0.00,0.00,0.00,14036.00,,,,,,,,
+Expenses,Utility Costs,Heating Gas,0.00,1577282.00,1189736.00,287610.00,0.00,1318298.00,7311.00,0.00,4119641.00,,,,,,,,
+Expenses,Utility Costs,Heating Oil,298250.00,0.00,0.00,64734.00,0.00,471139.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Utility Costs,Heating Steam,0.00,0.00,0.00,0.00,434181.00,0.00,0.00,270000.00,0.00,,,,,,,,
+Expenses,Utility Costs,Electricity,476241.00,1309929.00,1692164.00,436640.00,259768.00,2040805.00,0.00,717185.00,2287096.00,,,,,,,,
+Expenses,Utility Costs,Gas,19961.00,61234.00,97593.00,16671.00,12650.00,0.00,0.00,0.00,105600.00,,,,,,,,
+Expenses,Utility Costs,Water and Sewer,189786.00,1085664.00,1281076.00,202327.00,243598.00,1489296.00,28194.00,384295.00,1510733.00,,,,,,,,
+Expenses,Real Estate Taxes,Real Estate Taxes,141081.00,975092.00,1112959.00,240949.00,371149.00,1491059.00,21494.00,236992.00,1738383.00,,,,,,,,
+Expenses,Interest and Amortization,Mitchell-Lama Debt Service,652029.00,0.00,1095386.00,0.00,0.00,0.00,31071.00,0.00,0.00,,,,,,,,
+Expenses,Interest and Amortization,Article 8A Loan Debt Service,120368.00,0.00,0.00,161976.00,0.00,0.00,58128.00,190722.00,0.00,,,,,,,,
+Expenses,Interest and Amortization,Other Debt Service,0.00,1967734.00,0.00,273276.00,371149.00,4473792.00,2025.00,442753.00,229286.00,,,,,,,,
+Expenses,Actual Allocation to Reserves,Capital Repair and Replacement Reserve,23600.00,58367.00,0.00,0.00,15592.00,300000.00,0.00,86400.00,3706645.00,,,,,,,,
+Expenses,Actual Allocation to Reserves,Contingency,100000.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
+Expenses,Actual Allocation to Reserves,Working Capital,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,,,,,,,
