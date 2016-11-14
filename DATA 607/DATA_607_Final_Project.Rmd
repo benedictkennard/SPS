@@ -1,0 +1,364 @@
+---
+title: "Final Project"
+author: "Jose Zuniga"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '4'
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+United Hospital Fund (UHF) Neighborhood of Residence
+https://a816-healthpsi.nyc.gov/epiquery/CHS/uhf-zip-information.pdf
+https://www1.nyc.gov/assets/doh/downloads/pdf/ah/zipcodetable.pdf
+ 
+HOSPITAL ADDRESSES
+http://www.health.ny.gov/regulations/hcra/provider/provhosp.htm
+ 
+PRECINCT ADDRESSES
+http://www.nyc.gov/html/nypd/html/home/precincts.shtml
+ 
+GOOGLE GEOCODING
+https://maps.googleapis.com/maps/api/geocode/json?address=address+city+state
+2,500 free requests per day
+50 requests per second
+
+```{r  message=F}
+library(RCurl)
+library(XML)
+library(stringr)
+library(plyr)
+xmlAttrsToDF <- function(parsedHTML, xpath) {
+x <- xpathApply(parsedHTML, xpath, xmlAttrs)
+x <- lapply(x, function(x) as.data.frame(t(x)))
+do.call(rbind.fill, x)
+}
+info <- debugGatherer()
+handle <- getCurlHandle(cookiejar = "",
+followlocation = TRUE,
+autoreferer = TRUE,
+debugfunc = info$update,
+verbose = TRUE,
+httpheader = list(
+from = "eddie@r-datacollection.com",
+'user-agent' = str_c(R.version$version.string,
+", ", R.version$platform)
+))
+url <- "https://a816-healthpsi.nyc.gov/epiquery/VS/index.html"
+# signatures = system.file("CurlSSL", cainfo = "cacert.pem", package = "RCurl")
+# html_form <- getURL(url, cainfo = signatures)
+html_form <- getURL(url, ssl.verifypeer = FALSE)
+parsed_form <- htmlParse(html_form)
+xmlAttrsToDF(parsed_form, "//form")
+xmlAttrsToDF(parsed_form, "//form[1]/input")
+xpathApply(parsed_form, "//form[2]")
+res <- postForm(uri = str_c(url, "main_button"), cainfo = signatures, curl = handle, style = "POST", directInput = "Mortality - by select causes")
+```
+
+# Final Project Instructions
+
+Describe your motivation for performing this analysis. Have a recognizable data science workflow. Include data from at least two different types of data sources. Include at least one data transformation operation. Include at least one statistical analysis and at least one graphic that describes or validates the data. Includes at least one graphic that supports the conclusion. Includes at least one statistical analysis that supports the conclusion. Includes at least one feature not covered in class. Deliver the presentation in the allotted time of 3 to 5 minutes. Show at least one challenge encountered in code or data, and what was done when the challenge was encountered. Ensure the audience comes away with a clear understanding of the motivation for undertaking the project. Ensure the audience comes away with a clear understanding of at least one insight gained, the conclusion you reached, or the hypothesis you confirmed. Deliver the submit self-contained code and data. Deliver fully reproducible results. Ensure all of the delivered code runs without errors. Deliver code and conclusions using a reproducible research tool. Deliver draft project proposal, project, and presentation on time. 
+
+***
+
+# Purpose of Project
+
+In April of 2015 there was a murder in New York City. I did not see the crime, but I did hear the shots. There was a surge of police activity. Then, when crime scene investigation was done, the body remained covered by a white sheet and guarded by a police officer for a few hours until it was picked up by an ambulance. The strange thing is, a few news outlets reported that "EMS rushed him to St. Barnabas Hospital, where he was pronounced dead, cops said." I was disturbed by the whole situation, but these new reports also made me wonder how crime statistics are reported. Was this death reported in the statistics for the precinct of the hospital (48th) or the precinct of the crime (46th)? I never bothered to do the digging and find out.
+
+Then, in September of 2016, I read something about a similar situation in the news. There was a story about the time of death reported by the NYC Police Department. The report said "Police officials initially said that Graham died at Montefiore Medical Center. His death certificate says he was shot at 3:01 p.m. and died at 3:53 p.m. According to his family, the video indicates he was already dead, and contradicts the city account." Although this story was also disturbing in-and-of itself, it also made me wonder if the death was reported in the statistics for the precinct of the hospital (52nd) or the precinct of the crime (47th)? I also wondered if the total number of murders reported in NYC police statistics match the total number of homicides reported in NYC Hospitals statistics.
+
+Narrowing data down to the individual precinct and hospital level is quite an undertaking. A more reasonable task would be to compare NYC police statistics and NYC hospital statistics on a macro in lieu of a micro level.
+
+## Question
+
+Do murders reported in NYC police statistics match homicides reported by NYC hospital statistics.
+
+# Obtain and Explore the Data 
+
+## NYC [Police Deapartment](http://www.nyc.gov/html/nypd/html/analysis_and_planning/historical_nyc_crime_data.shtml)
+
+  + [Seven Major Felony Offenses](http://www.nyc.gov/html/nypd/downloads/excel/analysis_and_planning/seven_major_felony_offenses_by_precinct_2000_2015.xls). Statistical breakdown by citywide, borough, and precinct 2000 - 2015.
+
+## NYC [Department of Health and Mental Hygiene](https://nycopendata.socrata.com/)
+
+  + [New York City Leading Causes of Death](https://data.cityofnewyork.us/api/views/jb7j-dtam/rows.csv?accessType=DOWNLOAD). The leading causes of death by sex and ethnicity in New York City 2007 - 2011.
+
+# Load, Clean, Preprocess, and Reduce the Data
+
+```{r  message=F}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+```
+
+## Load Data Sets
+
+```{r}
+Felonys_Major <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
+                          "DATA%20607/DATA_607_Final_Project_1.csv"), stringsAsFactors = F)
+
+Deaths <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
+                          "DATA%20607/DATA_607_Final_Project_2.csv"), stringsAsFactors = F)
+```
+
+## Clean, Preprocess, and Reduce Data Sets
+
+```{r}
+Hospital <- Deaths %>% 
+  filter(grepl('HOMICIDE', Cause.of.Death)) %>% 
+  group_by(Year) %>% 
+  summarise(Total = sum(Count))
+
+Precincts <- Felonys_Major %>%
+  filter(grepl('MURDER', CRIME)) %>%
+  gather(xYear, Count, 3:18) %>%
+  na.omit(Count) %>%  
+  mutate(Year = as.integer(sub("X", "", xYear))) %>%
+  group_by(Year) %>%
+  summarise(Total = sum(Count))
+```
+
+# Determine the Data Mining Task
+
+Test the significance of the difference between pairs. 
+
+# Choose the Technique
+
+```{r}
+shapiro.test(unlist(Hospital))
+shapiro.test(unlist(Precincts))
+bartlett.test(Hospital,Precincts)
+```
+Given fairly normal and homoscedastic matched pairs, and assuming independent cases (years), the **paired t-test** would be appropriate. The paired t-test compares two populations of paired data that are correlated due to said pairing. It uses the mean and standard deviation of the differences to calcuate $t=\frac { \bar { d }  }{ s(d)/{ \sqrt { n }  } }$. The null hypothesis of the test is that the true mean difference is zero.
+
+# Use Algorithm to Perform Analysis
+
+```{r}
+(Compare_1 <- full_join(Precincts, Hospital, by = "Year", suffix = c(".NYPD", ".DOHMH")))
+visualize <- rbind(cbind(Precincts, Source = "NYPD"), cbind(Hospital, Source = "DOHMH"))
+ggplot() + geom_area(aes(x = Year, y = Total, fill = Source), data = visualize, 
+           stat="identity", position = position_dodge(width = 0), alpha= I(0.5))
+Compare_2 <- right_join(Precincts, Hospital, by = "Year", suffix = c(".NYPD", ".DOHMH"))
+data.frame(Compare_2, Difference = matrix((unlist(Compare_2[3] - Compare_2[2])), ncol=1),
+           Factor = matrix((unlist(Compare_2[3] / Compare_2[2])), ncol=1))
+t.test(Compare_2[3] - Compare_2[2])
+```
+
+# Interpret Results
+
+## Comparison
+
+The data reported by the NYC PD and NYC DOHMH has some serious flaws and conflicts. The NYC PD data shows `r nrow(Precincts)` years of data with an average of `r round(mean(unlist(Precincts[2])), 0)` while the NYC DOHMH data shows `r nrow(Hospital)` years of data with an average of `r round(mean(unlist(Hospital[2])), 0)`. When looking at the years where both have data available, the average difference is `r round(mean(unlist(Compare_2[3] - Compare_2[2])), 0)` which is very strange. The NYC DOHMH data is inflated by a constant factor of about `r round(mean(unlist(Compare_2[3] / Compare_2[2])), 2)`.
+
+## Statistical Test
+
+There is something wrong here that does not justify even discussing of the **t-test** results. 
+
+## Findings
+
+Occam's razor demands that the fewest assumptions be made in the interpretation of these findings. Therefore, it is likely that something is wrong in the data. Further investigation is necessary.
+
+# Further Investigation
+
+## Obtain and Explore More Data
+
+### NYC PD Freedom of Information Law Request
+
+> OIGNYPDFoil@oignypd.nyc.gov
+
+> FOIL Request #: 2016.0056
+
+> This is in response to your October 27, 2016 (received by the Office of the Inspector General for the NYPD ["OIG-NYPD"] on October 27, 2016) request, pursuant to the Freedom of Information Law, for "formal definition of the 'MURDER & NON NEGL. MANSLAUGHTER' CompStat category."
+ 
+> The New York Police Department uses the New York State Penal Law to define all crimes/offenses/infractions referred to in their CompStat 2.0 reporting data. 
+ 
+> Please note that the OIG-NYPD is not part of the NYPD.  For records kept by the NYPD, you may make an electronic FOIL request to the NYPD's Records Access Officer at http://www.nyc.gov/html/nypd/html/legal_matters/dclm_doc_production_foil.shtml.
+ 
+> This letter represents our complete response to your request. Should you wish to appeal this determination, you must send written notice within thirty days to Asim Rehman, General Counsel at the Office of the Inspector General for the New York City Police Department, City of New York Department of Investigation, 80 Maiden Lane, 14th Floor, New York, New York 10038.
+
+#### New York State Penal Law
+
+S 125.00 Homicide defined: Homicide means conduct which causes the death of a person or an unborn child with which a female has been pregnant for more than twenty-four weeks under circumstances constituting murder, manslaughter in the first degree, manslaughter in the second degree, criminally negligent homicide, abortion in the first degree or self-abortion in the first degree.
+
+Section Offense	                                      Class
+------  --------------------------------------------  -----------
+125.10	Criminally negligent homicide.	              E FELONY
+125.11	Aggravated criminally negligent homicide.	    C FELONY
+125.12	Vehicular manslaughter in the second degree.  D FELONY
+125.13	Vehicular manslaughter in the first degree.   C FELONY
+125.14	Aggravated vehicular homicide.	              B FELONY
+125.15	Manslaughter in the second degree.	          C FELONY
+125.20	Manslaughter in the first degree.	            B FELONY
+125.21	Aggravated manslaughter in the second degree. C FELONY
+125.22	Aggravated manslaughter in the first degree.  B FELONY
+125.25	Murder in the second degree.	                A-I FELONY
+125.26	Aggravated murder.	                          A-I FELONY
+125.27	Murder in the first degree.	                  A-I FELONY
+125.40	Abortion in the second degree.	              E FELONY
+125.45	Abortion in the first degree.	                D FELONY
+125.50	Self-abortion in the second degree.	          B MISD
+125.55	Self-abortion in the first degree.	          A MISD
+125.60	Issuing abortional articles.	                B MISD
+-----------------------------------------------------------------
+
+### NYC DOH Freedom of Information Law Request
+
+> recordsaccess@health.nyc.gov
+
+> FOIL Request #216FR02936
+
+> The NYC Department of Health and Mental Hygiene has received your Freedom of Information Law request and assigned it the control number noted above.  The data you seek for 2000 - 2014 is available online at the Department's EpiQuery website:  https://sasebiweb200.health.dohmh.nycnet/epiquery/VS/index.html .  If you select "Mortality - by select causes" and then click on the "SUBMIT" button, the data will appear.  Please note that 2015 data has not yet been finalized.
+
+> The definition of "homicide" is also available online at http://www1.nyc.gov/assets/doh/downloads/pdf/ip/ip-homicides-in-new-york-city.pdf.
+ 
+> This concludes the Department's response to your Freedom of Information Law request.
+
+####  International Classification of Disease (ICD)-10
+
+Category  Condition
+--------  -----------------------------------------------------------
+X85       Assault by drugs, medicaments and biological substances
+X86       Assault by corrosive substance
+X87       Assault by pesticides
+X88       Assault by gases and vapors
+X89       Assault by other specified chemicals and noxious substances
+X90       Assault by unspecified chemical or noxious substance
+X91       Assault by hanging, strangulation and suffocation
+X92       Assault by drowning and submersion
+X93       Assault by handgun discharge
+X94       Assault by rifle, shotgun and larger firearm discharge
+X95       Assault by other and unspecified firearm discharge
+X96       Assault by explosive material
+X97       Assault by smoke, fire and flames
+X98       Assault by steam, hot vapors and hot objects
+X99       Assault by sharp object
+Y00       Assault by blunt object
+Y01       Assault by pushing from high place
+Y02       Assault by pushing or placing victim before moving object
+Y03       Assault by crashing of motor vehicle
+Y04       Assault by bodily force
+Y05       Sexual assault by bodily force
+Y06       Neglect and abandonment
+Y07       Other maltreatment syndromes
+Y08       Assault by other specified means
+Y09       Assault by unspecified means
+Y87.1     Sequela of assault ^i^
+---------------------------------------------------------------------
+^i^ The sequela include conditions reported as such, or occurring 
+as "late effects" one year or more after the originating event.
+
+## Load New Data Sets
+
+```{r}
+Deaths_2 <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
+                          "DATA%20607/DATA_607_Final_Project_3.csv"), stringsAsFactors = F)
+```
+
+## Clean and Preprocess New Data Set
+
+```{r}
+Hospital_2 <- Deaths_2[1:15, 2:3]
+Hospital_2[1] <- as.integer(unlist(Hospital_2[1]))
+colnames(Hospital_2) <- colnames(Hospital)
+shapiro.test(unlist(Hospital_2))
+bartlett.test(Hospital_2,Precincts)
+```
+
+## Use Algorithm to Perform New Analysis
+
+```{r}
+visualize <- rbind(cbind(Precincts, Source = "NYPD"), cbind(Hospital_2, Source = "DOHMH"))
+ggplot() + geom_area(aes(x = Year, y = Total, fill = Source), data = visualize, 
+           stat="identity", position = position_dodge(width = 0), alpha= I(0.5))
+Compare_3 <- right_join(Precincts, Hospital_2, by = "Year", suffix = c(".NYPD", ".DOHMH"))
+data.frame(Compare_3, Difference = matrix((unlist(Compare_3[3] - Compare_3[2])), ncol=1),
+           Factor = matrix((unlist(Compare_3[3] / Compare_3[2])), ncol=1))
+t.test(Compare_3[3] - Compare_3[2])
+```
+
+# Interpret New Results
+
+## Comparison
+
+These data are much better. The new NYC DOHMH data shows `r nrow(Hospital_2)` years of data with an average of `r round(mean(unlist(Hospital_2[2])), 0)`. When looking at the years where both have data available, the average difference is `r round(mean(unlist(Compare_3[3] - Compare_3[2])), 0)`. The new NYC DOHMH data is still inflated, but now only by a factor of `r round(mean(unlist(Compare_3[3] / Compare_3[2])), 2)`.
+
+## Statistical Test
+
+For the t-test, the null hypothesis is set to a zero difference, $d = 0$, between the NYC PD murder statistics and NYC DOHMH homicide statistics (this would indicate variation is due to reporting discrepancies), and the alternate hypothesis to an actual difference, $d \neq 0$, existing between the two agencies. Failure to reject the null hypothesis will be assessed on a $p$-value of $0.05$ such that $H_{ 0 }: p > 0.05; H_{ A }: p \le 0.05$. The test results indicate the existence of a $p$-value $=`r format(t.test(Compare_3[3] - Compare_3[2])$p.value, scientific=F)` < 0.05$ indicating that the probability of observing a sample $t$ statistic with `r t.test(Compare_3[3] - Compare_3[2])$parameter` degrees of freedom as extreme as the test statistic `r t.test(Compare_3[3] - Compare_3[2])$statistic` is extremely low. Therefore the null hypothesis is rejected. 
+
+## Findings
+
+The data supports the conclusion that an actual difference exists between NYC PD murder statistics and NYC DOHMH homicide statistics. This begs the question about where this statistically significant and important difference in murders is coming from. Examining the data definitions, it seems reasonable to check if a sequela lag issue (homicide reported as such, or occurring as "late effects" one year or more after the originating event) can be the reason.
+
+# Refine
+
+```{r}
+(sequela <- data.frame("Year" = Compare_3[1] - 1, Compare_3[3] - Compare_3[2]))
+sequela_lag <- Precincts[1:14, ]
+sequela_lag[ , 2] <-  sequela_lag[ , 2] + sequela[2:15 ,2]
+visualize <- rbind(cbind(sequela_lag, Source = "NYPD"), cbind(Hospital_2[1:14,], Source = "DOHMH"))
+ggplot() + geom_area(aes(x = Year, y = Total, fill = Source), data = visualize, 
+           stat="identity", position = position_dodge(width = 0), alpha= I(0.5))
+Compare_4 <- left_join(sequela_lag, Hospital_2, by = "Year", suffix = c(".NYPD", ".DOHMH"))
+data.frame(Compare_4, Difference = matrix((unlist(Compare_4[3] - Compare_4[2])), ncol=1),
+           Factor = matrix((unlist(Compare_4[3] / Compare_4[2])), ncol=1))
+t.test(Compare_4[3] - Compare_4[2])
+```
+
+## Comparison
+
+Lagging the difference between agencies one year (although it can be greater), the modified NYC PD data shows `r nrow(sequela_lag)` years of data with an average of `r round(mean(unlist(sequela_lag[2])), 0)`. When looking at the years where both have data available, the average difference is `r round(mean(unlist(Compare_4[3] - Compare_4[2])), 0)`. The new modified data is still show some variation, but now the mean factor is `r round(mean(unlist(Compare_4[3] / Compare_4[2])), 2)`. The differences basically cancel out.
+
+## Statistical Test
+
+For the t-test, the null hypothesis is set to a zero difference, $d = 0$, between the NYC PD murder statistics **including sequela** and NYC DOHMH homicide statistics (this would indicate variation is due to reporting discrepancies), and the alternate hypothesis to an actual difference, $d \neq 0$, existing between the two agencies. Failure to reject the null hypothesis will be assessed on a $p$-value of $0.05$ such that $H_{ 0 }: p > 0.05; H_{ A }: p \le 0.05$. The test results indicate the existence of a $p$-value $=`r format(t.test(Compare_4[3] - Compare_4[2])$p.value, scientific=F)` > 0.05$ indicating that the probability of observing a sample $t$ statistic with `r t.test(Compare_4[3] - Compare_4[2])$parameter` degrees of freedom as extreme as the test statistic `r t.test(Compare_4[3] - Compare_4[2])$statistic` is extremely high. Therefore we fail to reject the null hypothesis. 
+
+## Findings
+
+The data supports the conclusion that no difference exists between NYC PD murder statistics and NYC DOHMH homicide statistics, or in other words, the variation in difference is due to reporting differences.
+
+# Conclusion
+
+On am macro level, NYC police statistics appear to match NYC hospital statistics when it comes to homicides. Differences in data reports from each agency appear to be attributable to how sequela is handled. What this analysis also shows is both the disparity between the quality of data and the importance of working through initial findings critically. 
+
+The unaddressed micro question about where murders are reported (at the precinct of the hospital or the precinct of the crime) is out of scope for this analysis but it could be examined by gathering addresses of hospitals and evaluating if homicide rates are inflated in their respective precincts relative to surrounding precincts.  
+
+# Comment
+
+Out of respect for the individual tragedies that served as the motivation for this analysis, regardless of what transpired and why, I would like to add this note extending condolences to the families.
+
+# References
+
+http://nypost.com/2015/04/06/daily-blotter-485/
+
+http://www.nydailynews.com/new-york/video-shows-ramarley-graham-carried-police-shooting-article-1.2810982
+
+http://www.ats.ucla.edu/stat/mult_pkg/whatstat/default.htm
+
+http://www.statstutor.ac.uk/resources/uploaded/paired-t-test.pdf
+
+http://www.statisticssolutions.com/manova-analysis-paired-sample-t-test/
+
+http://stattrek.com/hypothesis-test/paired-means.aspx?Tutorial=AP
+
+http://www.nyc.gov/html/oignypd/pages/about/foil-request.shtml
+
+http://ypdcrime.com/penal.law/article125.htm#p125.27
+
+http://www.nycourts.gov/judges/cji/2-PenalLaw/125/art125hp.shtml
+
+https://www1.nyc.gov/site/doh/about/ogc-foil.page
+
+https://a816-healthpsi.nyc.gov/epiquery/VS/index.html
+
+http://apps.who.int/classifications/apps/icd/icd10online2005/fr-icd.htm?gx85.htm+
+
+http://apps.who.int/classifications/apps/icd/icd10online2005/fr-icd.htm?gy85.htm+
+
+https://en.wikipedia.org/wiki/ICD-10_Chapter_XX:_External_causes_of_morbidity_and_mortality

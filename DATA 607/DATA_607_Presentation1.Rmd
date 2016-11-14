@@ -1,0 +1,172 @@
+---
+title: "Data Science Context Presentation 1"
+author: "Jose Zuniga"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Presentation Instructions
+
+Make a five-minute presentation on any chosen topic, preferably any topic from the current week's chapter reading of *Data Science for Business*, or another topic that would be of interest to *most*. Do not just summarize the topic, go a little further, such as:
+
+  + Discussing one or more business use cases, or
+  + Showing a short example with R code (and perhaps relevant R package(s)), or
+  + Providing a curated "learning path" of on-line resources to build further expertise in that topic.
+
+You may also record your presentation instead of presenting in our meetup. Effective data scientists need to be effective presenters, so making a presentation in front of a group is strongly encouraged but not required. In DATA 607, our primary focus is on writing R code related to getting and shaping data in preparation for downstream modeling and presentations. 
+
+***
+
+```{r  message=F, warning=F}
+library(tidyr)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+```
+
+# NYC Mitchell-Lama Housing
+
+## NYC Housing
+
+In many ways, the New York City real estate market is unlike any other in the United States. One of the biggest differences between NYC and Any-Other-Town, USA, is that apartments for sale in NYC are either condos or co-ops. In most places, condos are the rule but not in the Big Apple. Although co-ops outnumber condos in NYC - most estimates say about 75% are co-ops - more condos are on the active market at any given moment. ^i^
+
+## Housing Cooperative
+
+Roughly 75 percent of the Manhattan housing inventory is comprised of co-ops. Unlike a condo, co-ops are are owned by a corporation. This means, when you buy an apartment that is in a co-op building, you are not actually buying real property (like you would in a condo). You are in fact, buying shares of the corporation. These shares entitle you to a proprietary lease, which relates your relationship to the building close to that of an investor, rather than a condo building, where you are the outright owner of your specific unit. ^ii^ 
+
+## Mitchell-Lama Housing Program
+
+In 1955, New York's Governor signed into law a bill sponsored by State Senator MacNeill Mitchell and Assemblyman Alfred Lama to encourage and facilitate the construction and continued operation of affordable rental and cooperative housing in the State of New York. The law as we know it is the Mitchell-Lama Program. ^iii^ There are both New York City supervised Mitchell-Lama developments and New York State supervised Mitchell-Lama developments. ^iv^ 
+
+## Mitchell-Lama Admission Preference for Veterans
+
+Section 31 of the Private Housing Finance Law was amended effective September 12, 2010 to give Mitchell-Lama admission preference to all veterans, or their surviving spouses, who served on active duty in time of war, as defined in Section 85 of the Civil Service Law, and reside in New York State. ^v^
+
+## Rent and Carrying Charge Increases
+
+The housing company prepares the requisite petition, application, or motion for an increase in the maximum rental or carrying charges per room and submit same to HPD for approval as to form and authorization for hearing procedures. ^vi^ Proposed rent/carrying charge increases must be sufficient so that total income equals or exceeds total expenses.
+
+# NYC Supervised Mitchell-Lama Co-op Comparison
+
+## FOIL Request
+
+Freedom of Information Law requests were made for the most recent "Application for Rent/Carrying Charges Increase" for all New York City and New York State sponsored Mitchell-Lama Buildings. The request made to the NYC Department of Housing Preservation & Development (FOIL Request 908-15) was culled down to applications filed in 2015 (FOIL Request 365-16) after the agency expressed processing constraints. The request made to the NYS Division of Housing and Community Renewal (FOIL Request 359) has yet to be processed.
+
+## Documents Obtained
+
+|Development       |Units |Borough    |Address                                          |Pages  |
+|------------------|:----:|:---------:|-------------------------------------------------|-------|
+|Dayton Beach Park |1144  |Queens     |8400 Shore Front Pkwy, Rockaway Beach, NY 11693  |39     |
+|Dayton Towers     |1752  |Queens     |8000 Shore Front Pkwy, Far Rockaway, NY 11693    |30     |
+|First Atlantic    |202   |Brooklyn   |170 S Portland Ave, Brooklyn, NY 11217           |13     |
+|Franklin Plaza    |1633  |Manhattan  |2085 2nd Ave, New York, NY 10029                 |37     |
+|Luna Park         |1573  |Brooklyn   |2879 W 12th St, Brooklyn, NY 11224               |49     |
+|Northside Gardens |41    |Brooklyn   |114 N 5th St, Brooklyn, NY 11211                 |22     |
+|Rosedale Gardens  |406   |Bronx      |1810 Bruckner Blvd, Bronx, NY 10473              |24     |
+|Ryerson Towers    |326   |Brooklyn   |309 Lafayette Ave, Brooklyn, NY 11238            |33     |
+|Stryckers Bay     |234   |Manhattan  |66 W 94th St, New York, NY 10025                 |14     |
+
+The cost of reproduction is $0.25 per page.
+```{r}
+(39 + 30 + 13 + 37 + 49 + 22 + 24 + 33 + 14) * 0.25
+```
+
+### Import Data
+```{r}
+wide_data <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
+                        "DATA%20607/DATA_607_Presentation1_1.csv"), stringsAsFactors = F)
+```
+
+### Examine Data
+```{r}
+names(wide_data)
+head(wide_data)
+```
+
+### Transform Data
+```{r}
+long_data <- wide_data %>%
+  gather("Development", "Amount", 4:12)
+head(long_data)
+macro_data <- long_data %>% 
+  group_by(Category, Development) %>%
+  mutate(Total = ifelse(Category == "Income", sum(Amount), 0)) %>%
+  group_by(Development) %>%
+  mutate(Income = max(Total)) %>% select(-6) %>% 
+  group_by(Category, Development) %>%
+  mutate(Total = ifelse(Category == "Expenses", sum(Amount), 0)) %>%
+  group_by(Development) %>%
+  mutate(Expenses = max(Total)) %>% select(-7) %>% 
+  filter(Category == "Grounds") %>% select(-c(1,2)) %>%
+  spread(Description, Amount)  %>%  ungroup() %>% 
+  select(1,6,7,17,15,16,11,5,14,2,3)
+colnames(macro_data) <- c("Development", "Buildings", "Elevators", "Staff", "Rooms", "Apts", "Prof_Units", "Comm_Units", "Staff_Units", "Income", "Expenses")
+
+micro_data <- 
+  long_data %>% 
+  group_by(Category, Development) %>%
+  mutate(Total = ifelse(Category == "Income", sum(Amount), 0)) %>%
+  group_by(Development) %>%
+  mutate(Income = max(Total)) %>% select(-6) %>% 
+  group_by(Category, Development) %>%
+  mutate(Total = ifelse(Category == "Expenses", sum(Amount), 0)) %>%
+  group_by(Development) %>%
+  mutate(Expenses = max(Total)) %>% select(-7) %>% 
+  filter(Category == "Grounds") %>% select(-c(1,2)) %>%
+  spread(Description, Amount)  %>%  ungroup() %>% 
+  select(1,6,7,17,15,16,11,5,14,2,3)
+colnames(macro_data) <- c("Development", "Buildings", "Elevators", "Staff", "Rooms", "Apts", "Prof_Units", "Comm_Units", "Staff_Units", "Income", "Expenses")
+
+```
+
+# Analysis
+
+## Income versus Expenses
+
+```{r}
+macro_data %>% mutate(Net = Income - Expenses, Ratio = Income / Expenses) %>% select(1,10,11,12,13)
+```
+
+## Income Breakdown
+
+```{r}
+library(tidyr)
+library(dplyr)
+
+# Change to median
+# http://r.789695.n4.nabble.com/function-for-rowMedian-td791942.html
+
+wide_data %>% filter(Category == "Income") %>% select(3:12) %>%
+  mutate(Average = rowSums(.[, sapply(., is.numeric)]) / 9) %>%
+  filter(Average != 0) %>%
+  mutate_each(funs(paste0(round(( ( . - Average) / ifelse(Average == 0, 1e-15, Average))*100, 2),"%")), -1)
+  
+  summarise_each(funs(colSums), -1)
+
+macro_data %>% mutate(Net = Income - Expenses, Ratio = Income / Expenses) %>% select(1,10,11,12,13)
+```
+
+
+
+## Cost per Apartment Unit
+
+
+# Referenes
+
+^i^ http://www.investopedia.com/articles/personal-finance/090115/living-new-york-city-coops-vs-condos.asp
+
+^ii^ http://www.huffingtonpost.com/greg-jacobs/coop-vs-condo-what-you-ne_b_3460551.html
+
+^iii^ http://www.nychdc.com/pages/Mitchell-Lama-Program.html  
+
+^iv^ http://www1.nyc.gov/site/hpd/renters/mitchell-lama-rentals.page
+
+^v^ http://www.nyshcr.org/AboutUs/Offices/HousingOperations/2010_B06.htm
+
+^vi^ https://www1.nyc.gov/assets/hpd/downloads/pdf/renters-mitchell-lama/mitchell-lama-rules.pdf
