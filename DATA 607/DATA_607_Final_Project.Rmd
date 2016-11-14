@@ -100,27 +100,27 @@ library(ggplot2)
 ## Load Data Sets
 
 ```{r}
-Felonys_Major <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
-                          "DATA%20607/DATA_607_Final_Project_1.csv"), stringsAsFactors = F)
+Mortality_1 <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
+                               "DATA%20607/DATA_607_Final_Project_1.csv"), stringsAsFactors = F)
 
-Deaths <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
-                          "DATA%20607/DATA_607_Final_Project_2.csv"), stringsAsFactors = F)
+Mortality_2 <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
+                               "DATA%20607/DATA_607_Final_Project_2.csv"), stringsAsFactors = F)
 ```
 
 ## Clean, Preprocess, and Reduce Data Sets
 
 ```{r}
-Hospital <- Deaths %>% 
-  filter(grepl('HOMICIDE', Cause.of.Death)) %>% 
-  group_by(Year) %>% 
-  summarise(Total = sum(Count))
-
-Precincts <- Felonys_Major %>%
+Precincts <- Mortality_1 %>%
   filter(grepl('MURDER', CRIME)) %>%
   gather(xYear, Count, 3:18) %>%
   na.omit(Count) %>%  
   mutate(Year = as.integer(sub("X", "", xYear))) %>%
   group_by(Year) %>%
+  summarise(Total = sum(Count))
+
+Hospital <- Mortality_2 %>% 
+  filter(grepl('HOMICIDE', Cause.of.Death)) %>% 
+  group_by(Year) %>% 
   summarise(Total = sum(Count))
 ```
 
@@ -256,14 +256,14 @@ as "late effects" one year or more after the originating event.
 ## Load New Data Sets
 
 ```{r}
-Deaths_2 <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
-                          "DATA%20607/DATA_607_Final_Project_3.csv"), stringsAsFactors = F)
+Mortality_3 <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
+                               "DATA%20607/DATA_607_Final_Project_3.csv"), stringsAsFactors = F)
 ```
 
 ## Clean and Preprocess New Data Set
 
 ```{r}
-Hospital_2 <- Deaths_2[1:15, 2:3]
+Hospital_2 <- Mortality_3[1:15, 2:3]
 Hospital_2[1] <- as.integer(unlist(Hospital_2[1]))
 colnames(Hospital_2) <- colnames(Hospital)
 shapiro.test(unlist(Hospital_2))

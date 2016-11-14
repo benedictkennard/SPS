@@ -149,7 +149,6 @@ wide_data %>% filter(Category == "Income") %>% select(3:12) %>%
   
   summarise_each(funs(colSums), -1)
 
-macro_data %>% mutate(Net = Income - Expenses, Ratio = Income / Expenses) %>% select(1,10,11,12,13)
 ```
 
 
