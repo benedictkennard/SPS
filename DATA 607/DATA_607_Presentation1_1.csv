@@ -1,90 +1,90 @@
-Category,Subcategory,Description,First Atlantic,Dayton Beach,Dayton Towers,Ryerson Towers,Stryckers Bay,Luna Park,Northside Gardens,Rosedale Gardens,Franklin Plaza
-Grounds,Buildings,Number of Buildings,2,5,7,1,1,5,8,4,14
-Grounds,Buildings,Number of Elevators,4,15,25,4,4,15,0,8,28
-Grounds,Buildings,Total Staff,7,24,43,9,12,46,0,10,78
-Grounds,Units,Residential Units,202,1144,1752,326,234,1573,41,406,1633
-Grounds,Units,Professional Units,0,4,0,2,0,0,0,0,0
-Grounds,Units,Rent-free Staff Units,1,3,6,1,1,1,0,1,2
-Grounds,Units,Other Units,0,0,0,0,0,2,0,0,0
-Grounds,Units,Professional Space,0,0,3,0,0,0,0,0,0
-Grounds,Units,Commercial Space,0,0,1,0,9,9,0,0,26
-Grounds,Rooms,Residential Rooms,884,5486,7334,1455.5,1067.5,7328.5,169.5,1878,7349
-Grounds,Rooms,Professional Rooms,0,0,0,6,0,0,0,0,0
-Grounds,Rooms,Rent-free Staff Rooms,2.5,0,36,5,0,3.5,0,5.6,9
-Grounds,Rooms,Other Rooms,0,0,0,0,0,6,0,0,0
-Grounds,Rooms,Average Room Rent,265.5,182.39,174.95,172.42,179.51,224.77,129.64,154.81,227.7
-Income,Gross Residential Rents,Gross Residential Rents,2598619,12006767,15337797,3011520,2300311,19295434,263692,3488797,19672798
-Income,Surcharge Retention,Surcharge Retention,138052,169245,420652,118248,184213,0,0,0,225793
-Income,Other Income,Professional Apts,0,19756,0,45630,0,0,0,0,0
-Income,Other Income,Commercial Spaces,0,0,96631,0,719624,197801,0,0,2089293
-Income,Other Income,Garage,44716,242417,0,0,191026,0,0,0,0
-Income,Other Income,Parking Spaces,0,0,435147,61200,0,316032,6000,87920,151206
-Income,Other Income,Community Rooms,6300,0,0,11700,2350,0,0,0,35100
-Income,Other Income,Swimming Pool,0,0,101356,0,0,0,0,0,0
-Income,Other Income,Air Conditioner,28365,185172,406585,32237,0,436508,0,67856,233775
-Income,Other Income,Washing Machines,0,0,0,156,0,0,0,0,0
-Income,Other Income,Laundry Rooms,27825,86400,207000,25200,16250,97440,0,0,62600
+Category,Subcategory,Description,Dayton Beach,Dayton Towers,First Atlantic,Franklin Plaza,Luna Park,Northside Gardens,Rosedale Gardens,Ryerson Towers,Stryckers Bay
+Grounds,Buildings,Number of Buildings,5,7,2,14,5,8,4,1,1
+Grounds,Buildings,Number of Elevators,15,25,4,28,15,0,8,4,4
+Grounds,Buildings,Total Staff,24,43,7,78,46,0,10,9,12
+Grounds,Units,Residential Units,1144,1752,202,1633,1573,41,406,326,234
+Grounds,Units,Professional Units,4,0,0,0,0,0,0,2,0
+Grounds,Units,Rent-free Staff Units,3,6,1,2,1,0,1,1,1
+Grounds,Units,Other Units,0,0,0,0,2,0,0,0,0
+Grounds,Units,Professional Space,0,3,0,0,0,0,0,0,0
+Grounds,Units,Commercial Space,0,1,0,26,9,0,0,0,9
+Grounds,Rooms,Residential Rooms,5486,7334,884,7349,7328.5,169.5,1878,1455.5,1067.5
+Grounds,Rooms,Professional Rooms,0,0,0,0,0,0,0,6,0
+Grounds,Rooms,Rent-free Staff Rooms,0,36,2.5,9,3.5,0,5.6,5,0
+Grounds,Rooms,Other Rooms,0,0,0,0,6,0,0,0,0
+Grounds,Rooms,Average Room Rent,182.39,174.95,265.5,227.7,224.77,129.64,154.81,172.42,179.51
+Income,Gross Residential Rents,Gross Residential Rents,12006767,15337797,2598619,19672798,19295434,263692,3488797,3011520,2300311
+Income,Surcharge Retention,Surcharge Retention,169245,420652,138052,225793,0,0,0,118248,184213
+Income,Other Income,Professional Apts,19756,0,0,0,0,0,0,45630,0
+Income,Other Income,Commercial Spaces,0,96631,0,2089293,197801,0,0,0,719624
+Income,Other Income,Garage,242417,0,44716,0,0,0,0,0,191026
+Income,Other Income,Parking Spaces,0,435147,0,151206,316032,6000,87920,61200,0
+Income,Other Income,Community Rooms,0,0,6300,35100,0,0,0,11700,2350
+Income,Other Income,Swimming Pool,0,101356,0,0,0,0,0,0,0
+Income,Other Income,Air Conditioner,185172,406585,28365,233775,436508,0,67856,32237,0
+Income,Other Income,Washing Machines,0,0,0,0,0,0,0,156,0
+Income,Other Income,Laundry Rooms,86400,207000,27825,62600,97440,0,0,25200,16250
 Income,Other Income,Other Vending Machines,0,0,0,0,0,0,0,0,0
-Income,Other Income,Tenant Television,0,0,0,0,0,0,0,0,8370
+Income,Other Income,Tenant Television,0,0,0,8370,0,0,0,0,0
 Income,Other Income,Roof Rentals,0,0,0,0,0,0,0,0,0
-Income,Other Income,Interest on Investments,0,10538,111462,0,5169,49443,0,31925,3772
-Income,Other Income,Miscellaneous Income,9863,83054,0,14170,0,69015,6851,26914,493463
-Income,Other Income,Application Fees,9448,0,0,0,0,0,0,0,0
-Income,Other Income,Late Fees,0,29056,149528,0,30920,0,0,0,0
-Income,Other Income,Assessments,0,29056,149528,188579,0,143925,0,89974,0
-Income,Other Income,Storage,0,0,0,0,19220,0,0,4218,0
-Income,Other Income,Tenant Reimbursements,0,0,0,0,50223,0,0,0,0
-Income,Other Income,Other Tenant Charges,0,29056,149528,87869,0,143971,0,72931,118199
-Income,Other Income,Federal Subsidy,528068,0,0,0,0,0,0,0,0
-Income,Other Income,Rent Revenue,122439,0,0,0,0,0,0,0,0
-Income,Vacancy or Loss,Vacancy/Loss,-640,-158364,-25565,-40928,-18581,-45617,-8901,-51679,0
-Expenses,Repairs and Maintenance,Supplies,49094,379442,703578,155212,44779,371253,2740,187717,524714
-Expenses,Repairs and Maintenance,Exterminator,13795,43953,69571,19206,28275,98148,2419,40829,42411
-Expenses,Repairs and Maintenance,Permits,0,7046,0,0,0,0,404,0,0
-Expenses,Repairs and Maintenance,Painting and Decorating,96048,0,30400,109001,0,0,0,0,0
-Expenses,Repairs and Maintenance,Landscaping,0,92474,174039,10343,0,114506,4005,50198,0
-Expenses,Repairs and Maintenance,Plumbing,138880,187864,21662,135004,28911,1410409,33102,20023,101136
-Expenses,Repairs and Maintenance,Electrical,597,0,333842,22543,7475,479276,0,0,34296
-Expenses,Repairs and Maintenance,Pool,0,0,179822,0,0,0,0,0,52278
-Expenses,Repairs and Maintenance,Heating,14221,57145,45330,92873,14456,0,0,0,0
-Expenses,Repairs and Maintenance,Snow Removal,0,43918,0,0,0,0,0,0,0
-Expenses,Repairs and Maintenance,Roof,8341,0,0,0,0,0,0,0,0
+Income,Other Income,Interest on Investments,10538,111462,0,3772,49443,0,31925,0,5169
+Income,Other Income,Miscellaneous Income,83054,0,9863,493463,69015,6851,26914,14170,0
+Income,Other Income,Application Fees,0,0,9448,0,0,0,0,0,0
+Income,Other Income,Late Fees,29056,149528,0,0,0,0,0,0,30920
+Income,Other Income,Assessments,29056,149528,0,0,143925,0,89974,188579,0
+Income,Other Income,Storage,0,0,0,0,0,0,4218,0,19220
+Income,Other Income,Tenant Reimbursements,0,0,0,0,0,0,0,0,50223
+Income,Other Income,Other Tenant Charges,29056,149528,0,118199,143971,0,72931,87869,0
+Income,Other Income,Federal Subsidy,0,0,528068,0,0,0,0,0,0
+Income,Other Income,Rent Revenue,0,0,122439,0,0,0,0,0,0
+Income,Vacancy or Loss,Vacancy/Loss,-158364,-25565,-640,0,-45617,-8901,-51679,-40928,-18581
+Expenses,Repairs and Maintenance,Supplies,379442,703578,49094,524714,371253,2740,187717,155212,44779
+Expenses,Repairs and Maintenance,Exterminator,43953,69571,13795,42411,98148,2419,40829,19206,28275
+Expenses,Repairs and Maintenance,Permits,7046,0,0,0,0,404,0,0,0
+Expenses,Repairs and Maintenance,Painting and Decorating,0,30400,96048,0,0,0,0,109001,0
+Expenses,Repairs and Maintenance,Landscaping,92474,174039,0,0,114506,4005,50198,10343,0
+Expenses,Repairs and Maintenance,Plumbing,187864,21662,138880,101136,1410409,33102,20023,135004,28911
+Expenses,Repairs and Maintenance,Electrical,0,333842,597,34296,479276,0,0,22543,7475
+Expenses,Repairs and Maintenance,Pool,0,179822,0,52278,0,0,0,0,0
+Expenses,Repairs and Maintenance,Heating,57145,45330,14221,0,0,0,0,92873,14456
+Expenses,Repairs and Maintenance,Snow Removal,43918,0,0,0,0,0,0,0,0
+Expenses,Repairs and Maintenance,Roof,0,0,8341,0,0,0,0,0,0
 Expenses,Repairs and Maintenance,Carpentry,0,0,0,0,0,0,0,0,0
-Expenses,Repairs and Maintenance,Uniforms,0,3671,0,0,0,0,0,0,0
+Expenses,Repairs and Maintenance,Uniforms,3671,0,0,0,0,0,0,0,0
 Expenses,Repairs and Maintenance,Violations,0,0,0,0,0,0,0,0,0
-Expenses,Repairs and Maintenance,Garage,28716,0,0,0,0,0,0,0,0
-Expenses,Repairs and Maintenance,Intercom,0,29070,0,0,0,0,0,0,0
-Expenses,Repairs and Maintenance,Other,0,283025,165798,89159,41866,121202,6481,178632,485424
-Expenses,Repairs and Maintenance,Shareholder Reimbursement,0,283025,-90990,0,0,0,0,0,0
-Expenses,Elevator,Elevator Contract,17320,0,0,0,25976,100126,0,39974,254588
-Expenses,Elevator,Elevator Repairs,13894,101477,466584,37778,82,349193,0,240,310696
-Expenses,Personnel,Maintenance Salaries,219603,1338500,2493324,421298,809558,1004645,0,108803,2639430
-Expenses,Personnel,Security Salaries,0,0,0,0,0,0,0,64528,1136976
-Expenses,Personnel,Office Salaries,0,0,0,27058,0,0,0,69077,0
+Expenses,Repairs and Maintenance,Garage,0,0,28716,0,0,0,0,0,0
+Expenses,Repairs and Maintenance,Intercom,29070,0,0,0,0,0,0,0,0
+Expenses,Repairs and Maintenance,Other,283025,165798,0,485424,121202,6481,178632,89159,41866
+Expenses,Repairs and Maintenance,Shareholder Reimbursement,283025,-90990,0,0,0,0,0,0,0
+Expenses,Elevator,Elevator Contract,0,0,17320,254588,100126,0,39974,0,25976
+Expenses,Elevator,Elevator Repairs,101477,466584,13894,310696,349193,0,240,37778,82
+Expenses,Personnel,Maintenance Salaries,1338500,2493324,219603,2639430,1004645,0,108803,421298,809558
+Expenses,Personnel,Security Salaries,0,0,0,1136976,0,0,64528,0,0
+Expenses,Personnel,Office Salaries,0,0,0,0,0,0,69077,27058,0
 Expenses,Personnel,Super Rent Free Unit,0,0,0,0,0,0,0,0,0
-Expenses,Personnel,Other Salaries,64078,0,0,0,0,1260583,0,225394,0
-Expenses,Personnel,Workers Comp,0,0,145638,0,0,0,0,0,0
-Expenses,Personnel,Payroll Taxes,27221,131195,0,42759,76190,176720,0,36858,335526
-Expenses,Personnel,Employee Benefits,127020,443224,1221654,162612,290169,869770,0,114943,1405405
-Expenses,Professional Services,Security Contract,154831,604432,741886,195258,0,765393,0,210463,0
-Expenses,Professional Services,Legal,32630,217276,193644,38423,51565,397126,26836,65391,122172
-Expenses,Professional Services,Accounting,32602,38325,0,14000,18148,48709,10000,22322,28351
-Expenses,Professional Services,Management Fee,120700,428820,580540,109000,94188,366454,18500,101228,637324
-Expenses,Administrative,Insurance,79555,1416239,820553,179551,135274,1454929,19923,155120,1108229
-Expenses,Administrative,Office Expenses,72366,292774,116390,51507,3546,103425,2637,77614,103865
-Expenses,Administrative,Professional fees,15286,0,0,0,0,0,0,0,60128
-Expenses,Taxes,Corporate Taxes,0,0,0,0,188194,0,0,0,0
-Expenses,Other,Other,0,0,43132,90285,94071,0,0,0,14036
-Expenses,Utility Costs,Heating Gas,0,1577282,1189736,287610,0,1318298,7311,0,4119641
-Expenses,Utility Costs,Heating Oil,298250,0,0,64734,0,471139,0,0,0
-Expenses,Utility Costs,Heating Steam,0,0,0,0,434181,0,0,270000,0
-Expenses,Utility Costs,Electricity,476241,1309929,1692164,436640,259768,2040805,0,717185,2287096
-Expenses,Utility Costs,Gas,19961,61234,97593,16671,12650,0,0,0,105600
-Expenses,Utility Costs,Water and Sewer,189786,1085664,1281076,202327,243598,1489296,28194,384295,1510733
-Expenses,Taxes,Real Estate Taxes,141081,975092,1112959,240949,371149,1491059,21494,236992,1738383
-Expenses,Interest and Amortization,Mitchell-Lama Debt Service,652029,0,1095386,0,0,0,31071,0,0
-Expenses,Interest and Amortization,Article 8A Loan Debt Service,120368,0,0,161976,0,0,58128,190722,0
-Expenses,Interest and Amortization,Other Debt Service,0,1967734,0,273276,371149,4473792,2025,442753,229286
-Expenses,Actual Allocation to Reserves,Capital Repair and Replacement Reserve,23600,58367,0,0,15592,300000,0,86400,3706645
-Expenses,Actual Allocation to Reserves,Contingency,100000,0,0,0,0,0,0,0,0
+Expenses,Personnel,Other Salaries,0,0,64078,0,1260583,0,225394,0,0
+Expenses,Personnel,Workers Comp,0,145638,0,0,0,0,0,0,0
+Expenses,Personnel,Payroll Taxes,131195,0,27221,335526,176720,0,36858,42759,76190
+Expenses,Personnel,Employee Benefits,443224,1221654,127020,1405405,869770,0,114943,162612,290169
+Expenses,Professional Services,Security Contract,604432,741886,154831,0,765393,0,210463,195258,0
+Expenses,Professional Services,Legal,217276,193644,32630,122172,397126,26836,65391,38423,51565
+Expenses,Professional Services,Accounting,38325,0,32602,28351,48709,10000,22322,14000,18148
+Expenses,Professional Services,Management Fee,428820,580540,120700,637324,366454,18500,101228,109000,94188
+Expenses,Administrative,Insurance,1416239,820553,79555,1108229,1454929,19923,155120,179551,135274
+Expenses,Administrative,Office Expenses,292774,116390,72366,103865,103425,2637,77614,51507,3546
+Expenses,Administrative,Professional fees,0,0,15286,60128,0,0,0,0,0
+Expenses,Taxes,Corporate Taxes,0,0,0,0,0,0,0,0,188194
+Expenses,Other,Other,0,43132,0,14036,0,0,0,90285,94071
+Expenses,Utility Costs,Heating Gas,1577282,1189736,0,4119641,1318298,7311,0,287610,0
+Expenses,Utility Costs,Heating Oil,0,0,298250,0,471139,0,0,64734,0
+Expenses,Utility Costs,Heating Steam,0,0,0,0,0,0,270000,0,434181
+Expenses,Utility Costs,Electricity,1309929,1692164,476241,2287096,2040805,0,717185,436640,259768
+Expenses,Utility Costs,Gas,61234,97593,19961,105600,0,0,0,16671,12650
+Expenses,Utility Costs,Water and Sewer,1085664,1281076,189786,1510733,1489296,28194,384295,202327,243598
+Expenses,Taxes,Real Estate Taxes,975092,1112959,141081,1738383,1491059,21494,236992,240949,371149
+Expenses,Interest and Amortization,Mitchell-Lama Debt Service,0,1095386,652029,0,0,31071,0,0,0
+Expenses,Interest and Amortization,Article 8A Loan Debt Service,0,0,120368,0,0,58128,190722,161976,0
+Expenses,Interest and Amortization,Other Debt Service,1967734,0,0,229286,4473792,2025,442753,273276,371149
+Expenses,Actual Allocation to Reserves,Capital Repair and Replacement Reserve,58367,0,23600,3706645,300000,0,86400,0,15592
+Expenses,Actual Allocation to Reserves,Contingency,0,0,100000,0,0,0,0,0,0
 Expenses,Actual Allocation to Reserves,Working Capital,0,0,0,0,0,0,0,0,0
