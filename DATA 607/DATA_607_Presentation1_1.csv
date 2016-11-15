@@ -37,51 +37,51 @@ Income,Other Income,Tenant Reimbursements,0,0,0,0,50223,0,0,0,0
 Income,Other Income,Other Tenant Charges,0,29056,149528,87869,0,143971,0,72931,118199
 Income,Other Income,Federal Subsidy,528068,0,0,0,0,0,0,0,0
 Income,Other Income,Rent Revenue,122439,0,0,0,0,0,0,0,0
-Income,Vacancy/Loss,Vacancy/Loss,-640,-158364,-25565,-40928,-18581,-45617,-8901,-51679,0
-Expenses,Operating Expenses,Supplies,49094,379442,703578,155212,44779,371253,2740,187717,524714
-Expenses,Operating Expenses,Exterminator,13795,43953,69571,19206,28275,98148,2419,40829,42411
-Expenses,Operating Expenses,Permits,0,7046,0,0,0,0,404,0,0
-Expenses,Operating Expenses,Painting and Decorating,96048,0,30400,109001,0,0,0,0,0
-Expenses,Operating Expenses,Landscaping,0,92474,174039,10343,0,114506,4005,50198,0
-Expenses,Operating Expenses,Plumbing,138880,187864,21662,135004,28911,1410409,33102,20023,101136
-Expenses,Operating Expenses,Electrical,597,0,333842,22543,7475,479276,0,0,34296
-Expenses,Operating Expenses,Pool,0,0,179822,0,0,0,0,0,52278
-Expenses,Operating Expenses,Heating,14221,57145,45330,92873,14456,0,0,0,0
-Expenses,Operating Expenses,Snow Removal,0,43918,0,0,0,0,0,0,0
-Expenses,Operating Expenses,Roof,8341,0,0,0,0,0,0,0,0
-Expenses,Operating Expenses,Carpentry,0,0,0,0,0,0,0,0,0
-Expenses,Operating Expenses,Uniforms,0,3671,0,0,0,0,0,0,0
-Expenses,Operating Expenses,Violations,0,0,0,0,0,0,0,0,0
-Expenses,Operating Expenses,Garage,28716,0,0,0,0,0,0,0,0
-Expenses,Operating Expenses,Intercom,0,29070,0,0,0,0,0,0,0
-Expenses,Operating Expenses,Other,0,283025,165798,89159,41866,121202,6481,178632,485424
-Expenses,Operating Expenses,Shareholder Reimbursement,0,283025,-90990,0,0,0,0,0,0
-Expenses,Operating Expenses,Elevator Contract,17320,0,0,0,25976,100126,0,39974,254588
-Expenses,Operating Expenses,Elevator Repairs,13894,101477,466584,37778,82,349193,0,240,310696
-Expenses,Operating Expenses,Maintenance Salaries,219603,1338500,2493324,421298,809558,1004645,0,108803,2639430
-Expenses,Operating Expenses,Security Salaries,0,0,0,0,0,0,0,64528,1136976
-Expenses,Operating Expenses,Office Salaries,0,0,0,27058,0,0,0,69077,0
-Expenses,Operating Expenses,Super Rent Free Unit,0,0,0,0,0,0,0,0,0
-Expenses,Operating Expenses,Other Salaries,64078,0,0,0,0,1260583,0,225394,0
-Expenses,Operating Expenses,Workers Comp,0,0,145638,0,0,0,0,0,0
-Expenses,Operating Expenses,Payroll Taxes,27221,131195,0,42759,76190,176720,0,36858,335526
-Expenses,Operating Expenses,Employee Benefits,127020,443224,1221654,162612,290169,869770,0,114943,1405405
-Expenses,Operating Expenses,Security Contract,154831,604432,741886,195258,0,765393,0,210463,0
-Expenses,Operating Expenses,Legal,32630,217276,193644,38423,51565,397126,26836,65391,122172
-Expenses,Operating Expenses,Accounting,32602,38325,0,14000,18148,48709,10000,22322,28351
-Expenses,Operating Expenses,Management Fee,120700,428820,580540,109000,94188,366454,18500,101228,637324
-Expenses,Operating Expenses,Insurance,79555,1416239,820553,179551,135274,1454929,19923,155120,1108229
-Expenses,Operating Expenses,Office Expenses,72366,292774,116390,51507,3546,103425,2637,77614,103865
-Expenses,Operating Expenses,Professional fees,15286,0,0,0,0,0,0,0,60128
-Expenses,Operating Expenses,Corporate Taxes,0,0,0,0,188194,0,0,0,0
-Expenses,Operating Expenses,Other,0,0,43132,90285,94071,0,0,0,14036
+Income,Vacancy or Loss,Vacancy/Loss,-640,-158364,-25565,-40928,-18581,-45617,-8901,-51679,0
+Expenses,Repairs and Maintenance,Supplies,49094,379442,703578,155212,44779,371253,2740,187717,524714
+Expenses,Repairs and Maintenance,Exterminator,13795,43953,69571,19206,28275,98148,2419,40829,42411
+Expenses,Repairs and Maintenance,Permits,0,7046,0,0,0,0,404,0,0
+Expenses,Repairs and Maintenance,Painting and Decorating,96048,0,30400,109001,0,0,0,0,0
+Expenses,Repairs and Maintenance,Landscaping,0,92474,174039,10343,0,114506,4005,50198,0
+Expenses,Repairs and Maintenance,Plumbing,138880,187864,21662,135004,28911,1410409,33102,20023,101136
+Expenses,Repairs and Maintenance,Electrical,597,0,333842,22543,7475,479276,0,0,34296
+Expenses,Repairs and Maintenance,Pool,0,0,179822,0,0,0,0,0,52278
+Expenses,Repairs and Maintenance,Heating,14221,57145,45330,92873,14456,0,0,0,0
+Expenses,Repairs and Maintenance,Snow Removal,0,43918,0,0,0,0,0,0,0
+Expenses,Repairs and Maintenance,Roof,8341,0,0,0,0,0,0,0,0
+Expenses,Repairs and Maintenance,Carpentry,0,0,0,0,0,0,0,0,0
+Expenses,Repairs and Maintenance,Uniforms,0,3671,0,0,0,0,0,0,0
+Expenses,Repairs and Maintenance,Violations,0,0,0,0,0,0,0,0,0
+Expenses,Repairs and Maintenance,Garage,28716,0,0,0,0,0,0,0,0
+Expenses,Repairs and Maintenance,Intercom,0,29070,0,0,0,0,0,0,0
+Expenses,Repairs and Maintenance,Other,0,283025,165798,89159,41866,121202,6481,178632,485424
+Expenses,Repairs and Maintenance,Shareholder Reimbursement,0,283025,-90990,0,0,0,0,0,0
+Expenses,Elevator,Elevator Contract,17320,0,0,0,25976,100126,0,39974,254588
+Expenses,Elevator,Elevator Repairs,13894,101477,466584,37778,82,349193,0,240,310696
+Expenses,Personnel,Maintenance Salaries,219603,1338500,2493324,421298,809558,1004645,0,108803,2639430
+Expenses,Personnel,Security Salaries,0,0,0,0,0,0,0,64528,1136976
+Expenses,Personnel,Office Salaries,0,0,0,27058,0,0,0,69077,0
+Expenses,Personnel,Super Rent Free Unit,0,0,0,0,0,0,0,0,0
+Expenses,Personnel,Other Salaries,64078,0,0,0,0,1260583,0,225394,0
+Expenses,Personnel,Workers Comp,0,0,145638,0,0,0,0,0,0
+Expenses,Personnel,Payroll Taxes,27221,131195,0,42759,76190,176720,0,36858,335526
+Expenses,Personnel,Employee Benefits,127020,443224,1221654,162612,290169,869770,0,114943,1405405
+Expenses,Professional Services,Security Contract,154831,604432,741886,195258,0,765393,0,210463,0
+Expenses,Professional Services,Legal,32630,217276,193644,38423,51565,397126,26836,65391,122172
+Expenses,Professional Services,Accounting,32602,38325,0,14000,18148,48709,10000,22322,28351
+Expenses,Professional Services,Management Fee,120700,428820,580540,109000,94188,366454,18500,101228,637324
+Expenses,Administrative,Insurance,79555,1416239,820553,179551,135274,1454929,19923,155120,1108229
+Expenses,Administrative,Office Expenses,72366,292774,116390,51507,3546,103425,2637,77614,103865
+Expenses,Administrative,Professional fees,15286,0,0,0,0,0,0,0,60128
+Expenses,Taxes,Corporate Taxes,0,0,0,0,188194,0,0,0,0
+Expenses,Other,Other,0,0,43132,90285,94071,0,0,0,14036
 Expenses,Utility Costs,Heating Gas,0,1577282,1189736,287610,0,1318298,7311,0,4119641
 Expenses,Utility Costs,Heating Oil,298250,0,0,64734,0,471139,0,0,0
 Expenses,Utility Costs,Heating Steam,0,0,0,0,434181,0,0,270000,0
 Expenses,Utility Costs,Electricity,476241,1309929,1692164,436640,259768,2040805,0,717185,2287096
 Expenses,Utility Costs,Gas,19961,61234,97593,16671,12650,0,0,0,105600
 Expenses,Utility Costs,Water and Sewer,189786,1085664,1281076,202327,243598,1489296,28194,384295,1510733
-Expenses,Real Estate Taxes,Real Estate Taxes,141081,975092,1112959,240949,371149,1491059,21494,236992,1738383
+Expenses,Taxes,Real Estate Taxes,141081,975092,1112959,240949,371149,1491059,21494,236992,1738383
 Expenses,Interest and Amortization,Mitchell-Lama Debt Service,652029,0,1095386,0,0,0,31071,0,0
 Expenses,Interest and Amortization,Article 8A Loan Debt Service,120368,0,0,161976,0,0,58128,190722,0
 Expenses,Interest and Amortization,Other Debt Service,0,1967734,0,273276,371149,4473792,2025,442753,229286
