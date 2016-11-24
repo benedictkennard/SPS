@@ -1,11 +1,11 @@
 ---
-title: "Final Project"
+title: "NYC Mortality Statistics"
 author: "Jose Zuniga"
 output:
-  html_document:
+  pdf_document:
     toc: yes
     toc_depth: '4'
-  pdf_document:
+  html_document:
     toc: yes
     toc_depth: '4'
 ---
@@ -14,90 +14,51 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-United Hospital Fund (UHF) Neighborhood of Residence
-https://a816-healthpsi.nyc.gov/epiquery/CHS/uhf-zip-information.pdf
-https://www1.nyc.gov/assets/doh/downloads/pdf/ah/zipcodetable.pdf
- 
-HOSPITAL ADDRESSES
-http://www.health.ny.gov/regulations/hcra/provider/provhosp.htm
- 
-PRECINCT ADDRESSES
-http://www.nyc.gov/html/nypd/html/home/precincts.shtml
- 
-GOOGLE GEOCODING
-https://maps.googleapis.com/maps/api/geocode/json?address=address+city+state
-2,500 free requests per day
-50 requests per second
+# 1. Final Project Instructions
 
-```{r  message=F}
-library(RCurl)
-library(XML)
-library(stringr)
-library(plyr)
-xmlAttrsToDF <- function(parsedHTML, xpath) {
-x <- xpathApply(parsedHTML, xpath, xmlAttrs)
-x <- lapply(x, function(x) as.data.frame(t(x)))
-do.call(rbind.fill, x)
-}
-info <- debugGatherer()
-handle <- getCurlHandle(cookiejar = "",
-followlocation = TRUE,
-autoreferer = TRUE,
-debugfunc = info$update,
-verbose = TRUE,
-httpheader = list(
-from = "eddie@r-datacollection.com",
-'user-agent' = str_c(R.version$version.string,
-", ", R.version$platform)
-))
-url <- "https://a816-healthpsi.nyc.gov/epiquery/VS/index.html"
-# signatures = system.file("CurlSSL", cainfo = "cacert.pem", package = "RCurl")
-# html_form <- getURL(url, cainfo = signatures)
-html_form <- getURL(url, ssl.verifypeer = FALSE)
-parsed_form <- htmlParse(html_form)
-xmlAttrsToDF(parsed_form, "//form")
-xmlAttrsToDF(parsed_form, "//form[1]/input")
-xpathApply(parsed_form, "//form[2]")
-res <- postForm(uri = str_c(url, "main_button"), cainfo = signatures, curl = handle, style = "POST", directInput = "Mortality - by select causes")
-```
-
-# Final Project Instructions
-
-Describe your motivation for performing this analysis. Have a recognizable data science workflow. Include data from at least two different types of data sources. Include at least one data transformation operation. Include at least one statistical analysis and at least one graphic that describes or validates the data. Includes at least one graphic that supports the conclusion. Includes at least one statistical analysis that supports the conclusion. Includes at least one feature not covered in class. Deliver the presentation in the allotted time of 3 to 5 minutes. Show at least one challenge encountered in code or data, and what was done when the challenge was encountered. Ensure the audience comes away with a clear understanding of the motivation for undertaking the project. Ensure the audience comes away with a clear understanding of at least one insight gained, the conclusion you reached, or the hypothesis you confirmed. Deliver the submit self-contained code and data. Deliver fully reproducible results. Ensure all of the delivered code runs without errors. Deliver code and conclusions using a reproducible research tool. Deliver draft project proposal, project, and presentation on time. 
+Describe your motivation for performing this analysis (2). Have a recognizable data science workflow (4.a - 4.e, 5.a - 5.c). Include data from at least two different types of data sources (4.b.i, 4.e.iv.3, 5.a.i). Include at least one data transformation operation (4.b.ii, 5.a.ii). Include at least one statistical analysis and at least one graphic that describes or validates the data (4.d, 5.b). Includes at least one graphic that supports the conclusion (4.e, 5.b). Includes at least one statistical analysis that supports the conclusion (4.e, 5.c). Includes at least one feature not covered in class (5.a - 5.b). Deliver the presentation in the allotted time of 3 to 5 minutes. Show at least one challenge encountered in code or data, and what was done when the challenge was encountered (4.e.iv). Ensure the audience comes away with a clear understanding of the motivation for undertaking the project. Ensure the audience comes away with a clear understanding of at least one insight gained, the conclusion you reached, or the hypothesis you confirmed. Deliver the submit self-contained code and data. Deliver fully reproducible results. Ensure all of the delivered code runs without errors. Deliver code and conclusions using a reproducible research tool. Deliver draft project proposal, project, and presentation on time. 
 
 ***
 
-# Purpose of Project
+# 2. Purpose of Project
 
-In April of 2015 there was a murder in New York City. I did not see the crime, but I did hear the shots. There was a surge of police activity. Then, when crime scene investigation was done, the body remained covered by a white sheet and guarded by a police officer for a few hours until it was picked up by an ambulance. The strange thing is, a few news outlets reported that "EMS rushed him to St. Barnabas Hospital, where he was pronounced dead, cops said." I was disturbed by the whole situation, but these new reports also made me wonder how crime statistics are reported. Was this death reported in the statistics for the precinct of the hospital (48th) or the precinct of the crime (46th)? I never bothered to do the digging and find out.
+In April of 2015 there was a murder in New York City. I did not see the crime, but I did hear the shots. There was a surge of police activity. Then, when crime scene investigation was done, the body remained covered by a white sheet and guarded by a police officer for a few hours until it was picked up by an ambulance. The strange thing is, a few news outlets reported that "EMS rushed him to St. Barnabas Hospital, where he was pronounced dead, cops said." I was disturbed by the whole situation, but these new reports also made me wonder how crime statistics are reported. Was this death reported in the statistics for the precinct of the hospital (48th) or the precinct of the crime (46th)? I never did the digging necessary to find out.
 
-Then, in September of 2016, I read something about a similar situation in the news. There was a story about the time of death reported by the NYC Police Department. The report said "Police officials initially said that Graham died at Montefiore Medical Center. His death certificate says he was shot at 3:01 p.m. and died at 3:53 p.m. According to his family, the video indicates he was already dead, and contradicts the city account." Although this story was also disturbing in-and-of itself, it also made me wonder if the death was reported in the statistics for the precinct of the hospital (52nd) or the precinct of the crime (47th)? I also wondered if the total number of murders reported in NYC police statistics match the total number of homicides reported in NYC Hospitals statistics.
+Then, in September of 2016, I read something about a similar situation in the news. There was a story about the time of death reported by the NYC Police Department. The report said "Police officials initially said that Graham died at Montefiore Medical Center. His death certificate says he was shot at 3:01 p.m. and died at 3:53 p.m. According to his family, the video indicates he was already dead, and contradicts the city account." Although this story was also disturbing in-and-of itself, it also made me wonder if the death was reported in the statistics for the precinct of the hospital (52nd) or the precinct of the crime (47th)? I also wondered if the total number of mortalities reported in NYC police statistics match the total number of mortalities reported in NYC Hospitals statistics.
 
-Narrowing data down to the individual precinct and hospital level is quite an undertaking. A more reasonable task would be to compare NYC police statistics and NYC hospital statistics on a macro in lieu of a micro level.
+# 3. Question(s)
 
-## Question
+Do NYC Police Precincts and NYC Hospitals report different mortality figures? This question will be examined in general terms (whether NYC Police Precincts and NYC Hospitals report the same total mortality figures in their statistics) and much more specific terms (whether mortality statistics are skewed toward hospitals near police precincts).
 
-Do murders reported in NYC police statistics match homicides reported by NYC hospital statistics.
+```{r  message=F, warning=F}
+library(XML)
+library(httr)
+library(tidyr)
+library(dplyr)
+library(RCurl)
+library(ggmap)
+library(ggplot2)
+library(stringr)
+library(jsonlite)
+```
 
-# Obtain and Explore the Data 
+# 4.	General Question
 
-## NYC [Police Deapartment](http://www.nyc.gov/html/nypd/html/analysis_and_planning/historical_nyc_crime_data.shtml)
+Do NYC Police Precincts and NYC Hospitals report the same total mortality figures in their statistics?
 
-  + [Seven Major Felony Offenses](http://www.nyc.gov/html/nypd/downloads/excel/analysis_and_planning/seven_major_felony_offenses_by_precinct_2000_2015.xls). Statistical breakdown by citywide, borough, and precinct 2000 - 2015.
+## a. Obtain Data
 
-## NYC [Department of Health and Mental Hygiene](https://nycopendata.socrata.com/)
+### i.  NYC Police Department (PD)
+
+  + [Seven Major Felony Offenses](http://www.nyc.gov/html/nypd/html/analysis_and_planning/historical_nyc_crime_data.shtml). Statistical breakdown by citywide, borough, and precinct 2000 - 2015.
+
+### ii.  NYC Department of Health and Mental Hygiene (DOHMH)
 
   + [New York City Leading Causes of Death](https://data.cityofnewyork.us/api/views/jb7j-dtam/rows.csv?accessType=DOWNLOAD). The leading causes of death by sex and ethnicity in New York City 2007 - 2011.
 
-# Load, Clean, Preprocess, and Reduce the Data
+## b.	Scrub Data
 
-```{r  message=F}
-library(tidyr)
-library(dplyr)
-library(ggplot2)
-```
-
-## Load Data Sets
+### i. Load Data Sets
 
 ```{r}
 Mortality_1 <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
@@ -107,10 +68,10 @@ Mortality_2 <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS
                                "DATA%20607/DATA_607_Final_Project_2.csv"), stringsAsFactors = F)
 ```
 
-## Clean, Preprocess, and Reduce Data Sets
+### ii. Clean, Preprocess, and Reduce Data Sets
 
 ```{r}
-Precincts <- Mortality_1 %>%
+Precincts_1 <- Mortality_1 %>%
   filter(grepl('MURDER', CRIME)) %>%
   gather(xYear, Count, 3:18) %>%
   na.omit(Count) %>%  
@@ -118,57 +79,59 @@ Precincts <- Mortality_1 %>%
   group_by(Year) %>%
   summarise(Total = sum(Count))
 
-Hospital <- Mortality_2 %>% 
+Hospital_1 <- Mortality_2 %>% 
   filter(grepl('HOMICIDE', Cause.of.Death)) %>% 
   group_by(Year) %>% 
   summarise(Total = sum(Count))
 ```
 
-# Determine the Data Mining Task
+## c. Explore Data
+
+### i. Determine the Task
 
 Test the significance of the difference between pairs. 
 
-# Choose the Technique
+## d. Model Data
+
+### i.  Choose the Technique
 
 ```{r}
-shapiro.test(unlist(Hospital))
-shapiro.test(unlist(Precincts))
-bartlett.test(Hospital,Precincts)
+shapiro.test(unlist(Hospital_1))
+shapiro.test(unlist(Precincts_1))
+bartlett.test(Hospital_1,Precincts_1)
 ```
-Given fairly normal and homoscedastic matched pairs, and assuming independent cases (years), the **paired t-test** would be appropriate. The paired t-test compares two populations of paired data that are correlated due to said pairing. It uses the mean and standard deviation of the differences to calcuate $t=\frac { \bar { d }  }{ s(d)/{ \sqrt { n }  } }$. The null hypothesis of the test is that the true mean difference is zero.
+Given fairly normal and homoscedastic matched pairs, and assuming independent cases (years), the **paired t-test** would be appropriate. The paired t-test compares two populations of paired data that are correlated due to said pairing. It uses the mean and standard deviation of the differences to calculate $t=\frac { \bar { d }  }{ s(d)/{ \sqrt { n }  } }$. The null hypothesis of the test is that the true mean difference is zero.
 
-# Use Algorithm to Perform Analysis
+### ii.  Use Algorithm to Perform Analysis
 
 ```{r}
-(Compare_1 <- full_join(Precincts, Hospital, by = "Year", suffix = c(".NYPD", ".DOHMH")))
-visualize <- rbind(cbind(Precincts, Source = "NYPD"), cbind(Hospital, Source = "DOHMH"))
+(Compare_1 <- full_join(Precincts_1, Hospital_1, by = "Year", suffix = c(".NYPD", ".DOHMH")))
+visualize <- rbind(cbind(Hospital_1, Source = "DOHMH"), cbind(Precincts_1, Source = "NYPD"))
 ggplot() + geom_area(aes(x = Year, y = Total, fill = Source), data = visualize, 
            stat="identity", position = position_dodge(width = 0), alpha= I(0.5))
-Compare_2 <- right_join(Precincts, Hospital, by = "Year", suffix = c(".NYPD", ".DOHMH"))
+Compare_2 <- right_join(Precincts_1, Hospital_1, by = "Year", suffix = c(".NYPD", ".DOHMH"))
 data.frame(Compare_2, Difference = matrix((unlist(Compare_2[3] - Compare_2[2])), ncol=1),
            Factor = matrix((unlist(Compare_2[3] / Compare_2[2])), ncol=1))
 t.test(Compare_2[3] - Compare_2[2])
 ```
 
-# Interpret Results
+## e.  Interpret Data
 
-## Comparison
+### i. Comparison
 
-The data reported by the NYC PD and NYC DOHMH has some serious flaws and conflicts. The NYC PD data shows `r nrow(Precincts)` years of data with an average of `r round(mean(unlist(Precincts[2])), 0)` while the NYC DOHMH data shows `r nrow(Hospital)` years of data with an average of `r round(mean(unlist(Hospital[2])), 0)`. When looking at the years where both have data available, the average difference is `r round(mean(unlist(Compare_2[3] - Compare_2[2])), 0)` which is very strange. The NYC DOHMH data is inflated by a constant factor of about `r round(mean(unlist(Compare_2[3] / Compare_2[2])), 2)`.
+The data reported by the NYC PD and NYC DOHMH is conflicting and flawed. The NYC PD data shows `r nrow(Precincts_1)` years of data with an average of `r round(mean(unlist(Precincts_1[2])), 0)` while the NYC DOHMH data shows `r nrow(Hospital_1)` years of data with an average of `r round(mean(unlist(Hospital_1[2])), 0)`. When looking at the years where both have data available, the average difference is `r round(mean(unlist(Compare_2[3] - Compare_2[2])), 0)` which is very strange. The NYC DOHMH data is inflated by a constant factor of about `r round(mean(unlist(Compare_2[3] / Compare_2[2])), 2)`.
 
-## Statistical Test
+### ii.  Statistical Test
 
-There is something wrong here that does not justify even discussing of the **t-test** results. 
+There is something wrong here that does not justify even discussing the **t-test** results. 
 
-## Findings
+### iii. Findings
 
 Occam's razor demands that the fewest assumptions be made in the interpretation of these findings. Therefore, it is likely that something is wrong in the data. Further investigation is necessary.
 
-# Further Investigation
+### iv.	Investigate Further
 
-## Obtain and Explore More Data
-
-### NYC PD Freedom of Information Law Request
+#### 1. NYC PD Freedom of Information Law Request
 
 > OIGNYPDFoil@oignypd.nyc.gov
 
@@ -182,7 +145,7 @@ Occam's razor demands that the fewest assumptions be made in the interpretation 
  
 > This letter represents our complete response to your request. Should you wish to appeal this determination, you must send written notice within thirty days to Asim Rehman, General Counsel at the Office of the Inspector General for the New York City Police Department, City of New York Department of Investigation, 80 Maiden Lane, 14th Floor, New York, New York 10038.
 
-#### New York State Penal Law
+**New York State Penal Law**
 
 S 125.00 Homicide defined: Homicide means conduct which causes the death of a person or an unborn child with which a female has been pregnant for more than twenty-four weeks under circumstances constituting murder, manslaughter in the first degree, manslaughter in the second degree, criminally negligent homicide, abortion in the first degree or self-abortion in the first degree.
 
@@ -207,7 +170,7 @@ Section Offense	                                      Class
 125.60	Issuing abortional articles.	                B MISD
 -----------------------------------------------------------------
 
-### NYC DOH Freedom of Information Law Request
+#### 2. NYC DOH Freedom of Information Law Request
 
 > recordsaccess@health.nyc.gov
 
@@ -219,7 +182,7 @@ Section Offense	                                      Class
  
 > This concludes the Department's response to your Freedom of Information Law request.
 
-####  International Classification of Disease (ICD)-10
+**International Classification of Disease (ICD)-10**
 
 Category  Condition
 --------  -----------------------------------------------------------
@@ -253,56 +216,45 @@ Y87.1     Sequela of assault ^i^
 ^i^ The sequela include conditions reported as such, or occurring 
 as "late effects" one year or more after the originating event.
 
-## Load New Data Sets
+#### 3. Scrub, Explore, Model
 
 ```{r}
 Mortality_3 <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
                                "DATA%20607/DATA_607_Final_Project_3.csv"), stringsAsFactors = F)
-```
 
-## Clean and Preprocess New Data Set
-
-```{r}
 Hospital_2 <- Mortality_3[1:15, 2:3]
 Hospital_2[1] <- as.integer(unlist(Hospital_2[1]))
-colnames(Hospital_2) <- colnames(Hospital)
+colnames(Hospital_2) <- colnames(Hospital_1)
 shapiro.test(unlist(Hospital_2))
-bartlett.test(Hospital_2,Precincts)
-```
-
-## Use Algorithm to Perform New Analysis
-
-```{r}
-visualize <- rbind(cbind(Precincts, Source = "NYPD"), cbind(Hospital_2, Source = "DOHMH"))
+bartlett.test(Hospital_2, Precincts_1)
+visualize <- rbind(cbind(Hospital_2, Source = "DOHMH"), cbind(Precincts_1, Source = "NYPD"))
 ggplot() + geom_area(aes(x = Year, y = Total, fill = Source), data = visualize, 
            stat="identity", position = position_dodge(width = 0), alpha= I(0.5))
-Compare_3 <- right_join(Precincts, Hospital_2, by = "Year", suffix = c(".NYPD", ".DOHMH"))
+Compare_3 <- right_join(Precincts_1, Hospital_2, by = "Year", suffix = c(".NYPD", ".DOHMH"))
 data.frame(Compare_3, Difference = matrix((unlist(Compare_3[3] - Compare_3[2])), ncol=1),
            Factor = matrix((unlist(Compare_3[3] / Compare_3[2])), ncol=1))
 t.test(Compare_3[3] - Compare_3[2])
 ```
 
-# Interpret New Results
-
-## Comparison
+#### 4. Comparison
 
 These data are much better. The new NYC DOHMH data shows `r nrow(Hospital_2)` years of data with an average of `r round(mean(unlist(Hospital_2[2])), 0)`. When looking at the years where both have data available, the average difference is `r round(mean(unlist(Compare_3[3] - Compare_3[2])), 0)`. The new NYC DOHMH data is still inflated, but now only by a factor of `r round(mean(unlist(Compare_3[3] / Compare_3[2])), 2)`.
 
-## Statistical Test
+#### 5. Statistical Test
 
-For the t-test, the null hypothesis is set to a zero difference, $d = 0$, between the NYC PD murder statistics and NYC DOHMH homicide statistics (this would indicate variation is due to reporting discrepancies), and the alternate hypothesis to an actual difference, $d \neq 0$, existing between the two agencies. Failure to reject the null hypothesis will be assessed on a $p$-value of $0.05$ such that $H_{ 0 }: p > 0.05; H_{ A }: p \le 0.05$. The test results indicate the existence of a $p$-value $=`r format(t.test(Compare_3[3] - Compare_3[2])$p.value, scientific=F)` < 0.05$ indicating that the probability of observing a sample $t$ statistic with `r t.test(Compare_3[3] - Compare_3[2])$parameter` degrees of freedom as extreme as the test statistic `r t.test(Compare_3[3] - Compare_3[2])$statistic` is extremely low. Therefore the null hypothesis is rejected. 
+For the t-test, the null hypothesis is set to a zero difference, $d = 0$, between the NYC PD murder statistics and NYC DOHMH mortality statistics (this would indicate variation is due to reporting discrepancies), and the alternate hypothesis to an actual difference, $d \neq 0$, existing between the two agencies. Failure to reject the null hypothesis will be assessed on a $p$-value of $0.05$ such that $H_{ 0 }: p > 0.05; H_{ A }: p \le 0.05$. The test results indicate the existence of a $p$-value $=`r format(t.test(Compare_3[3] - Compare_3[2])$p.value, scientific=F)` < 0.05$ indicating that the probability of observing a sample $t$ statistic with `r t.test(Compare_3[3] - Compare_3[2])$parameter` degrees of freedom as extreme as the test statistic `r t.test(Compare_3[3] - Compare_3[2])$statistic` is extremely low. Therefore, the null hypothesis is rejected. 
 
-## Findings
+### v.  Findings
 
-The data supports the conclusion that an actual difference exists between NYC PD murder statistics and NYC DOHMH homicide statistics. This begs the question about where this statistically significant and important difference in murders is coming from. Examining the data definitions, it seems reasonable to check if a sequela lag issue (homicide reported as such, or occurring as "late effects" one year or more after the originating event) can be the reason.
+The data supports the conclusion that an actual difference exists between NYC PD mortality statistics and NYC DOHMH mortality statistics. This begs the question about where this statistically significant and important difference in mortalities is coming from. Examining the data definitions, it seems reasonable to check if a sequela lag issue (mortality reported as such, or occurring as "late effects" one year or more after the originating event) can be the reason.
 
-# Refine
+### vi.	Refine Further
 
 ```{r}
 (sequela <- data.frame("Year" = Compare_3[1] - 1, Compare_3[3] - Compare_3[2]))
-sequela_lag <- Precincts[1:14, ]
+sequela_lag <- Precincts_1[1:14, ]
 sequela_lag[ , 2] <-  sequela_lag[ , 2] + sequela[2:15 ,2]
-visualize <- rbind(cbind(sequela_lag, Source = "NYPD"), cbind(Hospital_2[1:14,], Source = "DOHMH"))
+visualize <- rbind(cbind(Hospital_2[1:14,], Source = "DOHMH"), cbind(sequela_lag, Source = "NYPD"))
 ggplot() + geom_area(aes(x = Year, y = Total, fill = Source), data = visualize, 
            stat="identity", position = position_dodge(width = 0), alpha= I(0.5))
 Compare_4 <- left_join(sequela_lag, Hospital_2, by = "Year", suffix = c(".NYPD", ".DOHMH"))
@@ -311,29 +263,192 @@ data.frame(Compare_4, Difference = matrix((unlist(Compare_4[3] - Compare_4[2])),
 t.test(Compare_4[3] - Compare_4[2])
 ```
 
-## Comparison
+#### 1. Comparison
 
 Lagging the difference between agencies one year (although it can be greater), the modified NYC PD data shows `r nrow(sequela_lag)` years of data with an average of `r round(mean(unlist(sequela_lag[2])), 0)`. When looking at the years where both have data available, the average difference is `r round(mean(unlist(Compare_4[3] - Compare_4[2])), 0)`. The new modified data is still show some variation, but now the mean factor is `r round(mean(unlist(Compare_4[3] / Compare_4[2])), 2)`. The differences basically cancel out.
 
-## Statistical Test
+#### 2. Statistical Test
 
-For the t-test, the null hypothesis is set to a zero difference, $d = 0$, between the NYC PD murder statistics **including sequela** and NYC DOHMH homicide statistics (this would indicate variation is due to reporting discrepancies), and the alternate hypothesis to an actual difference, $d \neq 0$, existing between the two agencies. Failure to reject the null hypothesis will be assessed on a $p$-value of $0.05$ such that $H_{ 0 }: p > 0.05; H_{ A }: p \le 0.05$. The test results indicate the existence of a $p$-value $=`r format(t.test(Compare_4[3] - Compare_4[2])$p.value, scientific=F)` > 0.05$ indicating that the probability of observing a sample $t$ statistic with `r t.test(Compare_4[3] - Compare_4[2])$parameter` degrees of freedom as extreme as the test statistic `r t.test(Compare_4[3] - Compare_4[2])$statistic` is extremely high. Therefore we fail to reject the null hypothesis. 
+For the t-test, the null hypothesis is set to a zero difference, $d = 0$, between the NYC PD mortality statistics **including sequela** and NYC DOHMH mortality statistics (this would indicate variation is due to reporting discrepancies), and the alternate hypothesis to an actual difference, $d \neq 0$, existing between the two agencies. Failure to reject the null hypothesis will be assessed on a $p$-value of $0.05$ such that $H_{ 0 }: p > 0.05; H_{ A }: p \le 0.05$. The test results indicate the existence of a $p$-value $=`r format(t.test(Compare_4[3] - Compare_4[2])$p.value, scientific=F)` > 0.05$ indicating that the probability of observing a sample $t$ statistic with `r t.test(Compare_4[3] - Compare_4[2])$parameter` degrees of freedom as extreme as the test statistic `r t.test(Compare_4[3] - Compare_4[2])$statistic` is extremely high. Therefore, we fail to reject the null hypothesis. 
 
-## Findings
+### vii. Findings
 
-The data supports the conclusion that no difference exists between NYC PD murder statistics and NYC DOHMH homicide statistics, or in other words, the variation in difference is due to reporting differences.
+The data supports the conclusion that no difference exists between NYC PD mortality statistics and NYC DOHMH mortality statistics, or in other words, the variation in difference is due to reporting differences. The question about where mortalities are reported (at the precinct of the hospital or the precinct of the crime) is examined next.
 
-# Conclusion
+# 5.	Specific Question
 
-On am macro level, NYC police statistics appear to match NYC hospital statistics when it comes to homicides. Differences in data reports from each agency appear to be attributable to how sequela is handled. What this analysis also shows is both the disparity between the quality of data and the importance of working through initial findings critically. 
+Are mortality statistics skewed toward hospitals near police precincts?
 
-The unaddressed micro question about where murders are reported (at the precinct of the hospital or the precinct of the crime) is out of scope for this analysis but it could be examined by gathering addresses of hospitals and evaluating if homicide rates are inflated in their respective precincts relative to surrounding precincts.  
+## a. Obtain, Scrub, Explore Data
 
-# Comment
+### i.  Google Geocoding API
 
-Out of respect for the individual tragedies that served as the motivation for this analysis, regardless of what transpired and why, I would like to add this note extending condolences to the families.
+The `geocode()` function from the `ggmap` library is extremely efficient but only returns longitude and latitude coordinates. Using *Google's* geocoding API returns much more information. The API allows 2,500 requests per day for free and returns results in `XML` or `JSON` format. The API has a limit of 50 requests per second.
+```{r cache=T}
+NYC_Precincts <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
+                               "DATA%20607/DATA_607_Final_Project_4.csv"), stringsAsFactors = F)
 
-# References
+NYC_Hospitals <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
+                               "DATA%20607/DATA_607_Final_Project_5.csv"), stringsAsFactors = F)
+
+Geocode_1 <- matrix(NA, nrow(NYC_Precincts), 13)
+for (i in 1:nrow(NYC_Precincts)) {
+  Geocode_1[i, 1] = NYC_Precincts[i, 1]
+  url <- "https://maps.googleapis.com/maps/api/geocode/json?address="
+  url <- str_replace_all(paste0(url, NYC_Precincts[i, 3],", ", NYC_Precincts[i, 4], ", NY"), "\\s", "+")
+  json <- GET(url)
+  json <- rawToChar(json$content)
+  json <- fromJSON(json)
+  geocode <- data.frame(json)
+  Geocode_1[i, c(2:3)] <- if(!is.null(geocode[[1,3]]$lat[1])) {
+    c(geocode[[1,3]]$lat[1], geocode[[1,3]]$lng[1])
+  } else if (length(unlist(geocode[[1,3]][2])) == 1){
+    c(unlist(geocode[[1,3]][1]), unlist(geocode[[1,3]][2]))
+  } else { unlist(geocode[[1,3]][1]) }
+  Geocode_1[i, 4] <- geocode[[2]][1]
+  Geocode_1[i, c(5:13)]  <- data.frame(geocode[[1]][1])[1:9, 1]
+  while (nchar(Geocode_1[i, 13]) != 5 | is.na(Geocode_1[i, 13])) {
+    if (nchar(Geocode_1[i, 12]) != 5 | is.na(Geocode_1[i, 12])) {
+      Geocode_1[i, c(10:13)] <- Geocode_1[i, c(9:12)]
+      Geocode_1[i, 8] <- Geocode_1[i, 7]
+    } else {
+      Geocode_1[i, c(10:13)] <- Geocode_1[i, c(9:12)]
+      Geocode_1[i, 9] <- Geocode_1[i, 8]
+    }
+  }
+  Sys.sleep(1 / 3) # Make no more than 3 requests per second
+}
+head(Geocode_1[, 2:4])
+Geocode_2 <- matrix(NA, nrow(NYC_Hospitals), 13)
+for(i in 1:nrow(NYC_Hospitals)) {
+  Geocode_2[i, 1] = NYC_Hospitals[i, 1]
+  url <- "https://maps.googleapis.com/maps/api/geocode/json?address="
+  url <- str_replace_all(paste0(url, NYC_Hospitals[i, 2], ", ",
+          NYC_Hospitals[i, 3],", NY ", NYC_Hospitals[i, 5]), "\\s", "+")
+  json <- GET(url)
+  json <- rawToChar(json$content)
+  json <- fromJSON(json)
+  geocode <- data.frame(json)
+  Geocode_2[i, c(2:3)] <- if(!is.null(geocode[[1,3]]$lat[1])) {
+    c(geocode[[1,3]]$lat[1], geocode[[1,3]]$lng[1])
+  } else if (length(unlist(geocode[[1,3]][2])) == 1){
+    c(unlist(geocode[[1,3]][1]), unlist(geocode[[1,3]][2]))
+  } else { unlist(geocode[[1,3]][1]) }
+  Geocode_2[i, 4] <- geocode[[2]][1]
+  Geocode_2[i, c(5:13)]  <- data.frame(geocode[[1]][1])[1:9, 1]
+  while (nchar(Geocode_2[i, 13]) != 5 | is.na(Geocode_2[i, 13])) {
+    if (nchar(Geocode_2[i, 12]) != 5 | is.na(Geocode_2[i, 12])) {
+      Geocode_2[i, c(10:13)] <- Geocode_2[i, c(9:12)]
+      Geocode_2[i, 8] <- Geocode_2[i, 7]
+    } else {
+      Geocode_2[i, c(10:13)] <- Geocode_2[i, c(9:12)]
+      Geocode_2[i, 9] <- Geocode_2[i, 8]
+    }
+  }
+  Sys.sleep(1 / 2) # Make no more than 3 requests per second
+}
+head(Geocode_2[, 2:4])
+```
+
+### ii. Calculate Distances
+
+Given latitudes $\lambda_{ 1 }, \lambda_{ 2 }$ and longitudes $\varphi _{ 1 }, \varphi _{ 2 }$ in radians, and the Earth's mean radius in miles of $R=3959$, the distance between two points in miles can be calculated with the below formula.
+
+$$d=\arccos { \left( \sin { \left( { \lambda  }_{ 1 } \right)  } \sin { \left( { \lambda  }_{ 2 } \right)  } +\cos { \left( { \lambda  }_{ 1 } \right)  } \cos { \left( { \lambda  }_{ 2 } \right)  } \cos { \left( \varphi _{ 1 }-\varphi _{ 2 } \right)  }  \right) R }$$
+
+```{r}
+Distance <- matrix(NA, nrow(Geocode_1), nrow(Geocode_2))
+R = 3959 # Earth mean radius in miles
+for (i in 1:nrow(Geocode_1)){
+  lat1 = as.double(Geocode_1[i, 2]) * pi / 180
+  lng1 = as.double(Geocode_1[i, 3]) * pi / 180
+  for (j in 1:nrow(Geocode_2)) {
+    lat2 = as.double(Geocode_2[j, 2]) * pi / 180
+    lng2 = as.double(Geocode_2[j, 3]) * pi / 180
+    Distance[i, j] = acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lng2 - lng1)) * R
+  }
+}
+NYC_Precincts <- Distance %>% as.data.frame() %>% 
+  mutate(Min_Dist = apply(.[, apply(., 1, is.numeric)], 1, min)) %>% 
+  select(ncol(Distance) + 1) %>% 
+  cbind(Geocode_1[ , 1:3], ., Geocode_1[ , c(4,9,13)])
+colnames(NYC_Precincts) <- c("Precinct", "Lat", "Lng", "Min_Dist", "Address", "Borough", "ZIP")
+NYC_Hospitals <- Distance %>% t() %>% as.data.frame() %>% 
+  mutate(Min_Dist = apply(.[, apply(., 2, is.numeric)], 1, min)) %>% 
+  select(nrow(Distance) + 1) %>% 
+  cbind(Geocode_2[ , 1:3], ., Geocode_2[ , c(4,9,13)])
+colnames(NYC_Hospitals) <- c("Precinct", "Lat", "Lng", "Min_Dist", "Address", "Borough", "ZIP")
+Precincts_2 <- Mortality_1 %>%
+  filter(grepl('MURDER', CRIME) & PCT != "DOC") %>%
+  gather(Year, Count, 3:18) %>%
+  mutate(Count = ifelse(is.na(Count), 0, Count)) %>% 
+  mutate(Year = as.integer(sub("X", "", Year))) %>%
+  rename(Precinct = PCT) %>% 
+  group_by(Precinct) %>%
+  summarise(Total = sum(Count))
+```
+
+### iii.	Determine the Task
+
+Test the correlation between mortality and distance.
+
+## b.	Model Data
+
+### i.	Choose the Technique
+
+Correlation coefficients measure the strength of association between two variables. The most common correlation coefficient, called the Pearson product-moment correlation coefficient, measures the strength of the linear association between variables.
+
+### ii.	Use Algorithm to Perform Analysis
+
+```{r warning=F, message=F}
+ggmap(get_map(location=geocode("NYC"), source="google", maptype="roadmap")) + 
+  geom_point(aes(y = as.numeric(levels(Lat))[Lat], x = as.numeric(levels(Lng))[Lng]), 
+  data = NYC_Precincts, alpha = 0.5, color="#009999", size = 2) +
+  geom_point(aes(y = as.numeric(levels(Lat))[Lat], x = as.numeric(levels(Lng))[Lng]), 
+  data = NYC_Hospitals, alpha = 0.5, color="#FF6699", size = 2)
+ggmap(get_map(location=geocode("Brooklyn, NY"), source="google", maptype="roadmap", zoom=11)) + 
+  geom_point(aes(y = as.numeric(levels(Lat))[Lat], x = as.numeric(levels(Lng))[Lng]), 
+  data = NYC_Precincts, alpha = 0.5, color="#009999", size = 3) +
+  geom_point(aes(y = as.numeric(levels(Lat))[Lat], x = as.numeric(levels(Lng))[Lng]), 
+  data = NYC_Hospitals, alpha = 0.5, color="#FF6699", size = 3)
+Compare_5 <- left_join(NYC_Precincts, Precincts_2, by = "Precinct")
+cor(Compare_5[, c(4,8)])[[2]]
+ggplot(Compare_5, aes(Min_Dist, Total)) + 
+  geom_point(aes(colour = factor(Borough))) + 
+  labs(x = "Miles to Nearest Hospital", y = "Total Mortality") +
+  labs(colour = "Borough", title = "Mortality Relative to Proximitry") +
+  theme(plot.title = element_text(hjust = 0.5))
+(Mortality_4 <- Compare_5 %>% 
+  group_by(Borough) %>% summarise(Total = sum(Total)) %>% 
+  cbind(., Population = c(1385107, 2504710, 1585874, 2230541, 468730)) %>% 
+  mutate(Frequency = paste0(round(100 * Total / Population, 2),"%")))
+```
+
+## c.	Interpret Data
+
+### i.	Comparison
+
+The police precincts and hospitals plotted on a map show relatively even spacing between police precincts and hospitals. Zooming in further also shows how close everything is to each other. The scatter plot makes this even more obvious with the vast majority of distances clustered in the area representing less than two miles. It is also worth noting the difference between mortality totals and mortality frequency relative to population.
+
+### ii.	Statistical Test
+
+The correlation between mortality and distance to nearest hospital is negative with $r=`r cor(Compare_5[, c(4,8)])[[2]]`$. This is an extremely weak correlation which does not support the conclusion that there exists a relationship between mortality figures reported from precincts closer to hospitals.
+
+### iii.	Findings
+
+The data supports the conclusion that no relationship exists between mortality figures reported from precincts closer to hospitals and those reported from precincts further from hospitals.
+
+# 6.  Conclusion
+
+In general, NYC police statistics appear to match NYC hospital statistics when it comes to mortalities. Differences in data reports from each agency appear to be attributable to how sequela is handled. What this analysis also shows is both the disparity between the quality of data and the importance of working through initial findings critically.
+
+Specifically, there is no evidence to support the hypothesis that mortality figures are skewed toward precincts closer to hospitals. Therefore, it is highly unlikely that mortality is reported at the precinct of the hospital rather than the precinct of the crime.
+
+# 7.  Comment
+
+The events that inspired this analysis were tragedies. Trying to explain what happened is not easy, if at all possible. At least now some possibilities can be ruled out. Yet regardless of what transpired and why, I would like to add this note extending condolences and respect to the families of the individuals involved. 
+
+# 8.  References
 
 http://nypost.com/2015/04/06/daily-blotter-485/
 
@@ -346,6 +461,8 @@ http://www.statstutor.ac.uk/resources/uploaded/paired-t-test.pdf
 http://www.statisticssolutions.com/manova-analysis-paired-sample-t-test/
 
 http://stattrek.com/hypothesis-test/paired-means.aspx?Tutorial=AP
+
+http://stattrek.com/statistics/correlation.aspx
 
 http://www.nyc.gov/html/oignypd/pages/about/foil-request.shtml
 
@@ -362,3 +479,19 @@ http://apps.who.int/classifications/apps/icd/icd10online2005/fr-icd.htm?gx85.htm
 http://apps.who.int/classifications/apps/icd/icd10online2005/fr-icd.htm?gy85.htm+
 
 https://en.wikipedia.org/wiki/ICD-10_Chapter_XX:_External_causes_of_morbidity_and_mortality
+
+https://a816-healthpsi.nyc.gov/epiquery/CHS/uhf-zip-information.pdf
+
+https://www1.nyc.gov/assets/doh/downloads/pdf/ah/zipcodetable.pdf
+ 
+http://www.health.ny.gov/regulations/hcra/provider/provhosp.htm
+
+https://en.wikipedia.org/wiki/Acute_care
+ 
+http://www.nyc.gov/html/nypd/html/home/precincts.shtml
+ 
+https://developers.google.com/maps/documentation/geocoding
+
+http://www.sunearthtools.com/tools/distance.php
+
+https://www.citypopulation.de/php/usa-newyorkcity.php
