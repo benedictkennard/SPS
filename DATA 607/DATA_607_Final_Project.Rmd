@@ -2,10 +2,10 @@
 title: "NYC Mortality Statistics"
 author: "Jose Zuniga"
 output:
-  pdf_document:
+  html_document:
     toc: yes
     toc_depth: '4'
-  html_document:
+  pdf_document:
     toc: yes
     toc_depth: '4'
 ---
@@ -22,13 +22,13 @@ Describe your motivation for performing this analysis (2). Have a recognizable d
 
 # 2. Purpose of Project
 
-In April of 2015 there was a murder in New York City. I did not see the crime, but I did hear the shots. There was a surge of police activity. Then, when crime scene investigation was done, the body remained covered by a white sheet and guarded by a police officer for a few hours until it was picked up by an ambulance. The strange thing is, a few news outlets reported that "EMS rushed him to St. Barnabas Hospital, where he was pronounced dead, cops said." I was disturbed by the whole situation, but these new reports also made me wonder how crime statistics are reported. Was this death reported in the statistics for the precinct of the hospital (48th) or the precinct of the crime (46th)? I never did the digging necessary to find out.
+In April of 2015 there was a murder in New York City. There was a surge of police activity. Then, when crime scene investigation was done, the body remained covered by a white sheet and guarded by a police officer for a few hours until it was picked up by an ambulance. The strange thing is, a few news outlets reported that "EMS rushed him to St. Barnabas Hospital, where he was pronounced dead, cops said." The whole situation was disturbing, but these new reports also made me wonder how crime statistics are reported. Was this death reported in the statistics for the precinct of the hospital (48th) or the precinct of the crime (46th)? I never did the digging necessary to find out.
 
-Then, in September of 2016, I read something about a similar situation in the news. There was a story about the time of death reported by the NYC Police Department. The report said "Police officials initially said that Graham died at Montefiore Medical Center. His death certificate says he was shot at 3:01 p.m. and died at 3:53 p.m. According to his family, the video indicates he was already dead, and contradicts the city account." Although this story was also disturbing in-and-of itself, it also made me wonder if the death was reported in the statistics for the precinct of the hospital (52nd) or the precinct of the crime (47th)? I also wondered if the total number of mortalities reported in NYC police statistics match the total number of mortalities reported in NYC Hospitals statistics.
+Then, in September of 2016, I read something about a similar situation. There was a story about the time of death reported by the NYC Police Department. The report said "Police officials initially said that Graham died at Montefiore Medical Center. His death certificate says he was shot at 3:01 p.m. and died at 3:53 p.m. According to his family, the video indicates he was already dead, and contradicts the city account." Although this story was also disturbing in-and-of itself, it also made me wonder if the death was reported in the statistics for the precinct of the hospital (52nd) or the precinct of the crime (47th)? I also wondered if the total number of mortalities reported in NYC police statistics match the total number of mortalities reported in NYC Hospitals statistics.
 
 # 3. Question(s)
 
-Do NYC Police Precincts and NYC Hospitals report different mortality figures? This question will be examined in general terms (whether NYC Police Precincts and NYC Hospitals report the same total mortality figures in their statistics) and much more specific terms (whether mortality statistics are skewed toward hospitals near police precincts).
+Do NYC Police Precincts and NYC Hospitals report different mortality figures? This question will be examined in general terms (whether NYC Police Precincts and NYC Hospitals report the same total mortality figures in their respective statistics) and much more specific terms (whether mortality statistics are skewed toward police precincts near hospitals).
 
 ```{r  message=F, warning=F}
 library(XML)
@@ -119,7 +119,7 @@ t.test(Compare_2[3] - Compare_2[2])
 
 ### i. Comparison
 
-The data reported by the NYC PD and NYC DOHMH is conflicting and flawed. The NYC PD data shows `r nrow(Precincts_1)` years of data with an average of `r round(mean(unlist(Precincts_1[2])), 0)` while the NYC DOHMH data shows `r nrow(Hospital_1)` years of data with an average of `r round(mean(unlist(Hospital_1[2])), 0)`. When looking at the years where both have data available, the average difference is `r round(mean(unlist(Compare_2[3] - Compare_2[2])), 0)` which is very strange. The NYC DOHMH data is inflated by a constant factor of about `r round(mean(unlist(Compare_2[3] / Compare_2[2])), 2)`.
+The data reported by the NYC PD and for the NYC DOHMH is conflicting and flawed. The NYC PD data shows `r nrow(Precincts_1)` years of data with an average of `r round(mean(unlist(Precincts_1[2])), 0)` while the NYC DOHMH data shows `r nrow(Hospital_1)` years of data with an average of `r round(mean(unlist(Hospital_1[2])), 0)`. When looking at the years where both have data available, the average difference is `r round(mean(unlist(Compare_2[3] - Compare_2[2])), 0)` which is very strange. The NYC DOHMH data is inflated by a constant factor of about `r round(mean(unlist(Compare_2[3] / Compare_2[2])), 2)`.
 
 ### ii.  Statistical Test
 
@@ -265,7 +265,7 @@ t.test(Compare_4[3] - Compare_4[2])
 
 #### 1. Comparison
 
-Lagging the difference between agencies one year (although it can be greater), the modified NYC PD data shows `r nrow(sequela_lag)` years of data with an average of `r round(mean(unlist(sequela_lag[2])), 0)`. When looking at the years where both have data available, the average difference is `r round(mean(unlist(Compare_4[3] - Compare_4[2])), 0)`. The new modified data is still show some variation, but now the mean factor is `r round(mean(unlist(Compare_4[3] / Compare_4[2])), 2)`. The differences basically cancel out.
+Lagging the difference between agencies one year (although it can be greater), the modified NYC PD data shows `r nrow(sequela_lag)` years of data with an average of `r round(mean(unlist(sequela_lag[2])), 0)`. When looking at the years where both have data available, the average difference is `r round(mean(unlist(Compare_4[3] - Compare_4[2])), 0)`. The new modified data is still showing some variation, but now the mean factor is `r round(mean(unlist(Compare_4[3] / Compare_4[2])), 2)`. The differences basically cancel out.
 
 #### 2. Statistical Test
 
@@ -273,17 +273,17 @@ For the t-test, the null hypothesis is set to a zero difference, $d = 0$, betwee
 
 ### vii. Findings
 
-The data supports the conclusion that no difference exists between NYC PD mortality statistics and NYC DOHMH mortality statistics, or in other words, the variation in difference is due to reporting differences. The question about where mortalities are reported (at the precinct of the hospital or the precinct of the crime) is examined next.
+The data supports the conclusion that no difference exists between NYC PD mortality statistics and NYC DOHMH mortality statistics, or in other words, the variation in difference is due to reporting differences. Now the question about where mortalities are reported--at the precinct of the hospital or the precinct of the crime--- will be addressed.
 
 # 5.	Specific Question
 
-Are mortality statistics skewed toward hospitals near police precincts?
+Are mortality statistics skewed toward police precincts near hospitals?
 
 ## a. Obtain, Scrub, Explore Data
 
 ### i.  Google Geocoding API
 
-The `geocode()` function from the `ggmap` library is extremely efficient but only returns longitude and latitude coordinates. Using *Google's* geocoding API returns much more information. The API allows 2,500 requests per day for free and returns results in `XML` or `JSON` format. The API has a limit of 50 requests per second.
+The `geocode()` function from the `ggmap` library is extremely efficient but only returns longitude and latitude coordinates. Using *Google's* geocoding API returns much more information. The API allows 2,500 free requests per day and returns results in `XML` or `JSON` format. The API has a limit of 50 requests per second.
 ```{r cache=T}
 NYC_Precincts <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
                                "DATA%20607/DATA_607_Final_Project_4.csv"), stringsAsFactors = F)
@@ -352,7 +352,7 @@ head(Geocode_2[, 2:4])
 
 ### ii. Calculate Distances
 
-Given latitudes $\lambda_{ 1 }, \lambda_{ 2 }$ and longitudes $\varphi _{ 1 }, \varphi _{ 2 }$ in radians, and the Earth's mean radius in miles of $R=3959$, the distance between two points in miles can be calculated with the below formula.
+Given latitudes $\lambda_{ 1 }, \lambda_{ 2 }$ and longitudes $\varphi _{ 1 }, \varphi _{ 2 }$ in radians, as well as the Earth's mean radius in miles of $R=3959$, the distance between two points in miles can be calculated trigonometrically using the below formula.
 
 $$d=\arccos { \left( \sin { \left( { \lambda  }_{ 1 } \right)  } \sin { \left( { \lambda  }_{ 2 } \right)  } +\cos { \left( { \lambda  }_{ 1 } \right)  } \cos { \left( { \lambda  }_{ 2 } \right)  } \cos { \left( \varphi _{ 1 }-\varphi _{ 2 } \right)  }  \right) R }$$
 
@@ -428,7 +428,7 @@ ggplot(Compare_5, aes(Min_Dist, Total)) +
 
 ### i.	Comparison
 
-The police precincts and hospitals plotted on a map show relatively even spacing between police precincts and hospitals. Zooming in further also shows how close everything is to each other. The scatter plot makes this even more obvious with the vast majority of distances clustered in the area representing less than two miles. It is also worth noting the difference between mortality totals and mortality frequency relative to population.
+The police precincts and hospitals plotted on a map show relatively even spacing between police precincts and hospitals. Zooming in further also shows how close police precincts and hospitals are to each other. The scatter plot makes this relationship even more obvious with the vast majority of distances clustered in the area representing less than two miles. It is also worth noting the difference between mortality totals and mortality frequency relative to population in each borough, as perception could be biased by looking solely at totals.
 
 ### ii.	Statistical Test
 
@@ -440,9 +440,9 @@ The data supports the conclusion that no relationship exists between mortality f
 
 # 6.  Conclusion
 
-In general, NYC police statistics appear to match NYC hospital statistics when it comes to mortalities. Differences in data reports from each agency appear to be attributable to how sequela is handled. What this analysis also shows is both the disparity between the quality of data and the importance of working through initial findings critically.
+In general, NYC police statistics appear to match NYC hospital statistics when it comes to mortalities. Differences in data reported by each agency appear to be attributable to how sequela is handled. What this analysis also shows is both the disparity between the quality of data and the importance of working through initial findings critically.
 
-Specifically, there is no evidence to support the hypothesis that mortality figures are skewed toward precincts closer to hospitals. Therefore, it is highly unlikely that mortality is reported at the precinct of the hospital rather than the precinct of the crime.
+Specifically, there is no evidence to support the hypothesis that mortality figures are skewed toward precincts closer to hospitals. Therefore, it is highly unlikely that mortality is reported at the precinct of the hospital rather than the precinct of the crime. It is worth noting both that the number of crimes, police precincts, and hospitals tend to higher in high density areas and that hospitals do not necessarily lie in the precinct to which they are closest. Yet given the questions raised and the findings, a micro level examination of those factors is unwarranted in this analysis.
 
 # 7.  Comment
 
