@@ -1,0 +1,52 @@
+CATEGORY,SERIES,ID_EXAMPLE,SIC_BASIS,HISTORIC
+Employment & Unemployment,"National Employment, Hours, and Earnings",CEU0800000003,0,0
+Employment & Unemployment,"National Employment, Hours, and Earnings (SIC basis)",EES10140001,1,0
+Employment & Unemployment,"State and Area Employment, Hours, and Earnings",SMU19197802023800001,0,0
+Employment & Unemployment,"State and Area Employment, Hours, and Earnings (SIC basis)",SAS0800002000011,1,0
+Employment & Unemployment,State and County Employment and Wages from Quarterly Census of Employment and Wages,ENU04013105111150,0,0
+Employment & Unemployment,"State and County Employment and Wages from Quarterly Census of Employment and Wages, 1997-2000 (SIC basis)",EWU040131050A0115,1,1
+Employment & Unemployment,Occupational Employment Statistics (OES),OEUN000000011100011000001,0,0
+Employment & Unemployment,Business Employment Dynamics,BDS0000000000000000110101LQ5,0,0
+Employment & Unemployment,Local Area Unemployment Statistics,LAUCN281070000000003,0,0
+Employment & Unemployment,Geographic Profile,GPU00200000R0328,0,0
+Employment & Unemployment,Mass Layoff Statistics,MLUMS00NN0001003,0,0
+Employment & Unemployment,Job Openings and Labor Turnover Survey (SIC basis),JLU00000000HIL,1,0
+Employment & Unemployment,Job Openings and Labor Turnover Survey,JTU00000000HIL,0,0
+Employment & Unemployment,Green Goods and Services,GGUQO100000000000050010L,0,0
+Spending & Time Use,American Time Use Survey,TUU10101AA01011987,0,0
+Spending & Time Use,Consumer Expenditure Survey,CXUMENBOYSLB0101M,0,0
+Inflation & Prices,Average Price Data,APU000070111,0,0
+Inflation & Prices,Consumer Price Index - All Urban Consumers,CUUR0000SA0L1E,0,0
+Inflation & Prices,Consumer Price Index - Urban Wage Earners and Clerical Workers,CWSR0000SA111211,0,0
+Inflation & Prices,Consumer Price Index - All Urban Consumers (Old Series),MUSR0000SA111211,0,1
+Inflation & Prices,Consumer Price Index - Urban Wage Earners and Clerical Workers (Old Series),MWSR0000SA111211,0,1
+Inflation & Prices,Department Store Inventory Price Index,LIUR0000SL00019,0,0
+Inflation & Prices,Chained CPI-All Urban Consumers,SUUR0000SA0,0,0
+Inflation & Prices,Producer Price Index Industry Data - Current Series,PCU22112222112241,0,0
+Inflation & Prices,Producer Price Index Industry Data - Discontinued Series (NAICS basis),NDU1051111051112345,0,1
+Inflation & Prices,Producer Price Index Industry Data - Discontinued Series (SIC basis),PDU1031#214,1,1
+Inflation & Prices,Producer Price Index Commodity Data - Current Series,WPS141101,0,0
+Inflation & Prices,Producer Price Index Commodity Data - Discontinued Series,WDU062201,0,1
+Pay & Benefits,Work Stoppage Data,WSUB00,0,0
+Pay & Benefits,Employee Benefits Survey,EBU401KINC0000ML,1,0
+Pay & Benefits,Employment Cost Index (SIC),ECS10001I,1,0
+Pay & Benefits,Employer Cost for Employee Compensation (SIC),CCU010000100000P,1,0
+Pay & Benefits,National Compensation Survey,NCU5306633300003,0,0
+Pay & Benefits,National Compensation Survey - Benefits (Beginning with 2010 data),NBU10000000000000028007,0,0
+Pay & Benefits,Modeled Wage Estimates,WMU40000011020000004130992500,0,0
+Workplace Injuries,Occupational Injuries and Illnesses - industry data (2014 forward),ISUNRM21222060N00,0,0
+Workplace Injuries,Census of Fatal Occupational Injuries (2011 forward),FWUNRM21222080M70,0,0
+Workplace Injuries,Census of Fatal Occupational Injuries (2003 - 2010),FIU00X00000080N00,0,1
+Workplace Injuries,Census of Fatal Occupational Injuries (1992 - 2002),CFU00000080,0,1
+Workplace Injuries,Nonfatal cases involving days away from work: selected characteristics (2011 forward),CSUSDX031XXX6E000,0,0
+Workplace Injuries,Nonfatal cases involving days away from work: selected characteristics (2003 - 2010),CHUSDX031XXX6E000,0,1
+Workplace Injuries,Nonfatal cases involving days away from work: selected characteristics (2002),HCU0012123N,0,1
+Workplace Injuries,Nonfatal cases involving days away from work: selected characteristics (1992 - 2001),CDUDMM10073,0,1
+Workplace Injuries,Occupational injuries and illnesses: industry data (pre-1989),HSU09020018,0,1
+Workplace Injuries,Occupational injuries and illnesses: industry data (1989 - 2001),SHU00000034,0,1
+Workplace Injuries,Occupational injuries and illnesses: industry data (2002),SIU00000001,0,1
+Workplace Injuries,Occupational Injuries and Illnesses - industry data (2003 - 2013),IIU00X00000060N00,0,1
+Productivity,Major Sector Productivity and Costs,PRS85006032,0,0
+Productivity,Major Sector Multifactor Productivity,MPU4900012,0,0
+Productivity,Industry Productivity,IPUBN212___W000,0,0
+International,Import/Export Price Indexes,EIUCOCANMANU,0,0
