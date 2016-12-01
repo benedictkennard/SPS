@@ -34,11 +34,11 @@ Pay & Benefits,Employer Cost for Employee Compensation (SIC),CCU010000100000P,1,
 Pay & Benefits,National Compensation Survey,NCU5306623300003,0,0
 Pay & Benefits,National Compensation Survey - Benefits (Beginning with 2010 data),NBU10000000000000028007,0,0
 Pay & Benefits,Modeled Wage Estimates,WMU00000001020000001300002400,0,0
-Workplace Injuries,Occupational Injuries and Illnesses - industry data (2014 forward),ISUNRM21222060N00,0,0
-Workplace Injuries,Census of Fatal Occupational Injuries (2011 forward),FWUNRM21222080M70,0,0
+Workplace Injuries,Occupational Injuries and Illnesses - industry data (2014 forward),ISU00000000000000,0,0
+Workplace Injuries,Census of Fatal Occupational Injuries (2011 forward),FWU00X00000080N00,0,0
 Workplace Injuries,Census of Fatal Occupational Injuries (2003 - 2010),FIU00X00000080N00,0,1
 Workplace Injuries,Census of Fatal Occupational Injuries (1992 - 2002),CFU00000080,0,1
-Workplace Injuries,Nonfatal cases involving days away from work: selected characteristics (2011 forward),CSUSDX031XXX6E000,0,0
+Workplace Injuries,Nonfatal cases involving days away from work: selected characteristics (2011 forward),CSU00X00000063000,0,0
 Workplace Injuries,Nonfatal cases involving days away from work: selected characteristics (2003 - 2010),CHUSDX031XXX6E000,0,1
 Workplace Injuries,Nonfatal cases involving days away from work: selected characteristics (2002),HCU0012123N,0,1
 Workplace Injuries,Nonfatal cases involving days away from work: selected characteristics (1992 - 2001),CDUDMM10073,0,1
