@@ -1,6 +1,6 @@
 CATEGORY,PROGRAM,DESCRIPTION,SERIES,ID_EXAMPLE,NAICS_SIC,HISTORIC
 Employment & Unemployment,BDM,Business Employment Dynamics,Business Employment Dynamics,BDS0000000000000000110101LQ5,N,0
-Employment & Unemployment,OES,Occupational Employment Statistics ,Employment and Wages ,OEUN000000021210011000001,N,0
+Employment & Unemployment,OES,Occupational Employment Statistics,Employment and Wages,OEUN000000021210011000001,N,0
 Employment & Unemployment,GPS,Geographic Profile of Employment & Unemployment,Geographic Profile,GPU00200000R0328,N,0
 Employment & Unemployment,GGS,Green Goods and Services,Green Goods and Services,GGUA000000000000000010L,N,1
 Employment & Unemployment,JOLTS,Job Openings and Labor Turnover Survey,Job Openings and Labor Turnover Survey,JTU00000000HIL,N,0
