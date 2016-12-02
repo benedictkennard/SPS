@@ -1,0 +1,52 @@
+CATEGORY,PROGRAM,DESCRIPTION,SERIES,ID_EXAMPLE,NAICS_SIC,HISTORIC
+Employment & Unemployment,BDM,Business Employment Dynamics,Business Employment Dynamics,BDS0000000000000000110101LQ5,N,0
+Employment & Unemployment,OES,Occupational Employment Statistics,Employment and Wages,OEUN000000021210011000001,N,0
+Employment & Unemployment,GPS,Geographic Profile of Employment & Unemployment,Geographic Profile,GPU00200000R0328,N,0
+Employment & Unemployment,GGS,Green Goods and Services,Green Goods and Services,GGUA000000000000000010L,N,1
+Employment & Unemployment,JOLTS,Job Openings and Labor Turnover Survey,Job Openings and Labor Turnover Survey,JTU00000000HIL,N,0
+Employment & Unemployment,JOLTS,Job Openings and Labor Turnover Survey,Job Openings and Labor Turnover Survey,JLU00000000HIL,S,0
+Employment & Unemployment,LAU,Local Area Unemployment Statistics,Local Area Unemployment Statistics,LAUCN281070000000003,N,0
+Employment & Unemployment,CPS,Current Population Survey,Mass Layoff Statistics,MLUMS00NN0001003,N,0
+Employment & Unemployment,CES,Current Employment Statistics,"National Employment, Hours, and Earnings",CEU0800000003,N,0
+Employment & Unemployment,CES,Current Employment Statistics,"National Employment, Hours, and Earnings",EES10140001,S,0
+Employment & Unemployment,SEA,Current Employment Statistics,"State and Area Employment, Hours, and Earnings",SMU19197802023800001,N,0
+Employment & Unemployment,SEA,Current Employment Statistics,"State and Area Employment, Hours, and Earnings",SAS0800002000011,S,0
+Employment & Unemployment,CEW,Quarterly Census of Employment and Wages,State and County Employment and Wages,ENU3600010010,N,0
+Employment & Unemployment,CEW,Quarterly Census of Employment and Wages,State and County Employment and Wages (1997-2000),EWU040131050A0115,S,1
+Inflation & Prices,CPI,Consumer Price Index,All Urban Consumers,CUUR0000SA0L1E,N,0
+Inflation & Prices,CPI,Consumer Price Index,All Urban Consumers (Old Series),MUSR0000SA111211,N,1
+Inflation & Prices,CPI,Consumer Price Index,Average Price Data,APU0000702111,N,0
+Inflation & Prices,CPI,Consumer Price Index,Chained CPI-All Urban Consumers,SUUR0000SA0,N,0
+Inflation & Prices,PPI,Producer Price Index,Commodity Data - Current Series,WPS141101,N,0
+Inflation & Prices,PPI,Producer Price Index,Commodity Data - Discontinued Series,WDU062201,N,1
+Inflation & Prices,CPI,Consumer Price Index,Department Store Inventory Price Index,LIUR0000SL00019,N,0
+Inflation & Prices,PPI,Producer Price Index,Industry Data - Current Series,PCU22112222112241,N,0
+Inflation & Prices,PPI,Producer Price Index,Industry Data - Discontinued Series,NDU1051111051112345,N,1
+Inflation & Prices,PPI,Producer Price Index,Industry Data - Discontinued Series,PDU1031#214,S,1
+Inflation & Prices,CPI,Consumer Price Index,Urban Wage Earners and Clerical Workers,CWSR0000SA0L1E,N,0
+Inflation & Prices,CPI,Consumer Price Index,Urban Wage Earners and Clerical Workers (Old Series),MWSR0000SA111211,N,1
+International,MXP,International Price Program,Import/Export Price Indexes,EIUCOCANMANU,N,0
+Pay & Benefits,NCS,National Compensation Survey,Benefits (2010 forward),NBU10000000000000028007,N,0
+Pay & Benefits,NCS,National Compensation Survey,Employee Benefits Survey,EBU401KINC0000ML,S,0
+Pay & Benefits,NCS,National Compensation Survey,Employer Cost for Employee Compensation,CCU010000100000P,S,0
+Pay & Benefits,NCS,National Compensation Survey,Employment Cost Index,ECS10001I,S,0
+Pay & Benefits,NCS,National Compensation Survey,Modeled Wage Estimates,WMU00000001020000001300002400,N,0
+Pay & Benefits,NCS,National Compensation Survey,National Compensation Survey,NCU5306623300003,N,0
+Pay & Benefits,WSP,Work Stoppages,Work Stoppage Data,WSU200,N,0
+Productivity,LPC,Productivity & Costs,Industry Productivity,IPUBN212___W000,N,0
+Productivity,LPC,Productivity & Costs,Major Sector Multifactor Productivity,MPU4900012,N,0
+Productivity,LPC,Productivity & Costs,Major Sector Productivity and Costs,PRS85006032,N,0
+Spending & Time Use,TUS,American Time Use Survey,American Time Use Survey,TUU10101AA01011987,N,0
+Spending & Time Use,CEX,Consumer Expenditure Survey,Consumer Expenditure Survey,CXUMENBOYSLB0101M,N,0
+Workplace Injuries,IIF,"Injuries, Illnesses, & Fatalities",Census of Fatal Occupational Injuries (1992 - 2002),CFU00000080,N,1
+Workplace Injuries,IIF,"Injuries, Illnesses, & Fatalities",Census of Fatal Occupational Injuries (2003 - 2010),FIU00X00000080N00,N,1
+Workplace Injuries,IIF,"Injuries, Illnesses, & Fatalities",Census of Fatal Occupational Injuries (2011 forward),FWU00X00000080N00,N,0
+Workplace Injuries,IIF,"Injuries, Illnesses, & Fatalities",Nonfatal cases involving days away from work (1992 - 2001),CDUDMM10073,N,1
+Workplace Injuries,IIF,"Injuries, Illnesses, & Fatalities",Nonfatal cases involving days away from work (2002),HCU0012123N,N,1
+Workplace Injuries,IIF,"Injuries, Illnesses, & Fatalities",Nonfatal cases involving days away from work (2003 - 2010),CHUSDX031XXX6E000,N,1
+Workplace Injuries,IIF,"Injuries, Illnesses, & Fatalities",Nonfatal cases involving days away from work (2011 forward),CSU00X00000063000,N,0
+Workplace Injuries,IIF,"Injuries, Illnesses, & Fatalities",Occupational injuries and Illnesses - Industry Data (1989 - 2001),SHU00000034,N,1
+Workplace Injuries,IIF,"Injuries, Illnesses, & Fatalities",Occupational injuries and Illnesses - Industry Data (2002),SIU00000001,N,1
+Workplace Injuries,IIF,"Injuries, Illnesses, & Fatalities",Occupational Injuries and Illnesses - Industry Data (2003 - 2013),IIU00X00000060N00,N,1
+Workplace Injuries,IIF,"Injuries, Illnesses, & Fatalities",Occupational Injuries and Illnesses - Industry Data (2014 forward),ISU00000000000000,N,0
+Workplace Injuries,IIF,"Injuries, Illnesses, & Fatalities",Occupational injuries and Illnesses - Industry Data (pre-1989),HSU09020018,N,1
