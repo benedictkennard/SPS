@@ -1,6 +1,6 @@
-# Ignore everything exexpt rmarkdown files
+# Ignore everything exept rmarkdown files
 /*
-!.Rmd
+!*.Rmd
 
 # Windows image file caches
 Thumbs.db
