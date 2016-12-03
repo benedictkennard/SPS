@@ -1,5 +1,5 @@
 ---
-title: "Data Science Context Presentation 1"
+title: "NYC Mitchell-Lama Cooperative Assessment"
 author: "Jose Zuniga"
 output:
   html_document:
@@ -19,26 +19,27 @@ Make a five-minute presentation on any chosen topic, preferably any topic from t
   + Showing a short example with R code (and perhaps relevant R package(s)), or
   + Providing a curated "learning path" of on-line resources to build further expertise in that topic.
 
-You may also record your presentation instead of presenting in our meetup. Effective data scientists need to be effective presenters, so making a presentation in front of a group is strongly encouraged but not required. In DATA 607, our primary focus is on writing R code related to getting and shaping data in preparation for downstream modeling and presentations. 
+You may also record your presentation instead of presenting in our meetup. Making a presentation in front of a group is strongly encouraged but not required. Our primary focus is on writing R code related to getting and shaping data in preparation for downstream modeling and presentations. 
 
 ***
 
 ```{r  message=F, warning=F}
-library(tidyr)
-library(dplyr)
-library(stringr)
-library(ggplot2)
+library("DT")
+library("tidyr")
+library("dplyr")
+library("stringr")
+library("ggplot2")
 ```
 
 # NYC Mitchell-Lama Housing
 
 ## NYC Housing
 
-In many ways, the New York City real estate market is unlike any other in the United States. One of the biggest differences between NYC and Any-Other-Town, USA, is that apartments for sale in NYC are either condos or co-ops. In most places, condos are the rule but not in the Big Apple. Although co-ops outnumber condos in NYC - most estimates say about 75% are co-ops - more condos are on the active market at any given moment. ^i^
+In many ways, the New York City real estate market is unlike any other in the United States. One of the biggest differences between NYC and Any-Other-Town, USA, is that apartments for sale in NYC are either condos or cooperatives. In most places, condos are the rule but not in the Big Apple. Although cooperatives outnumber condos in NYC - most estimates say about 75% are cooperatives - more condos are on the active market at any given moment. ^i^
 
 ## Housing Cooperative
 
-Roughly 75 percent of the Manhattan housing inventory is comprised of co-ops. Unlike a condo, co-ops are are owned by a corporation. This means, when you buy an apartment that is in a co-op building, you are not actually buying real property (like you would in a condo). You are in fact, buying shares of the corporation. These shares entitle you to a proprietary lease, which relates your relationship to the building close to that of an investor, rather than a condo building, where you are the outright owner of your specific unit. ^ii^ 
+Roughly 75 percent of the Manhattan housing inventory is comprised of cooperatives. Unlike a condo, cooperatives are owned by a corporation. This means, when you buy an apartment that is in a cooperative building, you are not actually buying real property (like you would in a condo). You are in fact, buying shares of the corporation. These shares entitle you to a proprietary lease, which relates your relationship to the building close to that of an investor, rather than a condo building, where you are the outright owner of your specific unit. ^ii^ 
 
 ## Mitchell-Lama Housing Program
 
@@ -52,7 +53,7 @@ Section 31 of the Private Housing Finance Law was amended effective September 12
 
 The housing company prepares the requisite petition, application, or motion for an increase in the maximum rental or carrying charges per room and submit same to HPD for approval as to form and authorization for hearing procedures. ^vi^ Proposed rent/carrying charge increases must be sufficient so that total income equals or exceeds total expenses.
 
-# NYC Supervised Mitchell-Lama Co-op Comparison
+# NYC Supervised Mitchell-Lama Cooperative Comparison
 
 ## FOIL Request
 
@@ -60,17 +61,17 @@ Freedom of Information Law requests were made for the most recent "Application f
 
 ## Documents Obtained
 
-|Development       |Units |Borough    |Address                                          |Pages  |
-|------------------|:----:|:---------:|-------------------------------------------------|-------|
-|Dayton Beach Park |1144  |Queens     |8400 Shore Front Pkwy, Rockaway Beach, NY 11693  |39     |
-|Dayton Towers     |1752  |Queens     |8000 Shore Front Pkwy, Far Rockaway, NY 11693    |30     |
-|First Atlantic    |202   |Brooklyn   |170 S Portland Ave, Brooklyn, NY 11217           |13     |
-|Franklin Plaza    |1633  |Manhattan  |2085 2nd Ave, New York, NY 10029                 |37     |
-|Luna Park         |1573  |Brooklyn   |2879 W 12th St, Brooklyn, NY 11224               |49     |
-|Northside Gardens |41    |Brooklyn   |114 N 5th St, Brooklyn, NY 11211                 |22     |
-|Rosedale Gardens  |406   |Bronx      |1810 Bruckner Blvd, Bronx, NY 10473              |24     |
-|Ryerson Towers    |326   |Brooklyn   |309 Lafayette Ave, Brooklyn, NY 11238            |33     |
-|Stryckers Bay     |234   |Manhattan  |66 W 94th St, New York, NY 10025                 |14     |
+|Code   |Development       |Units |Address                                          |Borough    |Pages  |
+|-------|------------------|:----:|-------------------------------------------------|:----------|:-----:|
+|DB_QU  |Dayton Beach Park |1144  |8400 Shore Front Pkwy, Rockaway Beach, NY 11693  |Queens     |[39](https://github.com/jzuniga123/SPS/raw/master/DATA%20607/Dayton_Beach.pdf)     |
+|DT_QU  |Dayton Towers     |1752  |8000 Shore Front Pkwy, Far Rockaway, NY 11693    |Queens     |[30](https://github.com/jzuniga123/SPS/raw/master/DATA%20607/Dayton_Towers.pdf)     |
+|FA_BK  |First Atlantic    |202   |170 S Portland Ave, Brooklyn, NY 11217           |Brooklyn   |[13](https://github.com/jzuniga123/SPS/raw/master/DATA%20607/First_Atlantic.pdf)     |
+|FP_MN  |Franklin Plaza    |1633  |2085 2nd Ave, New York, NY 10029                 |Manhattan  |[37](https://github.com/jzuniga123/SPS/raw/master/DATA%20607/Franklin_Plaza.pdf)     |
+|LP_BK  |Luna Park         |1573  |2879 W 12th St, Brooklyn, NY 11224               |Brooklyn   |[49](https://github.com/jzuniga123/SPS/raw/master/DATA%20607/Luna_Park.pdf)     |
+|NG_BK  |Northside Gardens |41    |114 N 5th St, Brooklyn, NY 11211                 |Brooklyn   |[22](https://github.com/jzuniga123/SPS/raw/master/DATA%20607/Northside_Gardens.pdf)     |
+|RG_BX  |Rosedale Gardens  |406   |1810 Bruckner Blvd, Bronx, NY 10473              |Bronx      |[24](https://github.com/jzuniga123/SPS/raw/master/DATA%20607/Rosedale_Gardens.pdf)     |
+|RT_BK  |Ryerson Towers    |326   |309 Lafayette Ave, Brooklyn, NY 11238            |Brooklyn   |[33](https://github.com/jzuniga123/SPS/raw/master/DATA%20607/Ryerson_Towers.pdf)     |
+|SB_MN  |Stryckers Bay     |234   |66 W 94th St, New York, NY 10025                 |Manhattan  |[14](https://github.com/jzuniga123/SPS/raw/master/DATA%20607/Strykers_Bay.pdf)     |
 
 The cost of reproduction is $0.25 per page.
 ```{r}
@@ -86,14 +87,21 @@ wide_data <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/m
 ### Examine Data
 ```{r}
 names(wide_data)
-head(wide_data)
+display <- function(data) {
+  datatable(data, options = list(
+    searching = TRUE,
+    pageLength = 10,
+    lengthMenu = c(5, nrow(data))
+    ), rownames = FALSE)
+}
+display(wide_data[, -c(1,2)])
 ```
 
 ### Transform Data
 ```{r}
 long_data <- wide_data %>%
   gather("Development", "Amount", 4:12)
-head(long_data)
+display(long_data[, c(4,3,5)])
 macro_data <- long_data %>% 
   group_by(Category, Development) %>%
   mutate(Total = ifelse(Category == "Income", sum(Amount), 0)) %>%
@@ -105,58 +113,191 @@ macro_data <- long_data %>%
   mutate(Expenses = max(Total)) %>% select(-7) %>% 
   filter(Category == "Grounds") %>% select(-c(1,2)) %>%
   spread(Description, Amount)  %>%  ungroup() %>% 
-  select(1,6,7,17,15,16,11,5,14,2,3)
-colnames(macro_data) <- c("Development", "Buildings", "Elevators", "Staff", "Rooms", "Apts", "Prof_Units", "Comm_Units", "Staff_Units", "Income", "Expenses")
-
-micro_data <- 
-  long_data %>% 
-  group_by(Category, Development) %>%
-  mutate(Total = ifelse(Category == "Income", sum(Amount), 0)) %>%
+  select(1,7,8,18,16,17,12,5,15,2,3)
+colnames(macro_data) <- c("Development", "Buildings", "Elevators", "Staff", 
+  "Rooms", "Apts", "Prof_Units", "Comm_Units", "Staff_Units", "Income", "Expenses")
+display(macro_data[, c(1,2,6,10,11)])
+micro_data <- long_data %>% 
+  group_by(Description, Development) %>%
+  mutate(Total = ifelse(Description == "Average Room Rent", sum(Amount), 0)) %>%
   group_by(Development) %>%
-  mutate(Income = max(Total)) %>% select(-6) %>% 
-  group_by(Category, Development) %>%
-  mutate(Total = ifelse(Category == "Expenses", sum(Amount), 0)) %>%
+  mutate(Room_Rent = max(Total)) %>% select(-6) %>% 
+  group_by(Description, Development) %>%
+  mutate(Total = ifelse(Description == "Increased Room Rent", sum(Amount), 0)) %>%
   group_by(Development) %>%
-  mutate(Expenses = max(Total)) %>% select(-7) %>% 
-  filter(Category == "Grounds") %>% select(-c(1,2)) %>%
-  spread(Description, Amount)  %>%  ungroup() %>% 
-  select(1,6,7,17,15,16,11,5,14,2,3)
-colnames(macro_data) <- c("Development", "Buildings", "Elevators", "Staff", "Rooms", "Apts", "Prof_Units", "Comm_Units", "Staff_Units", "Income", "Expenses")
-
+  mutate(Inc_Rent = max(Total)) %>% select(-7) %>% 
+  filter(Category == "Income" | Category == "Expenses") %>% 
+  full_join(macro_data, by = "Development") %>% 
+  mutate(Apt_Maint = round((Room_Rent * Rooms * 12) / Apts / 12, 2)) %>% 
+  mutate(Inc_Maint = round((Inc_Rent * Rooms * 12) / Apts / 12, 2)) %>% 
+  select(4,1,2,3,5,8:11,6,7,12,18,19) 
+display(micro_data[, c(1,2,4,5)])
 ```
 
 # Analysis
 
 ## Income versus Expenses
-
 ```{r}
-macro_data %>% mutate(Net = Income - Expenses, Ratio = Income / Expenses) %>% select(1,10,11,12,13)
+inc_exp <- macro_data %>% 
+  mutate(Net = Income - Expenses) %>% 
+  mutate(Ratio = round(Income / Expenses, 2)) %>% 
+  select(1,10,11,12,13)
+display(inc_exp)
+ggplot(filter(micro_data, Category == "Income"), 
+  aes(Development, Amount, fill=Subcategory)) + 
+  geom_bar(stat = "identity") +
+  labs(y = "Annual Income", title = "Income per Development") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.y = element_blank())
+ggplot(filter(micro_data, Category == "Expenses"), 
+  aes(Development, Amount, fill=Subcategory)) + 
+  geom_bar(stat = "identity") +
+  labs(y = "Annual Expenses", title = "Expenses per Development") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.y = element_blank())
 ```
 
-## Income Breakdown
+## Annual Income Comparison
 
+### Median Income
 ```{r}
-library(tidyr)
-library(dplyr)
-
-# Change to median
-# http://r.789695.n4.nabble.com/function-for-rowMedian-td791942.html
-
-wide_data %>% filter(Category == "Income") %>% select(3:12) %>%
-  mutate(Average = rowSums(.[, sapply(., is.numeric)]) / 9) %>%
-  filter(Average != 0) %>%
-  mutate_each(funs(paste0(round(( ( . - Average) / ifelse(Average == 0, 1e-15, Average))*100, 2),"%")), -1)
-  
-  summarise_each(funs(colSums), -1)
-
+income_coop <- micro_data %>% 
+  filter(Category == "Income") %>% 
+  select(1,4,5) %>% 
+  spread(Development, Amount) %>% 
+  mutate(Sum = apply(.[, sapply(., is.numeric)], 1, sum)) %>% 
+  filter(Sum != 0) %>% select(-11) 
+display((income_coop %>% 
+  mutate(Median = apply(.[, sapply(., is.numeric)], 1, median)) %>% 
+  mutate_each(funs(ifelse(Median == 0, 
+    ifelse(.==0,0,1), (. - Median) / Median)), -c(1,11)) %>% 
+  mutate_each(funs(paste0(format(round(. * 100, 2), 
+    scientific = F),"%")), -c(1,11)))[, -11])
 ```
 
+### Standardized Income
+```{r}
+ggplot(income_coop %>%
+  mutate(Mean = apply(.[, c(2:10)], 1, mean)) %>%
+  mutate(SD = apply(.[, c(2:10)], 1, sd)) %>%
+  mutate_each(funs((.- Mean) / SD), -c(1,11,12)) %>% 
+  select(-c(11,12)) %>% 
+  gather(Development, Amount, 2:10),
+  aes(x = Development, y = Description)) + 
+  geom_tile(aes(fill = Amount)) + 
+  scale_fill_gradient(low = 'black', high = 'green', name = "Standing") + 
+  theme(axis.title.y = element_blank(), 
+  legend.text = element_text(colour = "white"),
+  plot.title = element_text(hjust = 0.5)) +
+  labs(title = "Standardized Income Comparison")
+```
 
+## Annual Expense Comparison
 
-## Cost per Apartment Unit
+### Median Expenses
+```{r}
+expenses_coop <- micro_data %>% 
+  filter(Category == "Expenses") %>% 
+  select(1,4,5) %>% 
+  spread(Development, Amount) %>% 
+  mutate(Sum = apply(.[, sapply(., is.numeric)], 1, sum)) %>% 
+  filter(Sum != 0) %>% select(-11)
+display((expenses_coop %>% 
+  mutate(Median = apply(.[, sapply(., is.numeric)], 1, median)) %>% 
+  mutate_each(funs(ifelse(Median == 0, 
+    ifelse(.==0,0,1), (. - Median) / Median)), -c(1,11)) %>% 
+  mutate_each(funs(paste0(format(round(. * 100, 2), 
+    scientific = F),"%")), -c(1,11)))[, -11])
+```
 
+### Standardized Expenses
+```{r}
+ggplot(expenses_coop %>%
+  mutate(Mean = apply(.[, c(2:10)], 1, mean)) %>%
+  mutate(SD = apply(.[, c(2:10)], 1, sd)) %>%
+  mutate_each(funs((.- Mean) / SD), -c(1,11,12)) %>% 
+  select(-c(11,12)) %>% 
+  gather(Development, Amount, 2:10),
+  aes(x = Development, y = Description)) + 
+  geom_tile(aes(fill = Amount)) + 
+  scale_fill_gradient(low = 'black', high = 'red', name = "Standing") + 
+  theme(axis.title.y = element_blank(), 
+  legend.text = element_text(colour = "white"),
+  plot.title = element_text(hjust = 0.5)) +
+  labs(title = "Standardized Expense Comparison")
+```
 
-# Referenes
+## Monthly Income per Unit
+```{r}
+income_apt <- micro_data %>% filter(Category == "Income") %>%
+  mutate(Amount = round(Amount / Apts / 12, 2)) %>% select(1,3,4,5) 
+display(income_apt %>% spread(Development, Amount))
+ggplot(income_apt, aes(Development, Amount, fill=Subcategory)) + 
+  geom_bar(stat = "identity") +
+  labs(y = "Monthly Income", title = "Income per Apartment Unit") +
+  theme(plot.title = element_text(hjust = 0.5))
+cor((micro_data %>% filter(Category == "Income") %>% 
+  mutate(Amount = round(Amount / Apts / 12, 2)) %>% 
+  select(1,5,12) %>% group_by(Development) %>% 
+  mutate(Amount = sum(Amount)) %>% unique())[, c(2,3)])[[2]]
+```
+No correlation between size of coop (in units) and income (rent charged).
+
+## Monthly Expenses Per Unit
+```{r}
+expenses_apt <- micro_data %>%  filter(Category == "Expenses") %>%
+  mutate(Amount = round(Amount / Apts / 12, 2)) %>% select(1,3,4,5) 
+display(expenses_apt %>% spread(Development, Amount))
+ggplot(expenses_apt, aes(Development, Amount, fill=Subcategory)) + 
+  geom_bar(stat = "identity") +
+  labs(y = "Monthly Expenses", title = "Expenses per Apartment Unit") +
+  theme(plot.title = element_text(hjust = 0.5))
+cor((micro_data %>% filter(Category == "Expenses") %>% 
+  mutate(Amount = round(Amount / Apts / 12, 2)) %>% 
+  select(1,5,12) %>% group_by(Development) %>% 
+  mutate(Amount = sum(Amount)) %>% unique())[, c(2,3)])[[2]]
+```
+No correlation between size of coop (in units) and expenses (maintenance costs).
+
+## Maintenance Comparison
+```{r}
+maintenance <- data.frame(micro_data %>% 
+  group_by(Category) %>% 
+  mutate(Median_Maint = round(median(Apt_Maint), 2)) %>%  
+  ungroup() %>% select(1,13,15) %>% unique() %>% 
+  mutate(Dollar_Diff = round(Apt_Maint - Median_Maint, 2)) %>% 
+  mutate(Percent_Diff = round((Apt_Maint - Median_Maint) / Median_Maint, 2)))
+ggplot(maintenance, aes(x = Development, y = Apt_Maint, fill = Development)) + 
+  geom_bar(stat="identity")+ coord_flip() + 
+  labs(title = "Average Monthly Maintenance") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.title.x = element_blank()) +
+  theme(axis.title.y = element_blank()) +
+  theme(axis.text.y = element_blank())
+display(maintenance %>%
+  mutate(Percent_Diff = paste0(round(Percent_Diff * 100, 2), "%")))
+```
+
+## **Increased** Maintenance Comparison
+```{r}
+increases <- data.frame(micro_data %>% 
+  group_by(Category) %>% 
+  mutate(Median_Maint = round(median(Inc_Maint), 2)) %>%  
+  ungroup() %>% select(1,14,15) %>% unique() %>% 
+  mutate(Dollar_Diff = round(Inc_Maint - Median_Maint, 2)) %>% 
+  mutate(Percent_Diff = round((Inc_Maint - Median_Maint) / Median_Maint, 2)))
+ggplot(increases, aes(x = Development, y = Inc_Maint, fill = Development)) + 
+  geom_bar(stat="identity")+ coord_flip() + 
+  labs(title = "Average Monthly Increased Maintenance") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.title.x = element_blank()) +
+  theme(axis.title.y = element_blank()) +
+  theme(axis.text.y = element_blank())
+display(increases %>%
+  mutate(Percent_Diff = paste0(round(Percent_Diff * 100, 2), "%")))
+```
+
+# References
 
 ^i^ http://www.investopedia.com/articles/personal-finance/090115/living-new-york-city-coops-vs-condos.asp
 

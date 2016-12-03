@@ -2,10 +2,10 @@
 title: "NYC Mortality Statistics"
 author: "Jose Zuniga"
 output:
-  html_document:
+  pdf_document:
     toc: yes
     toc_depth: '4'
-  pdf_document:
+  html_document:
     toc: yes
     toc_depth: '4'
 ---

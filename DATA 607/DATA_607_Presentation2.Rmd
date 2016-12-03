@@ -1,7 +1,10 @@
 ---
-title: "Data Science Context Presentation 2"
+title: "BLS Public Data API"
 author: "Jose Zuniga"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
   html_document:
     toc: yes
     toc_depth: '3'
@@ -23,170 +26,210 @@ You may also record your presentation instead of presenting in our meetup. Effec
 
 ***
 
-# Data Mining for Business Intelligence: Concepts, Techniques, and Applications
+# BLS Public Data API
 
-Author: Galit Shmueli, Nitin R. Patel, and Peter C. Bruce
+The BLS Public Data Application Programming Interface (API) is an application designed to allow third party programmers, developers, and organizations to retrieve published historical time series data in `JSON` data-interchange format. Using Public Data API signatures, users can consume and manipulate raw data from all of the Bureau's surveys to create a wide range of applications that conform to W3C standards and accepted practices. The BLS Public Data API Version 1.0 does not require registration and is open for public use. The BLS Public Data API Version 2.0 does require [registration](http://data.bls.gov/registrationEngine/). API Version 2.0 offers greater query limits and allows users to request net changes, percent changes, and series description information. The API has a few known limitations specified on the website. The one which becomes most readily apparent as soon as one starts working with the API is that **users must have knowledge of BLS [Series IDs](http://www.bls.gov/help/hlpforma.htm) in order to successfully complete a request**.
 
-Date: October 26, 2010
+|Service	                                |Version 2.0  |Version 1.0  |
+|-----------------------------------------|:-----------:|:-----------:|
+|Daily query limit	                      |500	        |25           |
+|Series per query limit	                  |50	          |25           |
+|Years per query limit	                  |20	          |10           |
+|Net/Percent Changes	                    |Yes	        |No           |
+|Optional annual averages	                |Yes	        |No           |
+|Series description information (catalog) |Yes	        |No           |
 
-Hardcover: 428 pages
+# The `blsAPI` Package
 
-Publisher: Wiley
+The [`blsAPI`](https://cran.r-project.org/web/packages/blsAPI/blsAPI.pdf) Package allows users to request data for one or multiple series through the U.S. Bureau of Labor Statistics API.
 
-Language: English
-
-ISBN: 978-0470526828
-
-## Building a Model: Example with Linear Regression (2.6)
-
-### Purpose
-
-To predict the median house value in small Boston area neighborhoods.
-
-### Obtain the Data
-
-```{r}
-data(Boston, package="MASS")
+```{r warning=FALSE, message=FALSE}
+library(blsAPI)
+library(dplyr)
+library(tidyr)
 ```
 
-### Explore, Clean, and Preprocess the Data
+## The `blsAPI` Function
 
-```{r}
-Boston <- within(Boston, cat.medv <- ifelse(medv >= 30, 1, 0))
-names(Boston)
+`blsAPI(payload = NA, api.version = 1, return.data.frame = FALSE)`
+
+The `blsAPI` function allows users to request data for one or multiple series through the U.S. Bureau of Labor Statistics API. Users provide parameters and the function returns a JSON string or data frame. The `Payload` parameter consists of a string or a list containing the series name(s) to be sent to the API. Most Series ID formats can be found [here](http://www.bls.gov/help/hlpforma.htm). To retrieve optional parameters, users must include their assigned registration key. Optional parameters are `startyear`, `endyear`, `calculations`, `annualaverage`, and `catalog` data.
+
+```{r echo=FALSE, results="hide"}
+API_Key <- "564ca020f9d4427c8d6af35f49551a1d"
+```
+```{r cache=TRUE}
+payload <- 'LAUCN040010000000005'
+single <- blsAPI(payload, api.version = 1, return.data.frame = T)
+head(single)
+payload <- list('seriesid'=c('LAUCN040010000000005', 'LAUCN040010000000006'))
+multiple <- blsAPI(payload, api.version = 1, return.data.frame = T)
+head(multiple)
+payload <- list(
+'seriesid' = c('LAUCN040010000000005', 'LAUCN040010000000006'),
+'startyear' = 2010,
+'endyear' = 2012,
+'calculations' = TRUE,
+'annualaverage' = TRUE,
+'catalog' = TRUE,
+'registrationKey' = API_Key)
+parameters <- blsAPI(payload, api.version = 2, return.data.frame = T)
+head(parameters)
 ```
 
-  1. CRIM: per capita crime rate by town 
-  2. ZN: proportion of residential land zoned for lots over 25,000 sq.ft. 
-  3. INDUS: proportion of non-retail business acres per town 
-  4. CHAS: Charles River dummy variable (= 1 if tract bounds river; 0 otherwise) 
-  5. NOX: nitric oxides concentration (parts per 10 million) 
-  6. RM: average number of rooms per dwelling 
-  7. AGE: proportion of owner-occupied units built prior to 1940 
-  8. DIS: weighted distances to five Boston employment centers 
-  9. RAD: index of accessibility to radial highways 
-  10. TAX: full-value property-tax rate per $10,000 
-  11. PTRATIO: pupil-teacher ratio by town 
-  12. BLACK: 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town 
-  13. LSTAT: % lower status of the population 
-  14. MEDV: Median value of owner-occupied homes in $1000's
-  15. CAT.MEDV: High Income dummy variable (= 1 if MEDV $30K or more; 0 otherwise) 
-  
-```{r}
-str(Boston)
-summary(Boston)
+## The `blsQCEW` Function
+
+`blsQCEW(method, year = NA, quarter = NA, area = NA, industry = NA, size = NA)`
+
+The `blsQCEW` function allows users to request quarterly census of employment and wages (QCEW) data from the U.S.
+Bureau of Labor Statistics open access. Users provide parameters and the function returns a data
+frame. This function is based off of the sample code developed by the BLS. The `method` parameter consists of a case insensitive string describing which type of data you want requested. Valid options are [`area`](http://data.bls.gov/cew/doc/titles/area/area_titles.htm), [`industry`](http://data.bls.gov/cew/doc/titles/industry/industry_titles.htm), and [`size`](http://data.bls.gov/cew/doc/titles/size/size_titles.htm).
+
+```{r cache=TRUE}
+area <- blsQCEW('area', year='2013', quarter='1', area='36005')
+names(area)
+industry <- blsQCEW('industry', year='2013', quarter='1', industry='21222')
+names(industry)
+size <- blsQCEW('size', year='2013', size='6')
+names(size)
 ```
 
-### Reduce the Data and Partition them into Training, Validation, and Test Partitions
+# Current BLS NAICS Basis API Products
 
-No test data in this example. Test data is used when there are multiple models being compared to the validation data in order to reduce bias.
+For over 60 years, the Standard Industrial Classification (SIC) system served as the structure for the collection, presentation, and analysis of the U.S. economy. Over the years, there were numerous revisions to the SIC system. Despite these revisions, the system received increasing criticism. Developments in information services, new forms of health care provision, expansion of services, and high-tech manufacturing are examples of industrial changes that could not be studied under the SIC system. NAICS was introduced in 1997 and is periodically revised to reflect changes in the industrial structure of the U.S. and North American economy. NAICS provides a tool to ensure that economic statistics reflect the changing economy.
+
 ```{r}
-n <- nrow(Boston)
-set.seed(54)
-random <- sample(n, replace=F)
-training <- Boston[random[1:(n/2)], ]
-validation <- Boston[random[(n/2+1):n], ]
+BLS_Products <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
+                                "DATA%20607/BLS_Products.csv"), stringsAsFactors = F)
+BLS_Products <- BLS_Products %>% filter(NAICS_SIC == "N" & HISTORIC !=1)
+BLS_Products %>% select(4)
+examine <- function(Program) {
+  product <- BLS_Products %>% filter(PROGRAM == Program)
+  cat(noquote(paste0(rep("#", 75), collapse = "")),"\n")
+  for (i in 1:nrow(product)) {
+    payload <- list('seriesid' = product[i, "ID_EXAMPLE"], 'registrationKey' = API_Key)
+    data <- blsAPI(payload, api.version = 2, return.data.frame = T)
+    result <- list(PRODUCT_NAME = noquote(product[1, "SERIES"]),
+                   LINKS = noquote(cbind(
+                       information = c("PRODUCT_OVERVIEW", 
+                                       "SERIES_DETAILS",
+                                       "POPULAR_QUERIES"), 
+                       link = c(product[1, "OVERVIEW"], 
+                                product[1, "DEFINITIONS"], 
+                                product[1, "POPULAR"]))),
+                   PREVIEW = head(data))
+    print(result)
+    cat(noquote(paste0(rep("#", 75), collapse = "")),"\n")
+  }
+}
 ```
 
-### Determine the Data Mining Task
-
-Predict the value of MEDV using the 13 predictor variables.
-
-### Choose the Technique
-
-Multiple Linear Regression
-
-### Use the Algorithm to Perform the Task
-
-Fir the data. Produce a summary. Examine regression residuals. Apply the model to the validation data. Examine correlation. Compare sum of squared errors, mean error, and root-mean-squared (RMS) error of training data and validation data.
+## Business Employment Dynamics
 ```{r}
-fit <- lm(medv ~ crim + zn + indus + chas + nox + rm + age + dis + 
-            rad + tax + ptratio + black + lstat, data = training)
-summary(fit)
-training_e <- residuals(fit)
-par(mfrow = c(2, 2))
-plot(fit)
-predictions <- predict(fit, validation)
-validation_e <- validation$medv - predictions
-cor(validation$medv, predictions)
-round(c(sum(training_e^2), mean(training_e), sqrt(mean(training_e^2))), 4)
-round(c(sum(validation_e^2), mean(validation_e), sqrt(mean(validation_e^2))), 4)
+examine("BDM")
 ```
 
-### Interpret the Results
-
-At this point other prediction algorithms are typically tried, variables dropped or added, errors are compared, and then a well-perfuming parsimonious model is chosen.
-
-### Deploy the Model
-
-Median house value in small Boston area neighborhoods is predicted using the model.
-
-#### References
-
-https://archive.ics.uci.edu/ml/datasets/Housing
-
-http://www.slideshare.net/Wyendrila/mini-project-boston-housing-dataset-v1
-
-## Heatmaps: Visualizing Correlations and Missing Values (3.3)
-
-Heatmap of correlation matrix.
+## Current Employment Statistics
 ```{r}
-heatmap(cor(Boston), Rowv=NA, Colv=NA, col = heat.colors(10), scale="none")
+examine("CES")
 ```
 
-Heatmap of missing values.
+## Quarterly Census of Employment and Wages
 ```{r}
-x <- matrix(ifelse(is.na(sample(c(NA, 0:10), 1000, T)), 0, 1), 100)
-heatmap(x, Rowv=NA, Colv=NA, labRow = "", labCol = "", col = heat.colors(2), scale="column")
+examine("CEW")
 ```
 
-### References
-
-https://flowingdata.com/2010/01/21/how-to-make-a-heatmap-a-quick-and-easy-solution/
-
-## Specialized Visualizations (3.5)
-
-Visualizing Hierarchical Data (Treemaps).
+## Consumer Expenditure Survey
 ```{r}
-library(treemap)
-data(GNI2014)
-treemap(GNI2014, index=c("continent", "iso3"), vSize="population", vColor="GNI", type="value")
+examine("CEX")
 ```
 
-Visualizing Geogrphical Data (Map Charts).
+## Consumer Price Index
 ```{r}
-library(stringr)
-library(XML)
-library(maps)
-library(httr)
-url <- "http://en.wikipedia.org/wiki/List_of_World_Heritage_in_Danger"
-heritage_parsed <- htmlParse(rawToChar(GET(url)$content))
-tables <- readHTMLTable(heritage_parsed, stringsAsFactors = FALSE)
-danger_table <- danger_table <- tables[[2]]
-danger_table <- danger_table[, c(1, 3, 4, 6, 7)]
-colnames(danger_table) <- c("name", "locn", "crit", "yins", "yend")
-danger_table$crit <- ifelse(str_detect(danger_table$crit, "Natural") == TRUE, "nat", "cult")
-danger_table$yins <- as.numeric(danger_table$yins)
-yend_clean <- unlist(substr(str_extract_all(danger_table$yend, "[[:digit:]]{4}.$"),1,4))
-danger_table$yend <- as.numeric(yend_clean)
-reg_y <- "[/][ -]*[[:digit:]]*[.]*[[:digit:]]*[;]"
-reg_x <- "[;][ -]*[[:digit:]]*[.]*[[:digit:]]*"
-y_coords <- str_extract(danger_table$locn, reg_y)
-y_coords <- as.numeric(str_sub(y_coords, 3, -2))
-danger_table$y_coords <- y_coords
-x_coords <- str_extract(danger_table$locn, reg_x)
-x_coords <- as.numeric(str_sub(x_coords, 3, -1))
-danger_table$x_coords <- x_coords
-danger_table$locn <- NULL
-pch <- ifelse(danger_table$crit == "nat", 19, 2)
-map("world", col = "darkgrey", lwd = 0.5, mar = c(0.1, 0.1, 0.1, 0.1))
-points(danger_table$x_coords, danger_table$y_coords, pch = pch); box()
+examine("CPI")
 ```
 
-### References 
+## Current Population Survey
+```{r}
+examine("CPS")
+```
 
-http://finzi.psych.upenn.edu/library/treemap/html/treemap.html
+## Geographic Profile of Employment & Unemployment
+```{r}
+examine("GPS")
+```
 
-http://www.stat.wisc.edu/~gvludwig/327-5/maps#/16
+## Injuries, Illnesses, & Fatalities
+```{r}
+examine("IIF")
+```
 
-Automated Data Collection with R (Pages 1-5)
+## Job Openings and Labor Turnover Survey
+```{r}
+examine("JOLTS")
+```
+
+## Local Area Unemployment Statistics
+```{r}
+examine("LAU")
+```
+
+## Productivity & Costs
+```{r}
+examine("LPC")
+```
+
+## International Price Program
+```{r}
+examine("MXP")
+```
+
+## National Compensation Survey
+```{r}
+examine("NCS")
+```
+
+## Occupational Employment Statistics 
+```{r}
+examine("OES")
+```
+
+## Producer Price Index
+```{r}
+examine("PPI")
+```
+
+## Current Employment Statistics
+```{r}
+examine("SEA")
+```
+
+## American Time Use Survey
+```{r}
+examine("TUS")
+```
+
+## Work Stoppages
+```{r}
+examine("WSP")
+```
+
+# References
+
+http://www.bls.gov/data/
+
+http://www.bls.gov/ggs/#data
+
+http://www.bls.gov/bls/naics.htm
+
+http://data.bls.gov/cgi-bin/srgate
+
+http://www.bls.gov/bls/api_features.htm
+
+http://www.bls.gov/developers/api_r.htm
+
+http://www.bls.gov/bls/proghome_a-z.htm
+
+http://www.bls.gov/developers/api_signature.htm
+
+http://www.bls.gov/developers/api_signature_v2.htm
