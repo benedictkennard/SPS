@@ -2,10 +2,10 @@
 title: "BLS Public Data API"
 author: "Jose Zuniga"
 output:
-  pdf_document:
+  html_document:
     toc: yes
     toc_depth: '3'
-  html_document:
+  pdf_document:
     toc: yes
     toc_depth: '3'
 ---
@@ -102,21 +102,21 @@ For over 60 years, the Standard Industrial Classification (SIC) system served as
 BLS_Products <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/master/",
                                 "DATA%20607/BLS_Products.csv"), stringsAsFactors = F)
 BLS_Products <- BLS_Products %>% filter(NAICS_SIC == "N" & HISTORIC !=1)
-BLS_Products %>% select(4)
+BLS_Products %>% select(SERIES) %>% arrange (SERIES)
 examine <- function(Program) {
   product <- BLS_Products %>% filter(PROGRAM == Program)
   cat(noquote(paste0(rep("#", 75), collapse = "")),"\n")
   for (i in 1:nrow(product)) {
     payload <- list('seriesid' = product[i, "ID_EXAMPLE"], 'registrationKey' = API_Key)
     data <- blsAPI(payload, api.version = 2, return.data.frame = T)
-    result <- list(PRODUCT_NAME = noquote(product[1, "SERIES"]),
+    result <- list(PRODUCT_NAME = noquote(product[i, "SERIES"]),
                    LINKS = noquote(cbind(
                        information = c("PRODUCT_OVERVIEW", 
                                        "SERIES_DETAILS",
                                        "POPULAR_QUERIES"), 
-                       link = c(product[1, "OVERVIEW"], 
-                                product[1, "DEFINITIONS"], 
-                                product[1, "POPULAR"]))),
+                       link = c(product[i, "OVERVIEW"], 
+                                product[i, "DEFINITIONS"], 
+                                product[i, "POPULAR"]))),
                    PREVIEW = head(data))
     print(result)
     cat(noquote(paste0(rep("#", 75), collapse = "")),"\n")
@@ -124,94 +124,92 @@ examine <- function(Program) {
 }
 ```
 
-## Business Employment Dynamics
-```{r}
-examine("BDM")
-```
+## Office of Compensation and Working Conditions
 
-## Current Employment Statistics
-```{r}
-examine("CES")
-```
-
-## Quarterly Census of Employment and Wages
-```{r}
-examine("CEW")
-```
-
-## Consumer Expenditure Survey
-```{r}
-examine("CEX")
-```
-
-## Consumer Price Index
-```{r}
-examine("CPI")
-```
-
-## Current Population Survey
-```{r}
-examine("CPS")
-```
-
-## Geographic Profile of Employment & Unemployment
-```{r}
-examine("GPS")
-```
-
-## Injuries, Illnesses, & Fatalities
+### Injuries, Illnesses, & Fatalities
 ```{r}
 examine("IIF")
 ```
 
-## Job Openings and Labor Turnover Survey
-```{r}
-examine("JOLTS")
-```
-
-## Local Area Unemployment Statistics
-```{r}
-examine("LAU")
-```
-
-## Productivity & Costs
-```{r}
-examine("LPC")
-```
-
-## International Price Program
-```{r}
-examine("MXP")
-```
-
-## National Compensation Survey
+### National Compensation Survey
 ```{r}
 examine("NCS")
 ```
 
-## Occupational Employment Statistics 
-```{r}
-examine("OES")
-```
+## Office of Employment and Unemployment Statistics
 
-## Producer Price Index
-```{r}
-examine("PPI")
-```
-
-## Current Employment Statistics
-```{r}
-examine("SEA")
-```
-
-## American Time Use Survey
+### American Time Use Survey
 ```{r}
 examine("TUS")
 ```
 
-## Work Stoppages
+### Current Employment Statistics (National)
 ```{r}
-examine("WSP")
+examine("CES")
+```
+
+### Current Employment Statistics (State)
+```{r}
+examine("SEA")
+```
+
+### Current Population Survey
+```{r}
+examine("CPS")
+```
+
+### Geographic Profile of Employment & Unemployment
+```{r}
+examine("GPS")
+```
+
+### Job Openings and Labor Turnover Survey
+```{r}
+examine("JOLTS")
+```
+
+### Local Area Unemployment Statistics
+```{r}
+examine("LAU")
+```
+
+### Occupational Employment Statistics 
+```{r}
+examine("OES")
+```
+
+### Quarterly Census of Employment and Wages
+```{r}
+examine("CEW")
+```
+
+## Office of Prices and Living Conditions
+
+### Consumer Expenditure Survey
+```{r}
+examine("CEX")
+```
+
+### Consumer Price Index
+```{r}
+examine("CPI")
+```
+
+### International Price Program
+```{r}
+examine("IPP")
+```
+
+### Producer Price Index
+```{r}
+examine("PPI")
+```
+
+## Office of Productivity and Technology
+
+### Productivity & Costs
+```{r}
+examine("LPC")
 ```
 
 # References
@@ -224,11 +222,15 @@ http://www.bls.gov/bls/naics.htm
 
 http://data.bls.gov/cgi-bin/srgate
 
+http://www.bls.gov/bls/senior_staff/
+
 http://www.bls.gov/bls/api_features.htm
 
 http://www.bls.gov/developers/api_r.htm
 
 http://www.bls.gov/bls/proghome_a-z.htm
+
+http://www.bls.gov/opub/mpbls/mpbls919.pdf
 
 http://www.bls.gov/developers/api_signature.htm
 
