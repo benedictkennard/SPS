@@ -1,11 +1,11 @@
 ---
-title: "DATA 605 Final"
+title: "House Prices"
 author: "Jose Zuniga"
 output:
-  pdf_document:
+  html_document:
     toc: yes
     toc_depth: '3'
-  html_document:
+  pdf_document:
     toc: yes
     toc_depth: '3'
 ---
@@ -16,25 +16,19 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Final Instructions
 
-Register for free with Kaggle.com and compete in the *House Prices: Advanced Regression Techniques* competition. Post solutions to GitHub and make a short 3-5 minute presentation or post a recorded presentation to blackboard.
-
-> **Competition Details**
-
-> Ask a home buyer to describe their dream house, and they probably won't begin with the height of the basement ceiling or the proximity to an east-west railroad. But this playground competition's dataset proves that much more influences price negotiations than the number of bedrooms or a white-picket fence.
-
-> With 79 explanatory variables describing (almost) every aspect of residential homes in Ames, Iowa, this competition challenges you to predict the final price of each home.
-
-> The potential for creative feature engineering provides a rich opportunity for fun and learning. This dataset lends itself to advanced regression techniques like random forests and gradient boosting with the popular XGBoost library. We encourage Kagglers to create benchmark code and tutorials on Kernels for community learning. Top kernels will be awarded swag prizes at the competition close. 
+The final exam features a miniproject and several small & medium sized questions. The final exam is a comprehensive review of the course. Post solutions to GitHub and make a short 3-5 minute presentation or post a recorded presentation to blackboard. This project will show off your ability to understand the elements of the class.
 
 ```{r warning=FALSE}
-library(agrmt)
 library(MASS)
+library(agrmt)
+library(VennDiagram)
 ```
 
-Pick one of the quantitative independent variables from the training data set `train.csv`, and define that variable as `X`. *Make sure this variable is skewed to the right*. Pick the dependent variable and define it as `Y`. Data definitions are available [here](https://github.com/jzuniga123/SPS/blob/master/DATA%20605/train_data_description.txt).
+Register for free with Kaggle.com to compete in the *House Prices: Advanced Regression Techniques* competition. 
 
-  + Negative Skew: The left tail is longer; the mass of the distribution is concentrated on the right of the figure. The distribution is said to be left-skewed, left-tailed, or skewed to the left.
-  + Positive Skew: The right tail is longer; the mass of the distribution is concentrated on the left of the figure. The distribution is said to be right-skewed, right-tailed, or **skewed to the right**.
+> **Competition Details:** Ask a home buyer to describe their dream house, and they probably won't begin with the height of the basement ceiling or the proximity to an east-west railroad. But this playground competition's dataset proves that much more influences price negotiations than the number of bedrooms or a white-picket fence. With 79 explanatory variables describing (almost) every aspect of residential homes in Ames, Iowa, this competition challenges you to predict the final price of each home. The potential for creative feature engineering provides a rich opportunity for fun and learning. This dataset lends itself to advanced regression techniques like random forests and gradient boosting with the popular XGBoost library. We encourage Kagglers to create benchmark code and tutorials on Kernels for community learning. Top kernels will be awarded swag prizes at the competition close. 
+
+Pick one of the quantitative independent variables from the training [data set](https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20605/train_data_description.txt) `train.csv`, and define that variable as $X$. *Make sure this variable is skewed to the right*. Pick the dependent variable and define it as $Y$.
 
 ```{r warning=FALSE}
 train <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/",
@@ -67,54 +61,80 @@ skewed <- function (train) {
 X <- skewed(train)
 ```
 
+Negative Skew means the left tail is longer; the mass of the distribution is concentrated on the right of the figure. The distribution is said to be left-skewed, left-tailed, or skewed to the left. **Positive Skew means** the right tail is longer; the mass of the distribution is concentrated on the left of the figure. The distribution is said to be right-skewed, right-tailed, or ***skewed to the right***. <span style="color:red">In order to do a more thorough analysis, the vector $\mathbf{X}$ containing *all* right skewed independent variables was created.</span>
+
 ## 1. Probability
 
 ### 1.1 Instructions
-Calculate as a minimum the below probabilities a through d. Assume the small letter $x$ is estimated as the 3rd quartile of the $X$ variable, and the small letter $y$ is estimated as the 2nd quartile of the $Y$ variable. Interpret the meaning of all probabilities. In addition, make a table of counts as shown below. Does splitting the training data in this fashion make them independent?
+Calculate as a minimum the below probabilities a through c. Assume the small letter $x$ is estimated as the 3rd quartile of the $X$ variable, and the small letter $y$ is estimated as the 2nd quartile of the $Y$ variable. Interpret the meaning of all probabilities. In addition, make a table of counts as shown below. Does splitting the training data in this fashion make them independent?
+
+```{r}
+quantile(Y)
+```
+
+### 1.1 Calculations
 
 $$\textbf{a.} \quad P\left( { X > x }|{ Y > y } \right) \quad\quad\quad \textbf{b.} \quad P(X > x, Y > y) \quad\quad\quad \textbf{c.} \quad P\left( { X < x }|{ Y > y } \right)$$
 
-|$\textbf{d.}\quad x/y$   |$Y \leq$ 2nd quartile  |$Y >$ 2nd quartile |Total  |
-|-------------------------|:---------------------:|:-----------------:|:-----:|
-|**$X \leq$ 3rd quartile**|$P\left(X\leq x,Y\leq y\right)$|$P\left(X\leq x,Y>y\right)$|$P\left(X\leq x\right)$|
-|**$X >$ 3rd quartile**		|$P\left(X>x,Y\leq y\right)$|$P\left(X>x,Y>y\right)$|$P\left(X>x\right)$|
-|**Total**                |$P\left(Y\leq y\right)$|$P\left(Y>y\right)$|$1$|
-
-### 1.1 Calculations
 ```{r}
-quantile(Y)
 probabilities <- function(X, Y) {
-  y <- quantile(Y, 0.5)
-  cat(noquote(paste0(rep("#", 75), collapse = "")),"\n")
+  y <- quantile(Y, 0.5);  Q <- V <- A <- B <- C <- {}
   for (i in 1:ncol(X)) {
     x <- quantile(X[,i], 0.75, na.rm = T); n <- length(Y)
     a <- as.numeric(table(if (any(X[,i] < x)) {Y[X[,i] < x] > y} 
                           else {Y > y})["TRUE"])  / n
     c <- as.numeric(table(if (any(X[,i] > x)) {Y[X[,i] > x] > y} 
                           else {Y > y})["TRUE"])  / n
-    t1 <- as.numeric(table(Y[X[,i] <= x] <= y)["TRUE"]) / n
-    t4 <- as.numeric(table(Y[X[,i] <= x] > y)["TRUE"]) / n
-    t2 <- as.numeric(table(Y[X[,i] > x] <= y)["TRUE"]) / n
     t5 <- as.numeric(table(Y[X[,i] > x] > y)["TRUE"]) / n
-    t7 <- as.numeric(table(X[,i] <= x)["TRUE"]) / n
-    t8 <- as.numeric(table(X[,i] > x)["TRUE"]) / n
-    t3 <- as.numeric(table(Y <= y)["TRUE"]) / n
     t6 <- as.numeric(table(Y > y)["TRUE"]) / n
-    d <- data.frame(matrix(c(t1,t2,t3,t4,t5,t6,t7,t8,t7 + t8), nrow = 3))
-    colnames(d) <- c("Y <= 2nd quartile", "Y > 2nd quartile", "Total")
-    rownames(d) <- c("X <= 3rd quartile", "X > 3rd quartile", "Total")
-    print(list("Right-Skewed Quantitative X Variable" = names(X[i]), 
-               "Quartiles" = quantile(X[,i], na.rm = T),
-               "a. P(X > x|Y > y)" = a / t6, "b. P(X > x, Y > y)" = t5, 
-               "c. P(X < x|Y > y)" = c / t6, "Contingency Table" = d))
-    cat(noquote(paste0(rep("#", 75), collapse = "")),"\n")
+    Q <- rbind(Q, quantile(X[,i], na.rm = T))
+    V <- c(V, names(X[i])); 
+    A <- c(A, a / t6); B <- c(B, t5); C <- c(C, c / t6)
   }
+  colnames(Q) <- c("Q_0","Q_25","Q_50","Q_75","Q_100")
+  print(list("Quartiles" = data.frame("X" = V, Q),
+    "Probabilities"= data.frame("X" = V, "a." = A, "b." = B, "c." = C)))
 }
 probabilities(X, Y)
 ```
 
-### 1.1 Discussion
-$P(X \geq x, Y > y)$ is the probability of the events $X \geq x$ and $Y > y$ both occurring jointly. In Venn diagram terms, it is the area of the intersection of both events. $P\left( { X \geq x }|{ Y > y } \right)$ and $P\left( { X \leq x }|{ Y > y } \right)$ are the conditional probabilities of $X \leq x$ or $X \geq x$ given that $Y\geq y$ has occurred. In Venn diagram terms, it is the area of the intersection of both events, divided by the total area of the given event. The contingency table displays both: the joint probabilities of the events specified in the top and left margins, and the sums of the joint probabilities (marginal probabilities) in the bottom and right margins. Splitting the training data in this fashion does not make the data independent.
+|$\textbf{d.}\quad x/y$   |$Y \leq$ 2nd quartile        |$Y >$ 2nd quartile         |Total                      |
+|-------------------------|:---------------------------:|:-------------------------:|:-------------------------:|
+|**$X \leq$ 3rd quartile**|$n(X\leq x,Y\leq y)$         |$n(X\leq x,Y>y)$           |$n(X\leq x)$               |
+|**$X >$ 3rd quartile**		|$n(X>x,Y\leq y)$             |$n(X>x,Y>y)$               |$n(X>x)$                   |
+|**Total**                |$n(Y\leq y)$                 |$n(Y>y)$                   |$n(X)+n(Y)$                |
+
+```{r}
+counts <- function(X, Y) {
+  y <- quantile(Y, 0.5)
+  for (i in 1:ncol(X)) {
+    x <- quantile(X[,i], 0.75, na.rm = T); n <- length(Y)
+    t1 <- as.numeric(table(Y[X[,i] <= x] <= y)["TRUE"])
+    t4 <- as.numeric(table(Y[X[,i] <= x] > y)["TRUE"])
+    t2 <- as.numeric(table(Y[X[,i] > x] <= y)["TRUE"])
+    t5 <- as.numeric(table(Y[X[,i] > x] > y)["TRUE"])
+    t7 <- as.numeric(table(X[,i] <= x)["TRUE"])
+    t8 <- as.numeric(table(X[,i] > x)["TRUE"])
+    t3 <- as.numeric(table(Y <= y)["TRUE"])
+    t6 <- as.numeric(table(Y > y)["TRUE"])
+    d <- data.frame(matrix(c(t1,t2,t3,t4,t5,t6,t7,t8,t7 + t8), nrow = 3))
+    colnames(d) <- c("Y <= 2nd quartile", "Y > 2nd quartile", "Total")
+    rownames(d) <- c("X <= 3rd quartile", "X > 3rd quartile", "Total")
+    d <- list(d); names(d) <- names(X[i]); print(d)
+  }
+}
+counts(X, Y)
+```
+
+### 1.1 Analysis
+$P(X \geq x, Y > y)$ is the probability of the events $X \geq x$ and $Y > y$ both occurring jointly. In Venn diagram terms, it is the area represented by the intersection of both events. $P\left( { X \geq x }|{ Y > y } \right)$ and $P\left( { X \leq x }|{ Y > y } \right)$ are the conditional probabilities of $X \leq x$ or $X \geq x$ given that $Y\geq y$ has occurred. In Venn diagram terms, it is the area represented by the intersection of both events, divided by the total area of the given event. The contingency table displays counts of the events specified in the top and left margins, and the sums of the joint events in the bottom and right margins. Splitting the training data in this fashion does not make the data independent as can be seen in the fact that the number of events occurring given that the conditioned event occurred is not equal to the number of events occurring absent the conditioned event. In mathematical terms: $n(X|Y)=\frac { n\left( X,Y \right)  }{ n\left( Y \right)  } \neq \frac { n\left( X \right) n\left( Y \right)  }{ n\left( Y \right)  } =n(X)$.
+
+```{r warning=F, message=F}
+grid.newpage()
+draw.pairwise.venn(area1 = 1, area2 = 1, cross.area = 0.25, scaled = T, cat.prompts = T,
+                   lty = rep("blank", 2), fill = c("blue", "green"), alpha = rep(0.5, 2), 
+                   category = c("X", "Y"), cat.pos = c(0, 0), cat.dist = rep(0.025, 2))
+```
 
 ### 1.2 Instructions
 Let $A$ be the new variable counting those observations above the 3rd quartile for $X$, and let $B$ be the new variable counting those observations above the 2nd quartile for $Y$. Does $P(A|B)=P(A)P(B)$? Check mathematically, and then evaluate by running a Chi Square test for association.
@@ -122,7 +142,6 @@ Let $A$ be the new variable counting those observations above the 3rd quartile f
 ### 1.2 Calculations
 ```{r}
 independence <- function(X, Y) {
-  cat(noquote(paste0(rep("#", 75), collapse = "")),"\n")
   for (i in 1:ncol(X)) {
     y <- quantile(Y, 0.5); n <- length(Y)
     x <- quantile(X[,i], 0.75, na.rm = T)
@@ -132,21 +151,23 @@ independence <- function(X, Y) {
     Pa <- A / n; Pb <- B / n; 
     Pab1 <- (AB / n) / Pb; Pab2 <- (A / n) * (B / n)
     chi <- chisq.test(table(Y[X[,i] > x] > y), simulate.p.value = TRUE)
-    df1 <- data.frame(Variable = c("A", "B"), Count = c(A, B), Probability = c(Pa, Pb))
-    df2 <- data.frame(Dependent = (Pab1 != Pab2), "A given B" = Pab1, "A and B" = Pab2)
-    df3 <- data.frame(Dependent = chi$p.value < 0.01, chi$statistic, chi$p.value)
-    print(list("Right-Skewed Quantitative X Variable" = names(X[i]),
-               "New Variables" = df1, 
-               "Mathematical Analysis" = df2,
-               "Statistical Analysis" =  df3))
-    cat(noquote(paste0(rep("#", 75), collapse = "")),"\n")
+    c1 <- c(A, Pa); c2 <- c(B, Pb); c3 <- c(NA, Pab1); c4 <- c(NA, Pab2)
+    c5 <- rep(Pab1 != Pab2, 2); c6 <- c(chi$statistic, chi$p.value)
+    c7 <- rep(chi$p.value < 0.01, 2)
+    d <- data.frame(round(c1,4),round(c2,4),round(c3,4),round(c4,4),c5,round(c6,4),c7)
+    colnames(d) <- c("A","B","P(A|B)","P(A)P(B)","Dependent","Chi-test","Significant")
+    rownames(d) <- c("Value", "P(.)")
+    d <- list(d); names(d) <- names(X[i]); print(d)
   }
 }
 independence(X, Y)
 ```
 
-### 1.2 Discussion
-None of the right-skewed quantitative $X$ variables are mathematically independent of $Y$ since $P\left( A|B \right) ={ P\left( A,B \right)  }/{ P\left( B \right)  }\neq P(A)P(B)$. However, when evaluating the data statistically using the `chisq.test()` function at a $0.01$ significance level, some $X$ variables show statistically significant signs of independence. The $X$ variables showing statistically significant signs of dependence listed in order of least to most dependent are `ScreenPorch` , `EnclosedPorch`, `MasVnrArea`, and `LotArea`. Order was ranked using the ${ \chi  }^{ 2 }$ test statistic instead of the $p$-value since $p$-values were simulated given that very small expected values posed the potential for producing incorrect approximations of $p$.
+### 1.2 Analysis
+
+$$P(A|B)=\frac { P\left( A,B \right)  }{ P\left( B \right)  } =\frac { P\left( A \right) P\left( B \right)  }{ P\left( B \right)  } =P\left( A \right) P\left( B \right) \Leftrightarrow P\left( B \right) =1\Rightarrow P(A|B)=P(A)\models A\bot B \tag{1.2.1}$$
+
+Mathematically, $P(A|B)=P(A)P(B)$ holds if and only if $P(B)=1$, implying that $P(A|B)=P(A)$ and entailing that $A$ and $B$ are independent. Empirically, none of the right-skewed quantitative $X$ variables meet this strict mathematical definition of independence. However, when examining the $X$ variables statistically using the `chisq.test()` function at a $0.01$ significance level, only some of the $X$ variables show evidence of that dependence being statistically significant. The $X$ variables that show statistically significant signs of dependence listed in order of least to most dependent are `ScreenPorch`, `EnclosedPorch`, `MasVnrArea`, and `LotArea`. It is worth noting that order was ranked using the ${ \chi  }^{ 2 }$ test statistic instead of the $p$-value since the function simulated $p$-values where very small expected values posed the potential for producing incorrect approximations of $p$. This simulation lead to duplicate $p$-values in some cases, but the ${ \chi  }^{ 2 }$ test statistics remained unique.
 
 ## 2. Descriptive and Inferential Statistics
 
@@ -159,15 +180,12 @@ X <- X[ , c("ScreenPorch" , "EnclosedPorch", "MasVnrArea", "LotArea")]
 describe <- function(X) {
   par(mfrow=c(2,2))
   for (i in 1:ncol(X)) {
-    xbar <- mean(X[,i])
-    t <- qt(0.975, df = length(X[,i]) - 1)
-    s <- sd(X[,i])
-    n <- length(X[,i])
-    lb = xbar - t * s / sqrt(n)
-    ub = xbar + t * s / sqrt(n)
-    print(list("Variable" = names(X[i]), 
-               "Summary" = summary(X[,i]),
-               "Confidence Interval" = c(lb, ub)))
+    xbar <- mean(na.omit(X[,i]))
+    n <- length(na.omit(X[,i])); a <- 1 - .95
+    l <- qchisq(1 - a / 2, df = 2 * n); u <- qchisq(a / 2, df = 2 * n)
+    lb = xbar - 2 * n * xbar / l; ub = xbar + 2 * n * xbar / u
+    d <- summary(na.omit(X[,i])); d["Lower CI"] <- lb; d["Upper CI"] <- ub
+    d <- list(round(d, 3)); names(d) <- names(X[i]); print(d)
     plot(X[,i], Y, xlab = names(X[i]), ylab = names(train[81]),
          main = paste(names(X[i]), "vs.", names(train[81])))
   }
@@ -175,8 +193,10 @@ describe <- function(X) {
 describe(X)
 ```
 
-### 2.1 Discussion
-The `summary()` function provides a summary statistics for variables. The scatterplots of each $X$ variable against $Y$ show signs of clustering. For the confidence intervals, the formula $\bar { x } \pm \left( { t }_{ { \alpha  }/{ 2 } } \right) \left( { s }/{ \sqrt { n }  } \right)$ is used.
+### 2.1 Analysis
+From the preceding parts the training set has been filtered down to include just statistically dependent quantitative right skewed variables. A summary of the univariate descriptive statistics for this culled training data set that encompasses these variables was produced using the `summary()` function. Given that the remaining variables appear to follow an exponential distribution; the confidence intervals for the exponential ${ 1 }/{ \lambda }$ means were calculated using the below formula which applies to exponential distributions. The scatterplots of each $X$ variable against $Y$ show signs of clustering. 
+
+$$\frac { { 2n }\bar { x }  }{ { \chi  }_{ 1-{ \alpha  }/{ 2 },2n }^{ 2 } } <\frac { 1 }{ \lambda  } <\frac { { 2n }\bar { x }  }{ { \chi  }_{ { \alpha  }/{ 2 },2n }^{ 2 } }\tag{2.1.1}$$
 
 ### 2.2 Instructions
 Derive a correlation matrix for two of the quantitative variables you selected. Test the hypothesis that the correlation between these variables is 0 and provide a 99% confidence interval. Discuss the meaning of your analysis.
@@ -186,36 +206,32 @@ Derive a correlation matrix for two of the quantitative variables you selected. 
 cor(na.omit(X))
 correlation <-  function(X) {
   X <- na.omit(X)
-  cat(noquote(paste0(rep("#", 75), collapse = "")),"\n")
   for (i in 1:(ncol(X) - 1)) {
     for (j in (i+1):ncol(X)) {
       r <- cor.test(X[,i], X[,j], conf.level = 0.99)
-      print(list("Variables" = data.frame("X1" = names(X[i]), 
-                                "X2" = names(X[j])), 
-                 "Correlation" = data.frame("r"= r$estimate,
-                                "p.value" =  r$p.value,
-                                "Significant" = r$p.value < 0.01),
-                 "99% Confidence Interval" = r$conf.int[1:2]))
-      cat(noquote(paste0(rep("#", 75), collapse = "")),"\n")
+      d <- data.frame("r"= r$estimate, "Lower CI" = r$conf.int[1],
+                      "Upper CI" = r$conf.int[2], "p.value" =  r$p.value,
+                      "Significant" = r$p.value < 0.01)
+      d <- list(d); names(d) <- paste0(names(X[i]), " ~ ", names(X[j])); print(d)
       }
     }
 }
 correlation(X)
 ```
 
-### 2.2 Discussion
-The null hypothesis is no statistically significant correlation exists between the given $X$ variables. The alternate hypothesis is that the correlation is statistically significantly different from zero due to a relationship existing between the given $X$ variables. At a significance level of $0.01$, the null hypothesis failed to be rejected for relationships between `ScreenPorch, MasVnrArea`, `ScreenPorch, LotArea`, and `EnclosedPorch, LotArea` which do not have significantly small $p$-values. The null hypothesis was rejected for relationships between `ScreenPorch, EnclosedPorch`, `EnclosedPorch, MasVnrArea`, and `MasVnrArea, LotArea` which have significantly small $p$-values. The significance of the relationship can also be seen in the confidence intervals which do not include zero. The data support the conclusion that some of the $X$ variables are correlated to each other.
+### 2.2 Analysis
+The analysis was performed for the ${ _{ 4 }{ C }_{ 2 } }=6$ pairs of $X$ variables that remain. The null hypothesis is that no statistically significant correlation exists between the pairs of $X$ variables. The alternate hypothesis is that the correlation is statistically significantly different from zero due to a relationship existing between the pairs of $X$ variables. At a significance level of $0.01$, the null hypothesis failed to rejected for the absence of relationships between `ScreenPorch ~ MasVnrArea`, `ScreenPorch ~ LotArea`, and `EnclosedPorch ~ LotArea` which do not have significantly small $p$-values. The null hypothesis was rejected for the absence of relationships between `ScreenPorch ~ EnclosedPorch`, `EnclosedPorch ~ MasVnrArea`, and `MasVnrArea ~ LotArea` which do have significantly small $p$-values. The significance of the relationship can also be seen in the confidence intervals. Those intervals that include zero as a possible correlation value do not show statistically significant relationships. The data support the conclusion that some of the $X$ variables are correlated to each other.
 
 ## 3. Linear Algebra and Correlation
 
 ### 3.1 Instructions
-Invert your correlation matrix. (This is known as the precision matrix and contains variance inflation factors on the diagonal.) Multiply the correlation matrix by the precision matrix, and then multiply the precision matrix by the correlation matrix.
+Invert your correlation matrix. This is matrix and contains variance inflation factors on the diagonal. Multiply the correlation matrix by the precision matrix, and then multiply the precision matrix by the correlation matrix.
 
 ### 3.1 Calculations
 ```{r}
 precision <- function(X) {
   S <- cor(na.omit(cbind(X)))
-  P <- solve(S)
+  P <- solve(cov(na.omit(cbind(X))))
   print(list("Correlation Matrix (S)" = S,
              "Precision Matrix (P)" = P,
              "SP" = S %*% P, "PS" = P %*% S))
@@ -223,8 +239,8 @@ precision <- function(X) {
 precision(X)
 ```
 
-### 3.1 Discussion
-The `cor()` function produces the correlation matrix $\mathbf{S}$. However, missing values must first be removed. The inverse of the correlation matrix $\mathbf{P}$, known as the precision matrix, is produced using the `solve()` function. Multiplying the correlation matrix by the precision matrix and then the precision matrix by the correlation matrix shows an interesting property: $\mathbf{S}\mathbf{P}=(\mathbf{S}\mathbf{P})^{-1}$.
+### 3.1 Analysis
+The `cor()` function produces the correlation matrix $\mathbf{S}$ for all the remaining variables. Missing values must first be removed however. The inverse of the correlation matrix $\mathbf{S}^{-1}$ is produced using the `solve()` function. The diagonal elements of the inverse correlation matrix, referred to as variance inflation factors, measure the extent to which the variables are linear combinations of other variables. Variance inflation factors (VIF) to help detect multicollinearity. The general rule of thumb is that VIFs exceeding 4 warrant further investigation, while VIFs exceeding 10 are signs of serious multicollinearity requiring correction. Multiplying the correlation matrix by its inverse and then the inverse by the correlation matrix both yield the identity matrix: $\mathbf{S}\mathbf{S}^{-1}=\mathbf{S}^{-1}\mathbf{S}=\mathbf{I}$. Multiplying the correlation matrix by the inverse of the covariance matrix known as the precision matrix $\mathbf{P}$, and then the precision matrix by the correlation matrix shows an interesting property such that: $\mathbf{S}\mathbf{P}=(\mathbf{P}\mathbf{S})^{T}$.
 
 ### 3.2 Instructions
 Conduct principle components analysis (research this) and interpret.
@@ -233,12 +249,11 @@ Conduct principle components analysis (research this) and interpret.
 ```{r}
 PCA <- function(X) {
   pairs(as.matrix(X)) 
-  Xshifted <- na.omit(X) - min(na.omit(X)) + 1e-32
-  Xlog <- log(Xshifted)
-  Xpca <- prcomp(Xlog, center = T, scale. = T) 
-  print(list("Importance of components" = summary(Xpca)$importance, 
-             "Rotation (Variable Loadings)" = Xpca$rotation))
+  Xpca <- prcomp(na.omit(X), center = T, scale. = T) 
   M <- as.matrix(X); R <- as.matrix(Xpca$rotation); score <- M %*% R
+  print(list("Importance of Components" = summary(Xpca)$importance, 
+             "Rotation (Variable Loadings)" = Xpca$rotation,
+             "Correlation between X and PC" = cor(na.omit(X), na.omit(score))))
   par(mfrow=c(2,3))
   barplot(Xpca$sdev^2, ylab = "Component Variance")
   barplot(cor(na.omit(cbind(X))), ylab = "Correlations")
@@ -248,12 +263,13 @@ PCA <- function(X) {
 PCA(X)
 ```
 
-### 3.2 Discussion
-Principal Component Analysis is a dimension reduction technique. Principal components are linear combinations (weighted) of variables. Applying the weights rotates (transforms) the orthogonal basis of the data to align with the principal components. To perform the analysis the `prcomp()` function is used with the `center` argument to shift variables to a zero center and the `scale` argument to impose unit variance on variables before the analysis takes place. The standard deviations of the principal components are equal to the square roots of the eigenvalues of the correlation matrix. The rotation matrix has eigenvector columns that are the variable loadings. Loadings are the correlations between the original variables and the unit-scaled components which are used to restore the original correlation matrix. The `biplot()` function provides a visual representation of both the observations and variables for multivariate data.  The effects of applying Principal Component Analysis to these data can best be seen in the `pairs()` plots which show the scattering of the original data and then the alignment of the rotated data.
+### 3.2 Analysis
+Principal Component Analysis is a dimension reduction technique. Principal components are linear (weighted) combinations of variables. Applying the weights rotates (transforms) the orthogonal basis of the data to align with the principal components. To perform the analysis the `prcomp()` function is used with the `center = T` argument to shift variables to a zero center and the `scale = T` argument to impose unit variance on variables before the analysis takes place. The standard deviations of the principal components are equal to the square roots of the eigenvalues of the correlation matrix. The rotation matrix has eigenvector columns that are the variable loadings. Loadings are the correlations between the original variables and the unit-scaled components which are used to restore the original correlation matrix. The `biplot()` function provides a visual representation of both the observations and variables for multivariate data.  The effects of applying Principal Component Analysis to these data can best be seen in the `pairs()` plots which show the scattering of the original data and then the alignment of the rotated data. The first principal component is the linear combination of variables that has maximum variance (among all linear combinations), so it accounts for as much variation in the data as possible. Each sucessive principal component is the linear combination of all remaining variables that accounts for as much of the remaining variation (among all remaining linear combinations) as possible. Correlations between the original variables and each principal component are useful for interpreting each component. The primary purpose of this Principal Component Analysis is descriptive, it is not hypothesis testing. Sometimes the principal components scores will be used as explanatory variables in a regression. In these instances regression coefficients will be independent since the components are independent. 
 
 ## 4. Calculus-Based Probability & Statistics
+
 ### 4.1 Instructions
-fit a closed form distribution to the data. For your variable that is skewed to the right, shift it so that the minimum value is above zero. Then load the `MASS` package and run `fitdistr()` to fit an exponential probability density function. Find the optimal value of $\lambda$ for this distribution, and then take 1000 samples from this exponential distribution using this value (e.g., `rexp(1000, $\lambda$)`. Plot a histogram and compare it with a histogram of your original variable. Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF). Also generate a 95% confidence interval from the empirical data, assuming normality. Finally, provide the empirical 5th percentile and 95th percentile of the data.
+Fit a closed form distribution to the data. For variables skewed to the right, shift the minimum value above zero. Then run `fitdistr()` to fit an exponential probability density function. Find the optimal value of $\lambda$ for this distribution, and then take 1000 samples from this exponential distribution using this value. Plot a histogram and compare it with a histogram of your original variable. Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF). Also generate a 95% confidence interval from the empirical data, assuming normality. Finally, provide the empirical 5th percentile and 95th percentile of the data.
 
 ### 4.1 Calculations
 ```{r}
@@ -262,46 +278,77 @@ exponential <- function(X) {
   for (i in 1:ncol(X)){
     shifted <- na.omit(X[,i]) - min(na.omit(X[,i])) + 1e-32
     fit <- fitdistr(shifted, "Exponential")
-    exp <- rexp(1000, fit$estimate)
-    normal <- rnorm(1000, mean = mean(na.omit(X[,i])), sd = sd(na.omit(X[,i])))
-    df <- data.frame(quantile(exp, c(0.05,0.95)),
-                     quantile(normal, c(0.05,0.95)),
-                     quantile(na.omit(X[,i]), c(0.05,0.95)))
-    colnames(df) <- c("Exponential","Normal","Empirical")
-    print(list("Variable" = names(X[i]), 
-               "Lambda" = fit$estimate,
-               "Percentiles" = df))
-    hist(exp, prob=TRUE, col="grey", main = names(X[i]))
-    lines(density(exp), col="blue", lwd=2) # Theoretical
-    lines(density(shifted), col="red", lwd=2) # Empirical
-    hist(shifted, prob=TRUE, col="grey", main = names(X[i]))
-    lines(density(exp), col="blue", lwd=2) # Theoretical
-    lines(density(shifted), col="red", lwd=2) # Empirical
+    lambda <- fit$estimate
+    exp <- rexp(1000, lambda)
+    hist(exp, prob=TRUE, col="grey", main = names(X[i]), xlab="Theoretical")
+    lines(density(exp), col="blue", lwd=2) 
+    lines(density(shifted), col="red", lwd=2)
+    hist(shifted, prob=TRUE, col="grey", main = names(X[i]), xlab="Empirical")
+    lines(density(exp), col="blue", lwd=2)
+    lines(density(shifted), col="red", lwd=2)
   }
 }
 exponential(X)
 ```
 
-### 4.1 Discussion
-The variables were shifted by subtracting the minimum value. With data that have a negative minimum, subtracting the negative minimum value equates to adding the minimum value. After plotting the `exp` (theoretical) and `shifted` (empirical) histograms for each variable, curves representing both their respective <span style="color:blue">theoretical densities</span> are overplayed in blue and their respective <span style="color:red">empirical densities</span> are overplayed in red. These overlaid curves show that `LotArea` and `MasVnrArea` follow their respective fitted exponential distributions best.
+### 4.1 Analysis
+The variables were shifted to slightly above zero by subtracting the minimum value and then adding $1^{-32}$ to the modified value. This also shifts data with a negative minimum in the appropriate direction since subtracting the negative minimum value equates to adding the minimum value. The function `fitdistr()` was used to fit an exponential distribution to the data and then `rexp()` with a rate of $\lambda$ was used to get a sample of theoretical values from the fitted exponential distribution. After plotting the `theoretical` and `empirical` histograms for each variable, curves were overlayed representing both the <span style="color:blue">theoretical densities</span> in blue and the <span style="color:red">empirical densities</span> in red. These overlaid curves show that `LotArea` and `MasVnrArea` follow their respective fitted exponential distributions best.
+
+### 4.2 Instructions
+Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF). Also generate a 95% confidence interval from the empirical data, assuming normality. Finally, provide the empirical 5th percentile and 95th percentile of the data.
+
+### 4.2 Calculations
+```{r}
+percentiles <- function(X) {
+  par(mfrow=c(2,4))
+  for (i in 1:ncol(X)){
+    shifted <- na.omit(X[,i]) - min(na.omit(X[,i])) + 1e-32
+    fit <- fitdistr(shifted, "Exponential")
+    lambda <- fit$estimate
+    lb_e <-  -log(1 - .05) / lambda
+    ub_e <-  -log(1 - .95) / lambda
+    mu <- s <- 1 / lambda
+    n <- length(shifted)
+    lb_n <- mu + qnorm(0.05/2) * s / sqrt(n)
+    ub_n <- mu - qnorm(0.05/2) * s / sqrt(n)
+    emp <- quantile(na.omit(X[,i]), c(0.05,0.95))
+    d <- data.frame(c(lb_e, ub_e), c(lb_n, ub_n), c(emp[[1]], emp[[2]]))
+    rownames(d) <- c("5%","95%")
+    colnames(d) <- c("Exponential","Normal CI","Empirical")
+    x <- paste0(names(X[i]), " ~ Exp(", round(fit$estimate,6),")")
+    d <- list(d); names(d) <- x; print(d)
+  }
+}
+percentiles(X)
+```
+
+### 4.2 Analysis
+
+$$\int _{ 0 }^{ x }{ \lambda { e }^{ -\lambda x }dt } =F(t)-F(0)=\left[ -{ e }^{ -\lambda x } \right] -\left[ -{ e }^{ -\lambda 0 } \right] =-{ e }^{ -\lambda x }+1=1-{ e }^{ -\lambda x } \tag{4.2.1}$$
+
+$${ P }_{ i }=1-{ e }^{ -\lambda x }\Rightarrow { P }_{ i }-1=-{ e }^{ -\lambda x }\Rightarrow { e }^{ -\lambda x }=1-{ P }_{ i }\Rightarrow -\lambda x=\ln { \left( 1-{ P }_{ i } \right)  } \Rightarrow x=-\frac { \ln { \left( 1-{ P }_{ i } \right)  }  }{ \lambda  } \tag{4.2.2}$$
+
+$$\bar { x } \pm { z }_{ { \alpha  }/{ 2 } }\frac { s }{ \sqrt { n }  } \Rightarrow \lambda \pm { z }_{ { \alpha  }/{ 2 } }\frac { \lambda  }{ \sqrt { n }  }\tag{4.2.3}$$
+
+The CDF was derived using from the pdf as outlined in equation $4.2.1$. The percentiles were calculated using the derivation in $4.2.2$. Using the confidence interval equation for normally distributed data with exponential parameters as detailed in $4.2.3$, a confidence interval assuming normality was calculated next. The last set of percentiles was computed from the empirical data using the `quantile()` function. The disparity in these intervals show how varying assumptions can sometimes lead to wildly different results.
 
 ## 5. Modeling
 
 ### 5.1 Instructions
-The final includes a GLM component to be done in Kaggle.com. Build some type of regression model and submit your model to the competition board. Provide your complete model summary and results with analysis. Report your Kaggle.com username and score. There will be a video showing how to upload to Kaggle and to discuss methods for nonlinear optimization.
+The final includes a GLM component to be done in Kaggle.com. Register for free with Kaggle.com and compete in the *House Prices: Advanced Regression Techniques* competition. Build some type of regression model and submit your model to the competition board. Provide your complete model summary and results with analysis. 
 
-> Your submission should be in CSV format. We expect the solution file to have 1,459 predictions. The file should have a header row. Submissions are evaluated on Root-Mean-Squared-Error (RMSE) between the logarithm of the predicted value and the logarithm of the observed sales price. The use of RMSE is very common and it makes an excellent general purpose error metric for numerical predictions. Compared to the similar Mean Absolute Error, RMSE amplifies and severely punishes large errors. Taking logs means that errors in predicting expensive houses and cheap houses will affect the result equally.
+> Your submission should be in CSV format. We expect the solution file to have 1,459 predictions. The file should have a header row. Submissions are evaluated on Root-Mean-Squared-Error (RMSE) between the logarithm of the predicted value and the logarithm of the observed sales price. The use of RMSE is very common and it makes an excellent general purpose error metric for numerical predictions. Compared to the similar Mean Absolute Error, RMSE amplifies and severely punishes large errors. Taking logs means that errors in predicting expensive houses and cheap houses will affect the result equally. RMSLE penalizes an under-predicted estimate greater than an over-predicted estimate [due to the shape of the logarithmic distribution having] a larger change in $y$ corresponding to an equivalent change in $x$ when $x$ is small.
 
 ### 5.1 Calculations
-$$\hat{Y} = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \varepsilon_i$$
+$$\hat{Y} = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \varepsilon_i \tag{5.1.1}$$
 $$\hat{SalePrice_i} = \beta_0 + 
 \left(MasVnrArea_i\right) \cdot X_1 + 
-\left(LotArea_i\right) \cdot X_2 + \varepsilon_i$$
+\left(LotArea_i\right) \cdot X_2 + \varepsilon_i \tag{5.1.2}$$
 
 ```{r}
 cor(na.omit(cbind(X,Y)))
 fit <- lm(SalePrice ~ MasVnrArea + LotArea, data = train)
-sum <- summary(fit); par(mfrow = c(2, 2)); plot(fit)
+(sum <- summary(fit)); par(mfrow = c(2, 2)); plot(fit)
 test <- read.csv(paste0("https://raw.githubusercontent.com/jzuniga123/SPS/",
                          "master/DATA%20605/test.csv"), stringsAsFactors = F)
 X1 <- test[,"MasVnrArea"]; X1[is.na(X1)] <- median(na.omit(X1))
@@ -313,23 +360,36 @@ results <- data.frame(cbind("Id" = test[,"Id"],
 write.csv(results, "Kaggle.csv", row.names = F)
 ```
 
-### 5.1 Discussion
-
-The variables chosen for the model are those filtered through the preceding processes. Two right-skewed quantitative variables that show the strongest signs of correlation with $Y$. In cases where there are missing values, nulls were replaced with the most likely value-the median. This all yielded the below model for which the summary is given above.
+### 5.1 Analysis
+The variables chosen for the model are those filtered through the preceding problems. They are two right-skewed quantitative variables that show the strongest signs of correlation with $Y$. In cases where there are missing values, nulls were replaced with the most likely value--the median. This all yielded the below model for which the summary is above. The two variables and the intercept together are significnat at a $0.001$ level. Adjusted $R^2$ suggests that these variables account for `r round(sum$r.squared * 100, 2)`% of the variation in $Y$.
 
 $$\hat{SalePrice_i} = 
 `r format(round(fit$coefficients[1],3), scientific = F)`
 `r ifelse(sign(fit$coefficients[2]) < 0, "-", "+")`
 `r abs(round(fit$coefficients[2],3))` \cdot MasVnrArea_i
 `r ifelse(sign(fit$coefficients[3]) < 0, "-", "+")`
-`r abs(round(fit$coefficients[3],3))` \cdot LotArea_i + \varepsilon_i$$
+`r abs(round(fit$coefficients[3],3))` \cdot LotArea_i + \varepsilon_i \tag{5.1.3}$$
 
+### 5.2 Instructions
+Report your Kaggle.com username and score. There will be a video showing how to upload to Kaggle and to discuss methods for nonlinear optimization.
+
+### 5.2 Calculations
 <center>**Kaggle Username and Score**</center>
 <center>![](C:\Users\josez\Google Drive\Education\Masters\SPS\DATA 605\Kaggle_Score.png)</center>
 
-$$RMSLE = \sqrt{\frac{1}{n} \sum_{i=1}^n (\log(p_i + 1) - \log(a_i+1))^2 } =0.36631$$
+```{r}
+Predicted <- seq(1, 100, by=1)
+a <- rep(40, 100)
+RMSLE <- sqrt((1 / 100) * (log(Predicted + 1) - log(a + 1))^2)
+plot(Predicted, RMSLE, type="l", col="blue", 
+     main="Basic RMSLE Pattern", xaxt='n', yaxt='n')
+```
 
-At the time of posting, there were $8,471$ submissions. The range for $RMSLE$ is $[0.07186, 296.52145]$ although the maximum value appears to be an outlier since the penultimate largest value is $23.60064$. The score obtained culling variables as previously mentioned yielded a score in the `r  round((1 - 7785/8471)*100, 0)`th percentile. It is worth noting that several usernames show over 50 attempts.
+### 5.2 Analysis
+
+$$RMSLE = \sqrt{\frac{1}{n} \sum_{i=1}^n (\log(p_i + 1) - \log(a_i+1))^2 } =0.36631 \tag{5.2.1}$$
+
+The score obtained culling the variables as previously mentioned yielded the above Root Mean Squared Logarithmic Error (RMSLE). A score of $0.36631$ means that the deviations of the model's predicted values were around $e^{0.36631}=`r exp(0.36631)`$ times smaller or larger than the actual values. At the time of posting, there were $8,471$ submissions. The range for the RMSLE was $[0.07186, 296.52145]$. The "Sample Submission Benchmark" on the [letterboard]( https://www.kaggle.com/c/house-prices-advanced-regression-techniques/leaderboard) was 0.40890. RMSLE values closer to zero are better. It is worth noting both that lower scores are skewed toward usernames with multiple (in several cases over 50) attempts and that the maximum value appears to be an outlier since the penultimate value is $23.60064$. The RMSLE is one of several evaluation metrics commonly used in supervised machine learning. 
 
 # References
 
@@ -352,3 +412,15 @@ https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prcomp.html
 http://stats.stackexchange.com/questions/143905/loadings-vs-eigenvectors-in-pca-when-to-use-one-or-another
 
 http://setosa.io/ev/principal-component-analysis/
+
+https://onlinecourses.science.psu.edu/stat505/node/49
+
+https://rstudio-pubs-static.s3.amazonaws.com/13301_6641d73cfac741a59c0a851feb99e98b.html
+
+https://v8doc.sas.com/sashtml/insight/chap40/sect21.htm
+
+https://onlinecourses.science.psu.edu/stat501/node/347
+
+https://www.statlect.com/glossary/precision-matrix
+
+http://beyondvalence.blogspot.com/2014/07/predicting-capital-bikeshare-demand-in.html
