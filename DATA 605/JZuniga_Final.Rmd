@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Final Instructions
 
-The final exam features a miniproject and several small & medium sized questions. The final exam is a comprehensive review of the course. Post solutions to GitHub and make a short 3-5 minute presentation or post a recorded presentation to blackboard. This project will show off your ability to understand the elements of the class.
+The final exam features a mini-project and several small & medium sized questions. The final exam is a comprehensive review of the course. Post solutions to GitHub and make a short 3-5 minute presentation or post a recorded presentation to blackboard. This project will show off your ability to understand the elements of the class.
 
 ```{r warning=FALSE}
 library(MASS)
@@ -127,7 +127,7 @@ counts(X, Y)
 ```
 
 ### 1.1 Analysis
-$P(X \geq x, Y > y)$ is the probability of the events $X \geq x$ and $Y > y$ both occurring jointly. In Venn diagram terms, it is the area represented by the intersection of both events. $P\left( { X \geq x }|{ Y > y } \right)$ and $P\left( { X \leq x }|{ Y > y } \right)$ are the conditional probabilities of $X \leq x$ or $X \geq x$ given that $Y\geq y$ has occurred. In Venn diagram terms, it is the area represented by the intersection of both events, divided by the total area of the given event. The contingency table displays counts of the events specified in the top and left margins, and the sums of the joint events in the bottom and right margins. Splitting the training data in this fashion does not make the data independent as can be seen in the fact that the number of events occurring given that the conditioned event occurred is not equal to the number of events occurring absent the conditioned event. In mathematical terms: $n(X|Y)=\frac { n\left( X,Y \right)  }{ n\left( Y \right)  } \neq \frac { n\left( X \right) n\left( Y \right)  }{ n\left( Y \right)  } =n(X)$.
+$P(X > x, Y > y)$ is the probability of the events $X > x$ and $Y > y$ both occurring jointly. In Venn diagram terms, it is the area represented by the intersection of both events. $P\left( { X > x }|{ Y > y } \right)$ and $P\left( { X < x }|{ Y > y } \right)$ are the conditional probabilities of $X > x$ or $X < x$ given that $Y > y$ has occurred. In Venn diagram terms, it is the area represented by the intersection of both events, divided by the total area of the given event. The contingency table displays counts of the events specified in the top and left margins, and the sums of the joint events in the bottom and right margins. Splitting the training data in this fashion does not make the data independent as can be seen in the fact that the number of events occurring given that the conditioned event occurred is not equal to the number of events occurring absent the conditioned event. In mathematical terms: $n(X|Y)=\frac { n\left( X,Y \right)  }{ n\left( Y \right)  } \neq \frac { n\left( X \right) n\left( Y \right)  }{ n\left( Y \right)  } =n(X)$.
 
 ```{r warning=F, message=F}
 grid.newpage()
@@ -194,7 +194,7 @@ describe(X)
 ```
 
 ### 2.1 Analysis
-From the preceding parts the training set has been filtered down to include just statistically dependent quantitative right skewed variables. A summary of the univariate descriptive statistics for this culled training data set that encompasses these variables was produced using the `summary()` function. Given that the remaining variables appear to follow an exponential distribution; the confidence intervals for the exponential ${ 1 }/{ \lambda }$ means were calculated using the below formula which applies to exponential distributions. The scatterplots of each $X$ variable against $Y$ show signs of clustering. 
+From the preceding parts the training data set has been filtered down to include just statistically dependent quantitative right skewed variables. A summary of the univariate descriptive statistics for these culled data was produced using the `summary()` function. Given that the remaining variables appear to follow an exponential distribution; the confidence intervals for the exponential ${ 1 }/{ \lambda }$ means were calculated using the below formula which applies to exponential distributions. The scatterplots of each $X$ variable against $Y$ show signs of clustering. 
 
 $$\frac { { 2n }\bar { x }  }{ { \chi  }_{ 1-{ \alpha  }/{ 2 },2n }^{ 2 } } <\frac { 1 }{ \lambda  } <\frac { { 2n }\bar { x }  }{ { \chi  }_{ { \alpha  }/{ 2 },2n }^{ 2 } }\tag{2.1.1}$$
 
@@ -220,7 +220,7 @@ correlation(X)
 ```
 
 ### 2.2 Analysis
-The analysis was performed for the ${ _{ 4 }{ C }_{ 2 } }=6$ pairs of $X$ variables that remain. The null hypothesis is that no statistically significant correlation exists between the pairs of $X$ variables. The alternate hypothesis is that the correlation is statistically significantly different from zero due to a relationship existing between the pairs of $X$ variables. At a significance level of $0.01$, the null hypothesis failed to rejected for the absence of relationships between `ScreenPorch ~ MasVnrArea`, `ScreenPorch ~ LotArea`, and `EnclosedPorch ~ LotArea` which do not have significantly small $p$-values. The null hypothesis was rejected for the absence of relationships between `ScreenPorch ~ EnclosedPorch`, `EnclosedPorch ~ MasVnrArea`, and `MasVnrArea ~ LotArea` which do have significantly small $p$-values. The significance of the relationship can also be seen in the confidence intervals. Those intervals that include zero as a possible correlation value do not show statistically significant relationships. The data support the conclusion that some of the $X$ variables are correlated to each other.
+The analysis was performed for the ${ _{ 4 }{ C }_{ 2 } }=6$ pairs of $X$ variables that remain. The null hypothesis is that no statistically significant correlation exists between the pairs of $X$ variables. The alternate hypothesis is that the correlation has a statistically significant difference from zero due to a relationship existing between the pairs of $X$ variables. At a significance level of $0.01$, the null hypothesis postulating the absence of a relationship failed to rejected for correlations between `ScreenPorch ~ MasVnrArea`, `ScreenPorch ~ LotArea`, and `EnclosedPorch ~ LotArea` which do not have significantly small $p$-values. The null hypothesis postulating the absence of a relationship was rejected for correlations between `ScreenPorch ~ EnclosedPorch`, `EnclosedPorch ~ MasVnrArea`, and `MasVnrArea ~ LotArea` which do have significantly small $p$-values. The significance of the relationship can also be seen in the confidence intervals. Those intervals that include zero as a possible correlation value do not show statistically significant relationships. The data support the conclusion that some of the $X$ variables are correlated to each other.
 
 ## 3. Linear Algebra and Correlation
 
@@ -231,8 +231,10 @@ Invert your correlation matrix. This is matrix and contains variance inflation f
 ```{r}
 precision <- function(X) {
   S <- cor(na.omit(cbind(X)))
+  Sinv <- solve(S)
   P <- solve(cov(na.omit(cbind(X))))
   print(list("Correlation Matrix (S)" = S,
+             "Inverse Correlation Matrix" = Sinv,
              "Precision Matrix (P)" = P,
              "SP" = S %*% P, "PS" = P %*% S))
 }
@@ -264,12 +266,12 @@ PCA(X)
 ```
 
 ### 3.2 Analysis
-Principal Component Analysis is a dimension reduction technique. Principal components are linear (weighted) combinations of variables. Applying the weights rotates (transforms) the orthogonal basis of the data to align with the principal components. To perform the analysis the `prcomp()` function is used with the `center = T` argument to shift variables to a zero center and the `scale = T` argument to impose unit variance on variables before the analysis takes place. The standard deviations of the principal components are equal to the square roots of the eigenvalues of the correlation matrix. The rotation matrix has eigenvector columns that are the variable loadings. Loadings are the correlations between the original variables and the unit-scaled components which are used to restore the original correlation matrix. The `biplot()` function provides a visual representation of both the observations and variables for multivariate data.  The effects of applying Principal Component Analysis to these data can best be seen in the `pairs()` plots which show the scattering of the original data and then the alignment of the rotated data. The first principal component is the linear combination of variables that has maximum variance (among all linear combinations), so it accounts for as much variation in the data as possible. Each sucessive principal component is the linear combination of all remaining variables that accounts for as much of the remaining variation (among all remaining linear combinations) as possible. Correlations between the original variables and each principal component are useful for interpreting each component. The primary purpose of this Principal Component Analysis is descriptive, it is not hypothesis testing. Sometimes the principal components scores will be used as explanatory variables in a regression. In these instances regression coefficients will be independent since the components are independent. 
+Principal Component Analysis is a dimension reduction technique. Principal components are linear (weighted) combinations of variables. Applying the weights rotates (transforms) the orthogonal basis of the data to align with the principal components. To perform the analysis the `prcomp()` function is used with the `center = T` argument to shift variables to a zero center and the `scale = T` argument to impose unit variance on variables before the analysis takes place. The standard deviations of the principal components are equal to the square roots of the eigenvalues of the correlation matrix. The rotation matrix has eigenvector columns that are the variable loadings. Loadings are the correlations between the original variables and the unit-scaled components which are used to restore the original correlation matrix. The `biplot()` function provides a visual representation of both the observations and variables for multivariate data.  The effects of applying Principal Component Analysis to these data can best be seen in the `pairs()` plots which show the scattering of the original data and then the alignment of the rotated data. The first principal component is the linear combination of variables that has maximum variance (among all linear combinations), so it accounts for as much variation in the data as possible. Each successive principal component is the linear combination of all remaining variables that accounts for as much of the remaining variation (among all remaining linear combinations) as possible. Correlations between the original variables and each principal component are useful for interpreting each component. The primary purpose of this Principal Component Analysis is descriptive, it is not hypothesis testing. Sometimes the principal components scores will be used as explanatory variables in a regression. In these instances regression coefficients will be independent since the components are independent. 
 
 ## 4. Calculus-Based Probability & Statistics
 
 ### 4.1 Instructions
-Fit a closed form distribution to the data. For variables skewed to the right, shift the minimum value above zero. Then run `fitdistr()` to fit an exponential probability density function. Find the optimal value of $\lambda$ for this distribution, and then take 1000 samples from this exponential distribution using this value. Plot a histogram and compare it with a histogram of your original variable. Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF). Also generate a 95% confidence interval from the empirical data, assuming normality. Finally, provide the empirical 5th percentile and 95th percentile of the data.
+Fit a closed form distribution to the data. For variables skewed to the right, shift the minimum value above zero. Then run `fitdistr()` to fit an exponential probability density function. Find the optimal value of $\lambda$ for this distribution, and then take 1000 samples from this exponential distribution using this value. Plot a histogram and compare it with a histogram of your original variable.
 
 ### 4.1 Calculations
 ```{r}
@@ -292,7 +294,7 @@ exponential(X)
 ```
 
 ### 4.1 Analysis
-The variables were shifted to slightly above zero by subtracting the minimum value and then adding $1^{-32}$ to the modified value. This also shifts data with a negative minimum in the appropriate direction since subtracting the negative minimum value equates to adding the minimum value. The function `fitdistr()` was used to fit an exponential distribution to the data and then `rexp()` with a rate of $\lambda$ was used to get a sample of theoretical values from the fitted exponential distribution. After plotting the `theoretical` and `empirical` histograms for each variable, curves were overlayed representing both the <span style="color:blue">theoretical densities</span> in blue and the <span style="color:red">empirical densities</span> in red. These overlaid curves show that `LotArea` and `MasVnrArea` follow their respective fitted exponential distributions best.
+The variables were shifted to slightly above zero by subtracting the minimum value and then adding $1^{-32}$ to the modified value. This also shifts data with a negative minimum in the appropriate direction since subtracting the negative minimum value equates to adding the minimum value. The function `fitdistr()` was used to fit an exponential distribution to the data and then the `rexp()` function with a rate of $\lambda$ was used to get a sample of theoretical values from the fitted exponential distribution. After plotting the `theoretical` and `empirical` histograms for each variable, curves were overlayed representing the <span style="color:blue">theoretical densities</span> in blue and the <span style="color:red">empirical densities</span> in red. These overlaid curves show that `LotArea` and `MasVnrArea` follow their respective fitted exponential distributions best.
 
 ### 4.2 Instructions
 Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF). Also generate a 95% confidence interval from the empirical data, assuming normality. Finally, provide the empirical 5th percentile and 95th percentile of the data.
@@ -324,13 +326,13 @@ percentiles(X)
 
 ### 4.2 Analysis
 
-$$\int _{ 0 }^{ x }{ \lambda { e }^{ -\lambda x }dt } =F(t)-F(0)=\left[ -{ e }^{ -\lambda x } \right] -\left[ -{ e }^{ -\lambda 0 } \right] =-{ e }^{ -\lambda x }+1=1-{ e }^{ -\lambda x } \tag{4.2.1}$$
+$$\int _{ 0 }^{ x }{ \lambda { e }^{ -\lambda x }dt } =F(x)-F(0)=\left[ -{ e }^{ -\lambda x } \right] -\left[ -{ e }^{ -\lambda 0 } \right] =-{ e }^{ -\lambda x }+1=1-{ e }^{ -\lambda x } \tag{4.2.1}$$
 
 $${ P }_{ i }=1-{ e }^{ -\lambda x }\Rightarrow { P }_{ i }-1=-{ e }^{ -\lambda x }\Rightarrow { e }^{ -\lambda x }=1-{ P }_{ i }\Rightarrow -\lambda x=\ln { \left( 1-{ P }_{ i } \right)  } \Rightarrow x=-\frac { \ln { \left( 1-{ P }_{ i } \right)  }  }{ \lambda  } \tag{4.2.2}$$
 
-$$\bar { x } \pm { z }_{ { \alpha  }/{ 2 } }\frac { s }{ \sqrt { n }  } \Rightarrow \lambda \pm { z }_{ { \alpha  }/{ 2 } }\frac { \lambda  }{ \sqrt { n }  }\tag{4.2.3}$$
+$$\bar { x } \pm { z }_{ { \alpha  }/{ 2 } }\frac { s }{ \sqrt { n }  } \Rightarrow \frac { 1 }{ \lambda  } \pm { z }_{ { \alpha  }/{ 2 } }\frac { { 1 }/{ \lambda  } }{ \sqrt { n }  } \tag{4.2.3}$$
 
-The CDF was derived using from the pdf as outlined in equation $4.2.1$. The percentiles were calculated using the derivation in $4.2.2$. Using the confidence interval equation for normally distributed data with exponential parameters as detailed in $4.2.3$, a confidence interval assuming normality was calculated next. The last set of percentiles was computed from the empirical data using the `quantile()` function. The disparity in these intervals show how varying assumptions can sometimes lead to wildly different results.
+The CDF was derived using the pdf as outlined in equation $4.2.1$. The percentiles were calculated using the derivation detailed in $4.2.2$. Using the confidence interval equation for normally distributed data with exponential parameters as detailed in $4.2.3$, a confidence interval assuming normality was calculated next. The empirical data percentiles were computed using the `quantile()` function. The disparity in these intervals shows how varying assumptions can sometimes lead to wildly different results.
 
 ## 5. Modeling
 
@@ -361,7 +363,7 @@ write.csv(results, "Kaggle.csv", row.names = F)
 ```
 
 ### 5.1 Analysis
-The variables chosen for the model are those filtered through the preceding problems. They are two right-skewed quantitative variables that show the strongest signs of correlation with $Y$. In cases where there are missing values, nulls were replaced with the most likely value--the median. This all yielded the below model for which the summary is above. The two variables and the intercept together are significnat at a $0.001$ level. Adjusted $R^2$ suggests that these variables account for `r round(sum$r.squared * 100, 2)`% of the variation in $Y$.
+The two variables chosen for the model are those filtered through the preceding problems. They are right-skewed quantitative variables that show the strongest signs of correlation with $Y$. In cases where there are missing values, nulls were replaced with the most likely value--the median. This all yielded the below model for which the summary is above. The two variables and the intercept together are significant at a $0.001$ level. Adjusted $R^2$ suggests that these variables account for `r round(sum$r.squared * 100, 2)`% of the variation in $Y$.
 
 $$\hat{SalePrice_i} = 
 `r format(round(fit$coefficients[1],3), scientific = F)`
@@ -389,7 +391,7 @@ plot(Predicted, RMSLE, type="l", col="blue",
 
 $$RMSLE = \sqrt{\frac{1}{n} \sum_{i=1}^n (\log(p_i + 1) - \log(a_i+1))^2 } =0.36631 \tag{5.2.1}$$
 
-The score obtained culling the variables as previously mentioned yielded the above Root Mean Squared Logarithmic Error (RMSLE). A score of $0.36631$ means that the deviations of the model's predicted values were around $e^{0.36631}=`r exp(0.36631)`$ times smaller or larger than the actual values. At the time of posting, there were $8,471$ submissions. The range for the RMSLE was $[0.07186, 296.52145]$. The "Sample Submission Benchmark" on the [letterboard]( https://www.kaggle.com/c/house-prices-advanced-regression-techniques/leaderboard) was 0.40890. RMSLE values closer to zero are better. It is worth noting both that lower scores are skewed toward usernames with multiple (in several cases over 50) attempts and that the maximum value appears to be an outlier since the penultimate value is $23.60064$. The RMSLE is one of several evaluation metrics commonly used in supervised machine learning. 
+The score obtained culling the variables as previously mentioned yielded the above Root Mean Squared Logarithmic Error (RMSLE). A score of $0.36631$ means that the deviations of the model's predicted values were around $e^{0.36631}=`r round(exp(0.36631), 2)`$ times smaller or larger than the actual values. At the time of posting, there were $8,471$ submissions. The range for the RMSLE was $[0.07186, 296.52145]$. The "Sample Submission Benchmark" on the [letterboard]( https://www.kaggle.com/c/house-prices-advanced-regression-techniques/leaderboard) was $0.40890$. RMSLE values closer to zero are better. It is worth noting both that lower scores are skewed toward usernames with multiple (in several cases over 50) attempts and that the maximum value appears to be an outlier since the penultimate value is $23.60064$. The RMSLE is one of several evaluation metrics commonly used in supervised machine learning.
 
 # References
 
