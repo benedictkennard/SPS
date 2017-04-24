@@ -1,0 +1,145 @@
+---
+title: "DATA 621 Exercise 11"
+author: "Jose Zuniga"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: 2
+  html_document:
+    toc: yes
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# [A Modern Approach to Regression with R](http://www.stat.tamu.edu/~sheather/book/data_sets.php)
+
+## Exercise 9.1
+
+Senior management at the Australian Film Commission (AFC) has sought your help with the task of developing a model to predict yearly gross box office receipts from movies screened in Australia. Such data are publicly available for the period from 1976 to 2007 from the AFC's web site (www.afc.gov.au). The data are given in Table below. Interest centers on predicting gross box office results for 1 year beyond the latest observation, that is, predicting the 2008 result. In addition, there is interest in estimating the extent of any trend and autocorrelation in the data. A preliminary analysis of the data has been undertaken by a staffer at the AFC and these results appear below. In this analysis the variable `Year` was replaced by the number of years since 1975, which we shall denote as `YearsS1975` (i.e., YearsS1975 = Year-1975). The first model fit to the data by the staffer was $\textrm{GrossBoxOffice} = \beta_0 + \beta_1\textrm{YearsS1975} + \varepsilon$.
+
+|Year |Gross box office (\$M) |Year |Gross box office (\$M) |
+|:---:|:---------------------:|:---:|:---------------------:|
+|1976 |95.3                   |1992 |334.3                  |
+|1977 |86.4                   |1993 |388.7                  |
+|1978 |119.4                  |1994 |476.4                  |
+|1979 |124.4                  |1995 |501.4                  |
+|1980 |154.2                  |1996 |536.8                  |
+|1981 |174.3                  |1997 |583.9                  |
+|1982 |210.0                  |1998 |629.3                  |
+|1983 |208.0                  |1999 |704.1                  |
+|1984 |156.0                  |2000 |689.5                  |
+|1985 |160.6                  |2001 |812.4                  |
+|1986 |188.6                  |2002 |844.8                  |
+|1987 |182.1                  |2003 |865.8                  |
+|1988 |223.8                  |2004 |907.2                  |
+|1989 |257.6                  |2005 |817.5                  |
+|1990 |284.6                  |2006 |866.6                  |
+|1991 |325.0                  |2007 |895.4                  |
+
+```{r}
+boxoffice <- read.table(paste0("https://raw.githubusercontent.com/jzuniga123/",
+                               "SPS/master/DATA%20621/boxoffice.txt"), header = T)
+```
+
+Figure 9.16 shows plots associated with the least squares fit of model that were produced by the staffer. The staffer noted that a number of statistically significant autocorrelations in the standardized residuals as well as the existence of an obvious roller coaster pattern in the plot of standardized residuals against `YearsS1975`. As such, the staffer decided to fit model assuming that the errors are $AR(1)$. Given below is the output from R.
+
+```{r}
+
+```
+
+Given below is the output from R associated with fitting the model assuming that the errors are $AR(1)$ using least squares based on the transformed versions of the response and predictor variables in $\mathbf{Y}^* = \mathbf{X}^*\beta + \mathbf{e}^*$. The staffer was delighted that the results match those in the previous R output.
+
+```{r}
+# lm(formula = ystar ~ xstar - 1)
+```
+
+Figure 9.17 shows diagnostic plots based on the least squares residuals from $\mathbf{Y}^* = \mathbf{X}^*\beta + \mathbf{e}^*$. The staffer is relieved that none of the autocorrelations in the right-hand plot are statistically significant indicating that an $AR(1)$ process provides a valid model for the errors in the model. However, the staffer is concerned about the distinct nonrandom pattern in the left-hand plot of Figure 9.17. The dashed line is from a cubic LS fit which is statistically significant ($p$-value = 0.027). At this stage, the staffer is confused about what to do next and has sought your assistance.
+
+### Exercise 9.1.a
+
+Comment on the analysis performed by the staffer.
+
+### Exercise 9.1.b
+
+Obtain a final model for predicting `GrossBoxOffice` from `YearsS1975`. Ensure that you produce diagnostic plots to justify your choice of model. Describe any weaknesses in your model.
+
+### Exercise 9.1.c
+
+Use your model from (9.1.b) to predict `GrossBoxOffice` in 2008.
+
+### Exercise 9.1.d
+
+Use your model from (9.1.b) to identify any outliers. In particular, decide whether the year 2000 is an outlier. There is some controversy about the year 2000. In one camp are those that say that fewer people went to the movies in Australia in 2000 due to the Olympics being held in Sydney. In the other camp are those that point to the fact that a 10% Goods and Services Tax (GST) was introduced in July 2000 thus producing an increase in box office receipts.
+
+## Exercise 9.2
+
+This problem is based on an exercise from Abraham and Ledolter (2006, pp. 335-337) which focuses on monthly sales from a bookstore in the city of Vienna, Austria. The available data consisted of 93 consecutive monthly observations on the following variables:
+
+  + `Sales` = Sales (in hundreds of dollars)
+  + `Advert` = Advertising spend in the current month
+  + `Lag1Advert` = Advertising spend in the previous month
+  + `Time` = Time in months
+  + `Month_i` = Dummy variable which is 1 for month $i\in[2,12]$ and 0 otherwise
+
+```{r}
+bookstore <- read.table(paste0("https://raw.githubusercontent.com/jzuniga123/",
+                               "SPS/master/DATA%20621/bookstore.txt"), header = T)
+```
+
+### Exercise 9.2.a
+
+Follow the advice of Abraham and Ledolter (2006, pp. 336-337) and first build a model for `Sales` ignoring the effects due to `Advert` and `Lag1Advert`. Ensure that you produce diagnostic plots to justify your choice of model. Describe any weaknesses in your model.
+
+### Exercise 9.2.b
+
+Add the effects due to `Advert` and `Lag1Advert` to the model you have developed in (9.1.a). Last month's advertising (`Lag1Advert`) is thought to have an impact on the current month's sales. Obtain a final model for predicting `Sales`. Ensure that you produce diagnostic plots to justify your choice of model. Describe any weaknesses in your model.
+
+## Exercise 9.3
+
+This problem is based on a case involving real data from Tryfos (1998, pp. 467-469). According to Tryfos:
+
+> To the sales manager of Carlsen's Brewery, a formal model to explain and predict beer sales seemed worth a try... Carlsen's Brewery is one of the major breweries in Canada, with sales in all parts of the country, but the study itself was to be confined to one metropolitan area. In discussing this assignment, the manager pointed out that weather conditions obviously are responsible for most of the short-run variation in beer consumption. "When it is hot", the manager said, "people drink more - it's that simple." This was also the reason for confining the study to one area; since weather conditions vary so much across the country, there was no point in developing a single, countrywide model for beer sales. It was the manager's opinion that a number of models should be developed --one for each major selling area.
+
+The available data consisted of 19 consecutive quarterly observations on the following variables:
+
+  + `Sales` = Quarterly beer sales (in tons)
+  + `Temp` = Average quarterly temperature (in degrees F)
+  + `Sun` = Quarterly total hours of sunlight
+  + `Q2` = Dummy variable which is 1 for Quarter 2 and 0 otherwise
+  + `Q3` = Dummy variable which is 1 for Quarter 3 and 0 otherwise
+  + `Q4` = Dummy variable which is 1 for Quarter 4 and 0 otherwise.
+
+```{r}
+CarlsenQ <- read.table(paste0("https://raw.githubusercontent.com/jzuniga123/",
+                              "SPS/master/DATA%20621/CarlsenQ.txt"), header = T)
+```
+
+Develop a model which can be used to predict quarterly beer sales. Describe any weaknesses in your model. Write up the results in the form of a report that is to be given to the manager at Carlsen's brewery.
+
+# [Linear Models with R](http://www.maths.bath.ac.uk/~jjf23/LMR/)
+
+## Exercise 6.2
+
+Using the divorce data, fit a regression model with `divorce` as the response and `unemployed`, `femlab`, `marriage`, `birth` and `military` as predictors.
+
+```{r}
+divusa <- read.table(paste0("https://raw.githubusercontent.com/jzuniga123/",
+                               "SPS/master/DATA%20621/divusa.txt"))
+```
+
+### Exercise 6.2.a
+
+Make two graphical checks for correlated errors. What do you conclude?
+
+### Exercise 6.2.b
+
+Allow for serial correlation with an $AR(1)$ model for the errors. (Hint: Use maximum likelihood to estimate the parameters in the GLS fit by `gls(..., method="ML",...))`. What is the estimated correlation and is it significant? Does the GLS model change which variables are found to be significant?
+
+### Exercise 6.2.c
+
+Speculate why there might be correlation in the errors.
+
+# References
