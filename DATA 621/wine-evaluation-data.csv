@@ -1,4 +1,4 @@
-IN,TARGET,FixedAcidity,VolatileAcidity,CitricAcid,ResidualSugar,Chlorides,FreeSulfurDioxide,TotalSulfurDioxide,Density,pH,Sulphates,Alcohol,LabelAppeal,AcidIndex,STARS
+INDEX,TARGET,FixedAcidity,VolatileAcidity,CitricAcid,ResidualSugar,Chlorides,FreeSulfurDioxide,TotalSulfurDioxide,Density,pH,Sulphates,Alcohol,LabelAppeal,AcidIndex,STARS
 3,,5.4,-0.86,0.27,-10.7,0.092,23,398,0.98527,5.02,0.64,12.3,-1,6,
 9,,12.4,0.385,-0.76,-19.7,1.169,-37,68,0.99048,3.37,1.09,16,0,6,2
 10,,7.2,1.75,0.17,-33,0.065,9,76,1.04641,4.61,0.68,8.55,0,8,1
