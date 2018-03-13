@@ -1,0 +1,72 @@
+Category,Sector,Industry,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016
+Private,"Agriculture, forestry, fishing, and hunting",Farms,219.4,207.8,199.9,204.3,212.3,201.9,226.8,261.8,253,255.8,302.5,336.1,301.2,328.2,387,400.9,432.9,438.9,395.3,375.7
+Private,"Agriculture, forestry, fishing, and hunting","Forestry, fishing, and related activities",38.4,41.9,45.3,39.2,38.9,39.4,41.3,45.3,46.6,47.7,44.5,44.4,40.8,44.5,47.7,46.4,48.2,55,52.6,52.4
+Private,Mining,Oil and gas extraction,97.8,72.1,85.1,144.9,142.7,116.9,166.2,198.9,260.6,271,293.6,395.4,223.6,289.7,343.7,341.3,396.7,442.3,262.6,212.1
+Private,Mining,"Mining, except oil and gas",55.7,54.8,52.6,54.3,54.4,54.2,56.9,67,83.9,99.4,103.6,116.5,104.4,114.7,135.9,133.5,125.8,123.2,107.1,98.6
+Private,Mining,Support activities for mining,20.7,22.1,16.2,17.1,27.2,22.9,27.4,31.9,47.3,69.5,74.2,80.5,52.4,58.9,76.5,95.4,97,117.3,88,48
+Private,Utilities,Utilities,254.2,255.8,302.6,360.7,432,319,336.3,344.5,408.2,410.1,438.2,490.4,389.3,423.5,400.8,366.5,392.6,429.2,405.4,391.1
+Private,Construction,Construction,709.6,774.5,838.4,911.8,955.2,967.9,1035.1,1152.5,1280.1,1345,1329.4,1266,1090.4,1008.3,1008.6,1069.9,1139.7,1244.5,1355.5,1442
+Private,Manufacturing - Durable,Wood products,87.6,90.9,97.3,93.2,86.4,88.8,91,104.3,113.1,112.9,101.1,87.5,64.4,70.3,70.9,78.8,89.3,96,98.9,104.3
+Private,Manufacturing - Durable,Nonmetallic mineral products,84.9,90.9,94.5,95.8,93.4,94.3,95.6,101.5,112.3,124.9,126.7,113.5,88.9,90.8,92.4,99,105.9,113.4,119.8,123.8
+Private,Manufacturing - Durable,Primary metals,167,165.3,155.5,154.7,136,138.5,136.8,181.2,201.8,232.5,255.5,279.6,166,234.1,279.9,267.6,262.1,265.3,225.9,210.1
+Private,Manufacturing - Durable,Fabricated metal products,241.6,252.3,255.3,266.8,250.8,245.7,243.1,259.2,286.9,315.5,341.1,356.7,280.4,295,328.1,357.2,363.5,375.9,369.3,373.4
+Private,Manufacturing - Durable,Machinery,268,277,274.8,291.8,262.1,249.4,253.3,268.3,300.7,325,344.7,351.7,284.4,316.1,365.6,407.1,396.6,411.1,381.9,364.8
+Private,Manufacturing - Durable,Computer and electronic products,451,450.2,475.9,527.9,445.2,377.2,377.9,391.6,398.4,412.8,431.1,419.7,353.4,368.7,376.3,379.3,379,380.9,382.4,400.2
+Private,Manufacturing - Durable,"Electrical equipment, appliances, and components",110.8,114.5,115.9,122.6,110.1,100.5,98,102.7,109.2,117.2,126.5,126.4,101.8,108.3,116.8,122.9,122.7,127.2,125.3,119
+Private,Manufacturing - Durable,"Motor vehicles, bodies and trailers, and parts",428.9,446.6,502.4,482.1,455.3,478.4,489.5,509.4,523.8,524.5,513.4,421.1,320,422.7,488.8,510.8,548.1,620.4,668.3,677
+Private,Manufacturing - Durable,Other transportation equipment,156.1,184.6,180.6,162.2,180.3,173,169.9,174.9,201.6,212.8,261.3,270.7,250.1,248.1,256.4,295.6,309,328.3,335.9,317.6
+Private,Manufacturing - Durable,Furniture and related products,64.2,69.6,72.6,74.9,71.4,75.7,74.7,78.1,84.1,85.3,82.9,77.2,59.7,57.6,60.4,66.3,69.8,72.4,78.5,79.2
+Private,Manufacturing - Durable,Miscellaneous manufacturing,99.9,105.7,108.5,116.4,113.9,122.2,127.2,128.9,142.8,150.4,151.8,158.3,149.4,154.3,156.9,154.2,163.1,160.4,166.6,154.3
+Private,Manufacturing - Nondurable,Food and beverage and tobacco products,519.7,529.9,534.9,552.1,574.4,565,598.5,626.9,659.5,664.7,715.6,775.5,774.9,804.3,866.8,906.1,929.3,964.6,960.1,963.1
+Private,Manufacturing - Nondurable,Textile mills and textile product mills,89.8,88.5,87.1,85.3,77.2,75.9,72.9,73,76.3,71,63.1,57.4,46.1,49.9,52.4,51.7,53.9,56.2,55.6,57.5
+Private,Manufacturing - Nondurable,Apparel and leather and allied products,81,73.6,71.1,67.8,57.2,49.6,43.6,37.9,36.8,34.5,26.7,21.7,17.7,18.6,25.8,32.1,32.5,35.6,31.7,39.1
+Private,Manufacturing - Nondurable,Paper products,149,153,155.5,163.6,154.8,152.3,148.7,152.9,159.9,167.4,174.1,177.1,160,168.7,174.6,179.6,184.6,186.2,184.7,184.7
+Private,Manufacturing - Nondurable,Printing and related support activities,98,101.6,104.3,107.6,104.6,99.8,95.7,96.3,98.9,101,103.9,99.3,83.8,83.5,83.6,83.7,83.6,83,85.3,83.1
+Private,Manufacturing - Nondurable,Petroleum and coal products,175.3,135.3,159,230.7,215.8,211.6,243.8,322.2,458.4,533.5,602,731.6,479.4,601.7,807.6,829,823.8,760.5,491.7,416.2
+Private,Manufacturing - Nondurable,Chemical products,414.9,420.4,428.6,452.7,443.3,469.7,490.3,544.9,609.5,658.7,727.7,735.6,622.6,714.9,779.7,805.2,814,830.8,791,809.6
+Private,Manufacturing - Nondurable,Plastics and rubber products,158.3,163,171.6,177,169.2,172.3,175.1,181.7,197,208.5,205.3,197.4,166.2,185.1,199.1,215.2,222.4,230.3,232.1,235.5
+Private,Wholesale trade,Wholesale trade,748.5,773.5,828,884.3,862.6,893.9,925.8,1023,1116.8,1196.5,1269.5,1311.4,1092,1253.1,1357.8,1443.2,1506.8,1564.8,1576.3,1577.8
+Private,Retail trade,Motor vehicle and parts dealers,173.9,173.7,195.4,194.3,175.7,208.5,211,216.8,211.4,214,214.2,187.2,153.2,206.6,211.2,240,247.9,258.4,277.1,288.2
+Private,Retail trade,Food and beverage stores,128.9,132.8,139.7,140.7,151.9,153.4,158.3,167.6,174.4,184.2,186.9,194.3,191.9,198.9,206.6,211.4,214.8,221.8,232.3,238.1
+Private,Retail trade,General merchandise stores,115.4,122.2,130.3,134.6,137.6,138.2,155.9,171.2,179.5,184.3,193.9,200.1,208.7,216.6,214.3,214.7,220.7,224.8,231.8,231.8
+Private,Retail trade,Other retail,434,457.8,482.5,523.2,524.2,540.3,579.3,629.9,668.4,712.6,725.6,699.2,668.7,705.4,735.5,783.2,829.1,867.4,916.5,959.9
+Private,Transportation and warehousing,Air transportation,114.3,111.1,114.6,123.7,107.2,100.7,109.9,120.5,133.6,145.1,156,165,136.3,153.6,170.4,178.1,181,187.5,188.8,186.5
+Private,Transportation and warehousing,Rail transportation,39,38.9,39.5,40.1,40.7,41.3,42.3,46.6,52.6,59.3,61.9,69.5,55.4,67,76.1,79.3,81.7,88.2,81.4,74.7
+Private,Transportation and warehousing,Water transportation,24.6,24.8,26.2,27.6,27.7,27,31.3,37.3,39.3,42.2,48.3,54.7,49.2,54,56.6,59.3,60.6,62.3,59.7,57.3
+Private,Transportation and warehousing,Truck transportation,164.2,176.5,188.4,201.3,202.1,206,211.9,234.3,259.7,276.7,283.2,287.6,233.2,253.4,281.5,300.8,310,336.7,335.3,331
+Private,Transportation and warehousing,Transit and ground passenger transportation,24.2,26.4,26.2,25.9,26.7,27.3,28,33.3,36.9,42.3,44.8,45.3,45.1,45.8,48.9,51.9,55.1,60.1,61.6,60.2
+Private,Transportation and warehousing,Pipeline transportation,24.3,24.2,24.2,23.2,22.7,22.3,22.5,23.2,23,24.4,25.9,29.4,24,25.8,27.4,27.5,29.3,31.7,33.4,33.4
+Private,Transportation and warehousing,Other transportation and support activities,83.8,93.9,103.5,115.3,118.9,123.1,129.7,141.5,151.7,166.6,177.8,183.3,159.2,168.7,183.6,193.1,201.8,215.3,226.3,229.6
+Private,Transportation and warehousing,Warehousing and storage,26.3,28.6,31.1,33.8,36.4,39.7,45.2,49.7,53.2,61.5,69,73,71.1,76.3,80.4,84.5,87.5,90.2,93.2,94.3
+Private,Information,"Publishing industries, except internet (includes software)",190.9,214.1,238.1,254.2,259.3,262,258.7,273.4,283.2,292.6,304.4,308.1,286.6,288.2,299,301.1,310.3,324.4,326.8,345.5
+Private,Information,Motion picture and sound recording industries,86.3,93.7,101.2,110.3,112,119.5,127.3,127.4,131.5,134.3,135.7,132.7,125.9,136.1,137.9,144.1,148.4,146.6,155.3,158.8
+Private,Information,Broadcasting and telecommunications,403.7,445.2,505.5,562.7,579.9,577,574.5,587.2,610.2,627.3,648.7,669.2,660.4,690.4,716.7,747.7,772.3,818.2,847.8,879.4
+Private,Information,"Data processing, internet publishing, and other information services",46.8,51.2,61.5,73.7,76.7,82.7,84.6,92.1,98.4,110.8,119.8,132.7,132.5,141.2,155.2,173.7,187.9,203.9,227.5,238.6
+Private,Finance and insurance,"Federal Reserve banks, credit intermediation, and related activities",428.5,463.8,515,563.1,601.1,641.6,663.4,675.2,708.9,728.5,737.9,716.7,689.8,664.2,640.9,666.5,676.2,705.9,752.9,801.6
+Private,Finance and insurance,"Securities, commodity contracts, and investments",204.9,244.2,290.8,357.1,313.8,287.4,309.2,345.7,383.2,448.5,503.4,432.7,403,418.4,410.2,425.2,455.5,487.3,491.4,493.9
+Private,Finance and insurance,Insurance carriers and related activities,358.7,384.8,405.2,438.8,457.9,476.8,518.4,571.1,625.9,657.5,703.6,710.4,662.4,699.4,743.8,755.1,797.4,865.4,916.5,946.3
+Private,Finance and insurance,"Funds, trusts, and other financial vehicles",56.4,65.3,75,91.5,82.4,72.6,71.2,82.1,90,99.9,116.6,120.1,99.2,106.8,112.2,116.1,135.6,143.4,166.6,166.5
+Private,Real estate and rental and leasing,Housing,852.3,905.9,962.4,1022.7,1097.6,1146.7,1190.6,1260.8,1351.6,1438.4,1496.8,1553.4,1591,1605.5,1656.3,1701.3,1744.1,1820.4,1920.1,2018.7
+Private,Real estate and rental and leasing,Other real estate,384.3,402.1,431,484.1,505.8,571.7,641.5,757,894.4,901.5,876.5,793.8,726.4,761.7,770.8,833,902.6,1005.9,1027.3,1087.3
+Private,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets,148.1,168.6,186.3,208.2,207.8,199.9,217.4,229.3,248.1,259.5,267.9,287.8,249,266.6,284.5,300.2,320.4,346,345.9,348.6
+Private,Professional and business services,Legal services,158.4,174,185.1,191.9,205.3,216.1,239.5,251.3,268.3,279.1,288.5,287.7,276.4,280.1,289.7,297.7,301,307.9,321.8,331.8
+Private,Professional and business services,Computer systems design and related services,121.3,152.2,183.1,206.7,204.7,194.3,192.2,195.4,208.6,221.8,249.5,271.5,266.2,289.9,311.1,331.2,337.6,354.9,357.4,379.6
+Private,Professional and business services,"Miscellaneous professional, scientific, and technical services",525.9,572.8,617.3,683.6,708.3,717,741.3,802.1,867.4,929,1005.1,1057.2,1006.2,1039.1,1087.2,1134,1159.5,1231.3,1292.6,1334.5
+Private,Professional and business services,Management of companies and enterprises,196.1,221.9,240.2,260.5,259.6,262.5,281.2,319.4,353.2,384.5,431.7,439.3,415.3,447.1,484,531,558,594.9,629.3,634.1
+Private,Professional and business services,Administrative and support services,309.8,353,385.6,423.2,418.5,414,434.4,469.6,513.2,549.2,588.6,602.5,558.5,588.6,628.5,661.6,688.2,750.3,799.1,845.8
+Private,Professional and business services,Waste management and remediation services,41.8,46.2,50.4,52.3,52.9,52.9,56.7,61.4,66.2,72.8,75.8,79.8,73.8,82.6,85.3,85.7,87.1,91.7,92.3,95.8
+Private,"Educational services, health care, and social assistance",Educational services,115.5,123.9,133,144,157.4,166.4,176.1,182.9,193,209.3,227.1,244.4,259,279.4,292.8,299,307,317.4,329.1,339.6
+Private,"Educational services, health care, and social assistance",Ambulatory health care services,389.1,409.3,426.8,453.7,494.1,531.1,568.6,609.8,645.2,674.3,710.9,750.9,777.3,805.2,840.2,871.3,890.4,931.2,983.4,1026.4
+Private,"Educational services, health care, and social assistance",Hospitals,271.9,290.4,304.3,320.9,347,382.7,409.9,436.3,470.8,503.1,531.1,566.3,602.8,623.7,654.1,694,719.4,744.3,802.5,849.6
+Private,"Educational services, health care, and social assistance",Nursing and residential care facilities,94.1,100.8,104.6,111.2,120,127.1,136,143.4,153.5,162,171.5,180.7,186.6,194.2,202,208.4,213.9,220.6,230,239
+Private,"Educational services, health care, and social assistance",Social assistance,62.4,67.1,74.5,83.9,94.5,101.4,107.2,110.8,117.5,124.8,134.1,143.4,149.3,156.3,159.5,162,164.8,172.2,180.1,188.7
+Private,"Arts, entertainment, recreation, accommodation, and food services","Performing arts, spectator sports, museums, and related activities",59,64.2,68.8,75.1,82.4,90.3,97,100.7,106,115.9,126.3,131.8,132.3,132.2,136.5,144.4,149.1,158.3,168.7,175.1
+Private,"Arts, entertainment, recreation, accommodation, and food services","Amusements, gambling, and recreation industries",67.1,68.4,72.7,74.4,73.5,74.8,81.4,89,93.7,103.9,112.7,114.8,110.8,113,118.9,124.9,131.2,137.3,145.5,154.3
+Private,"Arts, entertainment, recreation, accommodation, and food services",Accommodation,117.9,124.6,134.4,150.9,145.6,148.7,154.1,166.7,179.3,189.4,196.1,197.6,178.4,178.8,189.4,203.3,213,229.1,242,249.4
+Private,"Arts, entertainment, recreation, accommodation, and food services",Food services and drinking places,304.1,321.9,338.1,362.5,378.4,399,418.2,443.8,467.1,493.1,513,525.3,521.6,540,570.4,603.6,627.1,668.3,723.1,765.2
+Private,"Other services, except government","Other services, except government",351.3,382.7,401.1,423.6,441.1,457,468.1,486.6,496.2,522.3,533.8,551.6,526,539.6,554.7,585.3,599.1,639,658.4,690.2
+Government,Federal,National defense,304.3,299.9,312.7,320.7,339.4,374.2,426,464.2,495.1,521.6,548,605.9,636.5,676.8,688.3,679.7,639.9,626.6,614.7,612
+Government,Federal,Nondefense,159.9,163.2,168.4,182.6,195.6,217.6,235.9,251.8,267.5,282.4,290.6,316.7,341.5,373.4,368.4,375,368.1,376.8,393.7,402.7
+Government,Federal,Government enterprises,72.8,75.6,78.1,80.3,81.3,83,83.7,85.6,85.9,92.6,96,98.4,96.2,95.9,94.6,98,91.1,92.9,92.7,92.1
+Government,State and local,General government,998.7,1058.7,1137.1,1223.7,1316.3,1381.8,1432.5,1510.1,1594.1,1685,1788,1879.7,1913.9,1942.3,1961.8,1982,2020.3,2083,2143.4,2201
+Government,State and local,Government enterprises,130.1,134.8,141.2,146.9,154.5,161.5,171,182.2,196.5,212,224.1,235.2,243.2,251.1,258.8,264.5,272.2,280.7,288.7,297.5
