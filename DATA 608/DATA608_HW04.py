@@ -1,160 +1,268 @@
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output
 
-# coding: utf-8
+app = dash.Dash()
+app.config.suppress_callback_exceptions = True
 
-# # Background
-# 
-# Enterococcus is a fecal indicating bacteria that lives in the intestines of humans and other warm-blooded animals. Enterococcus (“Entero”) counts are useful as a water quality indicator due to their abundance in human sewage, correlation with many human pathogens and low abundance in sewage free environments. The United States Environmental Protection Agency (EPA) reports Entero counts as colonies (or cells) per 100 ml of water.
-# 
-# The organization [Riverkeeper](http://www.riverkeeper.org/) has based its assessment of acceptable water quality on the 2012 Federal Recreational Water Quality Criteria from the US EPA. Unacceptable water is based on an illness rate of 32 per 1000 swimmers. The federal standard for unacceptable water quality is a single sample value of greater than 110 Enterococcus/100 mL, or five or more samples with a geometric mean (a weighted average) greater than 30 Enterococcus/100 mL.
-# 
-# # Data
-# 
-# Enterococcus levels in the Hudson River can be found [here](https://github.com/jzuniga123/SPS/blob/master/DATA%20608/riverkeeper_data_2013.csv). 
-# 
-# # Overview
-# 
-# Data have not been cleaned and needs to be cleaned. Each question should be a separate dash app. A single app.py for each will be sufficient.
-# 
-# ## Dowload Data
-%%bash
-wget https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20608/riverkeeper_data_2013.csv
-# # Python Libraries
+##############################################
+# URL BAR
+##############################################
 
-# In[45]:
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),
+    html.Div(id='page-content'),
+])
 
+app.css.append_css({
+    'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
+})
 
-import pandas as pd
+##############################################
+# HOME PAGE
+##############################################
+
+markdown_Q1 = '''
+### Question 1
+You’re a civic hacker and kayak enthusiast who just came across this dataset. You’d like to create an app that recommends launch sites to users. Ideally an app like this will use live data to give current recommendations, but you’re still in the testing phase. Create a prototype that allows a user to pick a date, and will give its recommendations for that particular date. Think about your recommendations . You’re given federal guidelines above, but you may still need to make some assumptions about which sites to recommend. Consider your audience. Users will appreciate some information explaining why a particular site is flagged as unsafe, but they’re not scientists.
+'''
+
+markdown_Q2 = '''
+### Question 2
+This time you are building an app for scientists. You’re a public health researcher analyzing this data. You would like to know if there’s a relationship between the amount of rain and water quality. Create an exploratory app that allows other researchers to pick different sites and compare this relationship.
+'''
+
+index_page = html.Div([
+    html.H1('Interactive Data Visualizations with Dash'),
+    html.H2('Jose Zuniga'),
+    dcc.Markdown(children=markdown_Q1),
+    dcc.Markdown(children=markdown_Q2),
+    dcc.Link('Go to Question 1 Solution', href='/app-1'),
+    html.Br(),
+    dcc.Link('Go to Question 2 Solution', href='/app-2'),
+])
+
+@app.callback(dash.dependencies.Output('page-content', 'children'),
+              [dash.dependencies.Input('url', 'pathname')])
+def display_page(pathname):
+    if pathname == '/app-1':
+        return page_1_layout
+    elif pathname == '/app-2':
+        return page_2_layout
+    else:
+        return index_page
+
+##############################################
+# APPLICATION 1
+##############################################
+
+import emoji, pandas as pd
 from scipy.stats.mstats import gmean
+import plotly.offline as offline
+import plotly.graph_objs as go
+df1 = pd.read_csv("riverkeeper_data_2013.csv", parse_dates=['Date'])
+df1 = df1.set_index(['Site','Date'], drop = True).sort_index()
+df1['EnteroCount'] = df1['EnteroCount'].replace('[^\d]', '', regex=True).astype(int)
+df1['GeometricMean'] = df1.EnteroCount.groupby(level='Site') \
+    .apply(lambda x: x.rolling(5, min_periods=1).apply(gmean))
+df1['EPA'] = (df1['EnteroCount'] <= 60).astype(int)
+df1['RK'] = (df1['GeometricMean'] <= 30).astype(int)
+df1['Both'] = df1['EPA'] + df1['RK']
+img1 = emoji.emojize(':poop:', use_aliases=True)
+img2 = emoji.emojize(':droplet:', use_aliases=True)
+img3 = emoji.emojize(':skull:', use_aliases=True)
+img4 = emoji.emojize(':see_no_evil:', use_aliases=True)
+img5 = emoji.emojize(':thumbsup:', use_aliases=True)
+df1['EPA'] = df1['EPA'].replace([0,1], [img1, img2])
+df1['RK'] = df1['RK'].replace([0,1], [img1, img2])
+df1['Both'] = df1['Both'].replace([0,1,2], [img3, img4, img5])
+sites = df1.index.get_level_values(0).unique()
 
+page_1_layout = html.Div([
+    html.H1('Hudson River'),
+    ##########################
+    dcc.Link('Go to Question 2 Solution', href='/app-2'),
+    html.Br(),
+    dcc.Link('Go back to Home Page', href='/'),
+    ##########################
+    html.H2('Site'),
+    dcc.Dropdown(
+        id='dropdown-site',
+        options=[{'label': i, 'value': i} for i in sites],
+        placeholder="Select Site",
+        clearable=False,
+        value='125th St. Pier'
+    ),
+    html.H2('Date'),
+    dcc.Dropdown(id='dropdown-date', 
+                 value='2013-10-16'),
+    html.H2('Findings'),
+    dcc.Graph(id='graph-with-slider'),
+])
 
-# # Import Data
+@app.callback(Output('dropdown-date', 'options'),
+              [Input('dropdown-site', 'value')])
+def page_1_update_category_options(site):
+    dates = df1.loc[site].index.get_level_values(0).unique().sort_values(ascending=False)
+    return [{'label': k, 'value': k} for k in dates]
 
-# In[9]:
+@app.callback(Output('graph-with-slider', 'figure'),
+              [Input('dropdown-site', 'value'),
+               Input('dropdown-date', 'value')])
+def page_1_update_output(input1, input2):
+    trace = go.Scatter(
+        x = df1.loc[input1]['EnteroCount'].index,
+        y = df1.loc[input1]['EnteroCount'],
+        mode = 'lines+markers',
+        text = df1.loc[input1]['Both']
+        )
+    layout = go.Layout(
+        title='Enterococcus Levels',
+        yaxis = dict(title = 'Enterococcus'),
+        xaxis=dict(
+            title = 'Date Sampled',
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=6, label='6M', step='month', stepmode='backward'),
+                    dict(count=1, label='YTD', step='year', stepmode='todate'),
+                    dict(count=1, label='1Y', step='year', stepmode='backward'),
+                    dict(label='All', step='all')
+                ])
+            ),
+            rangeslider=dict(),
+            type='date'
+        ),
+        annotations=[dict(
+                x = input2,
+                y = df1.loc[input1].loc[input2]['EnteroCount'],
+                text = 'EPA Rating: ' + df1.loc[input1].loc[input2]['EPA'] + \
+                    '<br>Riverkeeper: ' + df1.loc[input1].loc[input2]['RK'] + \
+                    '<br>Recommendation: ' + df1.loc[input1].loc[input2]['Both'],
+                textangle = 0,
+                ax = 0,
+                ay = -75,
+                font = dict(color = "black", size = 12)
+        )]
+    )
+    return {'data': [trace], 'layout': layout}
 
+##############################################
+# APPLICATION 2
+##############################################
 
-df = pd.read_csv("riverkeeper_data_2013.csv", parse_dates=['Date'])
+import numpy as np, pandas as pd
+import plotly.offline as offline
+import plotly.graph_objs as go
+df2 = pd.read_csv("riverkeeper_data_2013.csv", parse_dates=['Date'])
+df2 = df2.set_index(['Site','Date'], drop = True).sort_index()
+df2['EnteroCount'] = df2['EnteroCount'].replace('[^\d]', '', regex=True).astype(int)
+df2 = df2.drop('SampleCount', axis=1)
+EntroRain = df2.groupby('Site')[['EnteroCount','FourDayRainTotal']] \
+    .corr('kendall').iloc[::2] \
+    .reset_index(1, drop=True) \
+    .drop('EnteroCount', axis=1) \
+    .rename(columns={'FourDayRainTotal': 'Correlation'})
+sites = df2.index.get_level_values(0).unique()
 
+page_2_layout = html.Div([
+    html.H1('Hudson River'),
+    ##########################
+    dcc.Link('Go to Question 1 Solution', href='/app-1'),
+    html.Br(),
+    dcc.Link('Go back to Home Page', href='/'),
+    ##########################
+    html.H2('Site'),
+    dcc.Dropdown(
+        id='dropdown-site',
+        options=[{'label': i, 'value': i} for i in sites],
+        placeholder="Select Site",
+        clearable=False,
+        value='125th St. Pier'
+    ),
+    html.H2('Correlation'),
+    dcc.Graph(id='graph-with-inlet')   
+])
 
-# ## Pre-process Data
-# 
-# https://www.riverkeeper.org/water-quality/hudson-river/
-# 
-# https://www.riverkeeper.org/water-quality/hudson-river/#table
+@app.callback(Output('graph-with-inlet', 'figure'),
+              [Input('dropdown-site', 'value')])
+def page_2_update_output(input1):
+    ######### MAIN PLOT
+    trace0 = go.Scatter(
+        x = df2.drop([input1])['FourDayRainTotal'],
+        y = df2.drop([input1])['EnteroCount'],
+        mode = 'markers',
+        hoverinfo = 'none',
+        marker = dict(
+            size = '10',
+            color = 'rgba(204,204,204,1)'
+        )
+    )
+    trace1 = go.Scatter(
+        x = df2.loc[input1]['FourDayRainTotal'],
+        y = df2.loc[input1]['EnteroCount'],
+        mode = 'markers',
+        name = input1,
+        marker = dict(
+            size = '10',
+            color = 'rgba(222,45,38,0.8)'
+        )
+    )
+    ############ SUB-PLOT
+    bins = np.arange(-1.0, 1.0, 0.1)
+    c = ['hsl('+str(h)+',50%'+',50%)' for h in np.linspace(0, 360, len(bins))]
+    traceData = [] # info for traces
+    for i in range(0, len(bins)):
+        k = i if (i <= np.floor(len(bins)/2).astype(int)) else (len(bins) - i + 10)
+        trace_iter = go.Bar(
+            x = [bins[k]],
+            y = ['Correlation'],
+            base = 0,
+            hoverinfo = 'none',
+            orientation = 'h',
+            marker=dict(
+                color=c[k]
+            ),
+            xaxis='x2',
+            yaxis='y2'
+        )
+        traceData.append(trace_iter)     
+    trace2 = go.Scatter(
+        x = EntroRain.loc[input1],
+        y = ['Correlation'],
+        mode = 'markers',
+        name = input1,
+        marker=dict(
+            symbol = 'star-diamond-dot',
+            size = '15',
+            color = 'yellow'
+        ),
+        xaxis='x2',
+        yaxis='y2'
+    )
+    traceData.append(trace0)
+    traceData.append(trace1)
+    traceData.append(trace2)
+    layout = go.Layout(
+        title='Enterococcus-Rain Relationship',
+        yaxis = dict(title = 'Enterococcus (log)',
+                     type = "log",
+                     showticklabels=False),
+        xaxis = dict(title = 'Four Day Rain Total (inches)'),
+        xaxis2=dict(
+            zeroline=False,
+            domain=[0.75, 0.95],
+            anchor='y2'
+        ),
+        yaxis2=dict(
+            showticklabels=False,
+            domain=[0.85, 0.95],
+            anchor='x2'
+        ),
+        showlegend=False,
+        barmode = 'stack'
+    )
+    return {'data': traceData, 'layout': layout}
 
-# In[32]:
-
-
-df.dtypes
-
-
-# In[59]:
-
-
-# df['Date'].dt.strftime('%Y-%m-%d')
-df['EnteroCount'] = df['EnteroCount'].replace('[^\d]', '', regex=True).astype(int)
-df['Acceptable'] = df['EnteroCount'] <= 60
-df.head()
-
-
-# In[96]:
-
-
-# group by year, rolling geomtric mean take mean of last five samples
-# https://pandas.pydata.org/pandas-docs/stable/computation.html#time-aware-rolling
-# 
-# df.groupby(['Site']).mean().head()
-# df.groupby(['Site']).rolling(5, on='EnteroCount', closed='both').sum()
-# test = pd.DataFrame(df[['EnteroCount']], index = df[['Site', 'Date']])
-test = pd.Series(df['EnteroCount'], index = df[['Site', 'Date']])
-# test.set_index(df[['Site', 'Date']])
-# test = df[['Site', 'Date', 'EnteroCount']]
-# dt_index = pd.to_datetime(test['Date'], format = '%Y-%m-%d')
-# test.set_index(dt_index)
-test.head()
-
-
-# # Question 1
-# 
-# You’re a civic hacker and kayak enthusiast who just came across this dataset. You’d like to create an app that recommends launch sites to users. Ideally an app like this will use live data to give current recommendations, but you’re still in the testing phase. Create a prototype that allows a user to pick a date, and will give its recommendations for that particular date.
-# 
-# Think about your recommendations . You’re given federal guidelines above, but you may still need to make some assumptions about which sites to recommend. Consider your audience. Users will appreciate some information explaining why a particular site is flagged as unsafe, but they’re not scientists.
-
-# # Question 2
-# 
-# This time you are building an app for scientists. You’re a public health researcher analyzing this data. You would like to know if there’s a relationship between the amount of rain and water quality. Create an exploratory app that allows other researchers to pick different sites and compare this relationship.
-
-# # References
-# 
-# https://dash.plot.ly/
-# 
-# https://github.com/plotly/dash-docs
-# 
-# https://github.com/plotly/dash-docs/tree/master/tutorial
-# 
-# ***
-# Thread: Dash Applicaton
-# 
-# Dash user guide can be found here: https://dash.plot.ly/ github repository can be found here: https://github.com/plotly/dash-docs There's a folder named tutorial with many examples.
-# ***
-# Thread: Dash Functionality
-# 
-# Did anyone come across issues working with multi-select? Chrome Vs. Firefox browsers. For some reason, the multi-select option is not working in Chrome.
-# ***
-# Thread: Calculations
-# 
-# The following paragraph explains calculation for unacceptable water quality "The federal standard for unacceptable water quality is a single sample value of greater than 110 Enterococcus/100 mL, or five or more samples with a geometric mean (a weighted average) greater than 30 Enterococcus/100 mL" I notice "SampleCount" column has values ranging from 27 to 187. My question, how to apply geometric mean to the data? 
-# 
-# I took it to mean as the number of samples taken.  For example, some sites might have 65 samples.  I also ran into an issue manually counting the sample mean so I used the builtin function for scipy. And by trouble, I mean an overflow issue when using integers (if you are taking larger samples)
-# 
-# Are you taking Date into account, some of the observations are from different years. 
-# 
-# No, I had sorted the values by date and then just took the last n samples to create the geometric mean.
-# ***
-# Thread: Date Picker Problems  
-# 
-# I'm getting problems when using the date picker. I had a static graph working, and put in a date picker to vary the graph by date. I have a couple  functions that estimate counts based on the closest observations. Any ideas on what I'm doing wrong? Github: https://github.com/AsherMeyers/DATA-608/blob/master/module4/question1/app.py
-# 
-# To be honest I was toying with the data first, trying to understand what I have and how I can approach it; hence, I haven't started dash yet! ...but based on your output, it seems to me that there seems to be some sort of data type confusion there; it seems that you need data date/time type but it's passing it as string type. Perhaps that might the problem.
-# 
-# have you set parse_dates=True, inside of pd.read_csv()?
-# 
-# No but I did convert the dates after reading it in.
-# 
-# I had to do both parse and the strftime in order for the dash app to read the dates correctly when being passed through the app. 
-# 
-# 	df = pd.read_csv("riverkeeper_data_2013.csv", parse_dates=['Date'])
-# 	df['Date']=df['Date'].dt.strftime('%Y-%m-%d')
-# 
-# ***
-# Thread: [Errno 48] Address already in use  
-# 
-# I keep getting this error after I successfully run the example dash app code found here: https://dash.plot.ly/getting-started, but I can do repeated runs as I update the code without completely shutting down my machine.
-# 
-# 	$ ps -fA | grep python
-# 
-# and then 
-# 
-# 	$ kill XXXX
-# 
-# But it's not working...I don't know how to kill the server and then re-run the app. 
-# 
-# If you are ussing Ubuntu or linux, from terminal you can use (assuming you are running port 8050, if not just change it.
-# 
-# 	~$ sudo kill $(sudo lsof -t -i:8050)
-#     sudo kill $(sudo lsof -t -i:8050)
-# 
-# It worked!!! Life saver!!!
-# ***
-# Thread: Safety Calculations
-# 
-# According to the assignment: "The federal standard for unacceptable water quality is a single sample value of greater than 110 Enterococcus/100 mL, or five or more samples with a geometric mean (a weighted average) greater than 30 Enterococcus/100 mL." How do we calculate this from the total "EnteroCount" which I presume gives the total of all samples, and the SampleCount, which is self-explanatory? For safe levels, one calculation I'd do would be: EnteroCount / SampleCount. This would give the average so any number of samples greater than five and with a calculation over 30, would be unsafe. My question is how would I calculate the first criteria?
-# 
-# I believe that the geometric average of All Samples for a single day in a single station are given already! Now, If you divide by the number of samples (as you have explained above) it will provide the wrong assumption of safety when in reality is not! that is for example if we have 60 EnteroCount Based on 5 Samples we know that it is NOT safe but if you divide it, it will return 12 making it "SAFE" but is NOT. From my perspective, we can apply the geometric mean to compare different stations or different days/time frames.
-# 
-# I'm still confused. How would you use EnteroCount and SampleCount to create the two thresholds for safety?
-# 
-# Easy..."A geometric mean (GM) is a weighted average of multiple samples. If the GM exceeds 30, water is not considered safe for swimming" You can use the EnteroCount as follows: to calculate for example: ACROSS ALL STATIONS. The SampleCount is used to calculate an Statistical Threshold Value.
-# ***
-# 6:57 PM - Mezu to Everyone: i read online that the solution is to set app.run_server(debug=False) ...have not tried it yet
-# 
-# 6:58 PM - Duubar Villalobos Jimenez to Everyone: yes, that "problem" occurs when is run as debug=True and then the code crash due to testing
+if __name__ == '__main__':
+    app.run_server(debug=False, port=8050, host='0.0.0.0')
