@@ -358,7 +358,11 @@ power[!complete.cases(power), ] # look at NAs
 
 ### Visualizations
 
-Visualizations consists of Time Plots, Histograms, ACF, and PACF plots. The *Time Plot* is a line graph that plots each observed value against the time of the observation, with a single line connecting each observation across the entire period. The *Histogram* displays the frequency at which values occur. 
+Visualizations consists of Time Plots, Histograms, ACF, and PACF plots. 
+
+#### Time Plot and Histogram
+
+The *Time Plot* is a line graph that plots each observed value against the time of the observation, with a single line connecting each observation across the entire period. The *Histogram* displays the frequency at which values occur. 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 kWh <- xts::xts(power$KWH, order.by=power$YYYY.MMM)
@@ -366,6 +370,8 @@ par(mfrow=c(2, 1), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
 plot(kWh, main="kWh")
 hist(kWh, col="steelblue", xlab="", main="")
 ```
+
+#### ACF and PACF
 
 The *ACF* plot shows the autocorrelations between each observation and its immediate predecessor (lagged observation). The *PACF* plot shows the autocorrelations between the current observation and each lagged observation individually. The ` xts::xts()`function converts data to a time series object which displays better in visualizations than time series objects created using other packages.
 
@@ -377,9 +383,7 @@ pacf(na.omit(kWh), ylab="kWh", main="")
 
 ## Clean Data
 
-Remove Outliers, NAs. 
-
->The value of argument frequency is used when the series is sampled an integral number of times in each unit time interval. For example, one could use a value of 7 for frequency when the data are sampled daily, and the natural time period is a week, or 12 when the data are sampled monthly and the natural time period is a year. Values of 4 and 12 are assumed in (e.g.) print methods to imply a quarterly and monthly series respectively.
+Data are cleaned using ` forecast::tsclean()` and then converted to a time series object using the `ts()` function. The `tsclean()` function imputes nulls and removes outliers. The ` ts()`function converts data to a time series object which is compatible with the `forecast` package.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 kWh <- ts(forecast::tsclean(power$KWH, replace.missing=T), 
@@ -389,7 +393,7 @@ kWh[kWh==min(kWh)] <- mean(kWh) # outlier wasnt removed
 
 ### Examine Trend
 
-MA Smoothing --- looks absent/stochastic
+A moving average smoother is helpful in examining what kind of trend is involved in a series. Moving average models should not be confused with moving average smoothing. A moving average model is used for forecasting future values while moving average smoothing is used for estimating the trend-cycle of past values. The `ma()` function computes a simple moving average smoother of a given time series.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 plot(kWh, col=8, xaxt = "n", ylab="ATM1")
@@ -399,13 +403,15 @@ lines(forecast::ma(kWh, order=12), col=4)
 
 ### Decomposition
 
+The Decomposition Plot decomposes and plots the observed values, the underlying trend, seasonality, and randomness of the time series data.
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 plot(decompose(kWh))
 ```
 
 ### Dickey-Fuller Test
 
-null hypothesis is non-stationarity (deterministic trend). If stochastic, do not difference.
+An augmented Dickey-Fuller unit root test evaluates if the data exhibit a Stationarity process with deterministic trend or a Stationarity process with stochastic trend.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 tseries::adf.test(kWh)
@@ -415,6 +421,8 @@ tseries::adf.test(kWh)
 
 ### Train-Test Split
 
+The train and test sets are created by referencing rows by index.
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 index_train <- 1:(length(kWh) - 12)
 kWh_train <- ts(kWh[index_train], frequency=12)
@@ -423,8 +431,7 @@ kWh_test <- ts(kWh[-index_train], frequency=12)
 
 ### Transformation
 
-no forecast::seasadj(ATM1w) since should be included in model
-no diff(ATM1w) after due to adf test
+The Augmented Dickey-Fuller Test supports the results that no differencing should be performed. The data will not be seasonal adjusted so that seasonal components evaluated by the model are reflected in predictions. Heteroskedasticity refers to the circumstance in which the variability of a variable is unequal across the range of values of a second variable. Box-Cox transformations can help to stabilize the variance of a time series. Some typical Box-Cox transformations are: $$-2\Rightarrow \frac { 1 }{ y_t^{ 2 } }, \quad -1\Rightarrow \frac { 1 }{ y_t }, \quad -0.5\Rightarrow \frac { 1 }{ \sqrt { y_t }  }, \quad 0\Rightarrow \log { \left( y_t \right)  }, \quad 0.5\Rightarrow \sqrt { y_t }, \quad 1\Rightarrow y_t, \quad 2\Rightarrow  y_t^{ 2 }$$
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 (lambda <- forecast::BoxCox.lambda(kWh_train))
@@ -432,7 +439,7 @@ no diff(ATM1w) after due to adf test
 
 ### ARIMA Model
 
-ARIMA Model. The number of seasonal differences is sometimes poorly chosen. If your data shows strong seasonality, try setting D=1 rather than relying on the automatic selection of D.
+The `auto.arima()` function chooses an ARIMA model automatically. It uses a variation of the Hyndman and Khandakar algorithm which combines unit root tests, minimization of the AICc, and MLE to obtain an ARIMA model. The function takes some short-cuts in order to speed up the computation and will not always yield the best model. Setting `stepwise` and `approximation` to `FALSE` prevents the function from taking short-cuts.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 (fit <- forecast::auto.arima(kWh_train, stepwise=F, approximation=F, d=0, lambda=lambda))
@@ -442,6 +449,8 @@ ARIMA Model. The number of seasonal differences is sometimes poorly chosen. If y
 
 ### ACF and PACF
 
+The *ACF* plot shows the autocorrelations between each observation and its immediate predecessor (lagged observation). The *PACF* plot shows the autocorrelations between the current observation and each lagged observation individually.
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 par(mfrow=c(2, 1), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
 acf(residuals(fit), ylab="ACF kWh"); pacf(residuals(fit), ylab="PACF kWh")
@@ -449,8 +458,7 @@ acf(residuals(fit), ylab="ACF kWh"); pacf(residuals(fit), ylab="PACF kWh")
 
 ### Box-Ljung Test
 
-null hypothesis independce (white noise)
-arma: p,q,P,Q,period,d,D
+The Box-Ljung test is helpful in assessing if data follow a White Noise pattern. The `arma` parameter of the fit returns a vector containing the ARIMA model parameters $p$, $q$, $P$, $Q$, period, $d$, and $D$ in that order.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 Box.test(residuals(fit), lag=7, fitdf=sum(fit$arma[1:2]), type="Ljung-Box")
@@ -460,6 +468,8 @@ Box.test(residuals(fit), lag=7, fitdf=sum(fit$arma[1:2]), type="Ljung-Box")
 
 ### In-Sample
 
+Forecasts are done using the `forecast::forecast()` function. Since the data were not seasonally adjusted, they need not be "reseasonalized" prior to forecast. Prediction point estimates are represented by a blue line, prediction intervals are represented by blue bands, and actual values are represented by a red line.
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 fcast <- forecast::forecast(fit, h=12)
 plot(fcast, ylab="kWh", main="kWh Predictions", xaxt="n")
@@ -468,17 +478,23 @@ lines(lag(kWh_test, -length(kWh_train)), col="red")
 
 ### Model Accuracy
 
+The accuracy() function is helful for obtaining summary measures of the forecast accuracy: Mean Error (ME), Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), Mean Percentage Error (MPE), Mean Absolute Percentage Error (MAPE), Mean Absolute Scaled Error (MASE), and Autocorrelation of errors at lag 1 (ACF1).
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 round(forecast::accuracy(fcast, length(kWh_test)), 3)
 ```
 
 ### Out-of-Sample
 
+Forecasts are done using the `forecast::forecast()` function. Since the data were not seasonally adjusted, they need not be "reseasonalized" prior to forecast. These out-of-sample predictions and for exporting.
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 fcast <- forecast::forecast(forecast::Arima(kWh, model=fit), h=12)
 ```
 
 ## Export Results
+
+Results are exported to an Excel file using the ` xlsx::write.xlsx()` function which includes an option for appending a worksheet to an existing file.
 
 ```{r warning=F, message=F, cache=T}
 xlsx::write.xlsx(fcast, file="DATA624_Project1.xlsx", 
@@ -542,7 +558,11 @@ head(Pipes)
 
 ### Visualizations
 
-Visualizations consists of Time Plots, Histograms, ACF, and PACF plots. The *Time Plot* is a line graph that plots each observed value against the time of the observation, with a single line connecting each observation across the entire period. The *Histogram* displays the frequency at which values occur. 
+Visualizations consists of Time Plots, Histograms, ACF, and PACF plots. 
+
+#### Time Plot and Histogram
+
+The *Time Plot* is a line graph that plots each observed value against the time of the observation, with a single line connecting each observation across the entire period. The *Histogram* displays the frequency at which values occur. 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 par(mfrow=c(3, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
@@ -553,6 +573,8 @@ hist(Pipe1h, col="steelblue", xlab="", main="")
 plot(Pipe2, main="Pipe 2")
 hist(Pipe2, col="steelblue", xlab="", main="")
 ```
+
+#### ACF and PACF
 
 The *ACF* plot shows the autocorrelations between each observation and its immediate predecessor (lagged observation). The *PACF* plot shows the autocorrelations between the current observation and each lagged observation individually. The ` xts::xts()`function converts data to a time series object which displays better in visualizations than time series objects created using other packages.
 
@@ -568,9 +590,7 @@ pacf(Pipe2, ylab="PACF Pipe 2", main="")
 
 ## Clean Data
 
-Remove Outliers, NAs. 
-
->The value of argument frequency is used when the series is sampled an integral number of times in each unit time interval. For example, one could use a value of 7 for frequency when the data are sampled daily, and the natural time period is a week, or 12 when the data are sampled monthly and the natural time period is a year. Values of 4 and 12 are assumed in (e.g.) print methods to imply a quarterly and monthly series respectively.
+Data are cleaned using ` forecast::tsclean()` and then converted to a time series object using the `ts()` function. The `tsclean()` function imputes nulls and removes outliers. The ` ts()`function converts data to a time series object which is compatible with the `forecast` package.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 Pipe1 <- ts(Pipe1h, frequency = 12, start=start(Pipe1h))
@@ -579,7 +599,7 @@ Pipe2 <- ts(pipe2$WaterFlow, frequency = 12, start=start(pipe2$Date.Time))
 
 ### Examine Trend
 
-MA Smoothing --- looks absent/stochastic
+A moving average smoother is helpful in examining what kind of trend is involved in a series. Moving average models should not be confused with moving average smoothing. A moving average model is used for forecasting future values while moving average smoothing is used for estimating the trend-cycle of past values. The `ma()` function computes a simple moving average smoother of a given time series.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 par(mfrow=c(2, 1), mar = c(0, 4, 0, 0), oma = c(0, 0, 0.5, 0.5))
@@ -593,6 +613,8 @@ lines(forecast::ma(Pipe2, order=30), col=4)
 
 ### Decomposition
 
+The Decomposition Plot decomposes and plots the observed values, the underlying trend, seasonality, and randomness of the time series data.
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 plot(decompose(Pipe1))
 plot(decompose(Pipe2))
@@ -600,7 +622,7 @@ plot(decompose(Pipe2))
 
 ### Dickey-Fuller Test
 
-null hypothesis is non-stationarity (deterministic trend). If stochastic, do not difference.
+An augmented Dickey-Fuller unit root test evaluates if the data exhibit a Stationarity process with deterministic trend or a Stationarity process with stochastic trend.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 tseries::adf.test(Pipe1)
@@ -610,6 +632,8 @@ tseries::adf.test(Pipe2)
 ## Model Data
 
 ### Train-Test Split
+
+The train and test sets are created by referencing rows by index.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 index_train <- 1:(length(Pipe1) - 24*7)
@@ -622,8 +646,7 @@ Pipe2_test <- ts(Pipe2[-index_train], frequency=12)
 
 ### Transformation
 
-no forecast::seasadj(ATM1w) since should be included in model
-no diff(ATM1w) after due to adf test
+The Augmented Dickey-Fuller Test supports the results that no differencing should be performed. The data will not be seasonal adjusted so that seasonal components evaluated by the model are reflected in predictions. Heteroskedasticity refers to the circumstance in which the variability of a variable is unequal across the range of values of a second variable. Box-Cox transformations can help to stabilize the variance of a time series. Some typical Box-Cox transformations are: $$-2\Rightarrow \frac { 1 }{ y_t^{ 2 } }, \quad -1\Rightarrow \frac { 1 }{ y_t }, \quad -0.5\Rightarrow \frac { 1 }{ \sqrt { y_t }  }, \quad 0\Rightarrow \log { \left( y_t \right)  }, \quad 0.5\Rightarrow \sqrt { y_t }, \quad 1\Rightarrow y_t, \quad 2\Rightarrow  y_t^{ 2 }$$
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 (lambda1 <- forecast::BoxCox.lambda(Pipe1_train))
@@ -632,7 +655,7 @@ no diff(ATM1w) after due to adf test
 
 ### ARIMA Model
 
-ARIMA Model. The number of seasonal differences is sometimes poorly chosen. If your data shows strong seasonality, try setting D=1 rather than relying on the automatic selection of D.
+The `auto.arima()` function chooses an ARIMA model automatically. It uses a variation of the Hyndman and Khandakar algorithm which combines unit root tests, minimization of the AICc, and MLE to obtain an ARIMA model. The function takes some short-cuts in order to speed up the computation and will not always yield the best model. Setting `stepwise` and `approximation` to `FALSE` prevents the function from taking short-cuts.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 (fit1 <- forecast::auto.arima(Pipe1_train, stepwise=F, approximation=F, d=0, lambda=lambda1))
@@ -643,6 +666,8 @@ ARIMA Model. The number of seasonal differences is sometimes poorly chosen. If y
 
 ### ACF and PACF
 
+The *ACF* plot shows the autocorrelations between each observation and its immediate predecessor (lagged observation). The *PACF* plot shows the autocorrelations between the current observation and each lagged observation individually.
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 par(mfrow=c(2, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
 acf(residuals(fit1), ylab="ACF Pipe 1"); pacf(residuals(fit1), ylab="PACF Pipe 1")
@@ -651,8 +676,7 @@ acf(residuals(fit2), ylab="ACF Pipe 2"); pacf(residuals(fit2), ylab="PACF Pipe 2
 
 ### Box-Ljung Test
 
-null hypothesis independce (white noise)
-arma: p,q,P,Q,period,d,D
+The Box-Ljung test is helpful in assessing if data follow a White Noise pattern. The `arma` parameter of the fit returns a vector containing the ARIMA model parameters $p$, $q$, $P$, $Q$, period, $d$, and $D$ in that order.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 Box.test(residuals(fit1), lag=7, fitdf=sum(fit1$arma[1:2]), type="Ljung-Box")
@@ -662,6 +686,8 @@ Box.test(residuals(fit2), lag=7, fitdf=sum(fit1$arma[1:2]), type="Ljung-Box")
 ## Forecast
 
 ### In-Sample
+
+Forecasts are done using the `forecast::forecast()` function. Since the data were not seasonally adjusted, they need not be "reseasonalized" prior to forecast. Prediction point estimates are represented by a blue line, prediction intervals are represented by blue bands, and actual values are represented by a red line.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 fcast1 <- forecast::forecast(fit1, h=24*7)
@@ -676,6 +702,8 @@ title("Waterflow Predictions", outer=TRUE)
 
 ### Model Accuracy
 
+The accuracy() function is helful for obtaining summary measures of the forecast accuracy: Mean Error (ME), Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), Mean Percentage Error (MPE), Mean Absolute Percentage Error (MAPE), Mean Absolute Scaled Error (MASE), and Autocorrelation of errors at lag 1 (ACF1).
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 round(forecast::accuracy(fcast1, length(Pipe1_test)), 3)
 round(forecast::accuracy(fcast2, length(Pipe2_test)), 3)
@@ -683,12 +711,16 @@ round(forecast::accuracy(fcast2, length(Pipe2_test)), 3)
 
 ### Out-of-Sample
 
+Forecasts are done using the `forecast::forecast()` function. Since the data were not seasonally adjusted, they need not be "reseasonalized" prior to forecast. These out-of-sample predictions and for exporting.
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 fcast1 <- forecast::forecast(forecast::Arima(Pipe1, model=fit1), h=30)
 fcast2 <- forecast::forecast(forecast::Arima(Pipe2, model=fit2), h=30)
 ```
 
 ## Export Results
+
+Results are exported to an Excel file using the ` xlsx::write.xlsx()` function which includes an option for appending a worksheet to an existing file.
 
 ```{r warning=F, message=F, cache=T}
 xlsx::write.xlsx(fcast1, file="DATA624_Project1.xlsx", 
@@ -717,6 +749,8 @@ http://rpubs.com/josezuniga/362102
 http://rpubs.com/josezuniga/363796
 
 http://rpubs.com/josezuniga/366918
+
+https://people.duke.edu/~rnau/411arim3.htm
 
 https://www.statmethods.net/input/dates.html
 
