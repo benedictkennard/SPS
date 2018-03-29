@@ -1,0 +1,665 @@
+---
+title: "Time Series Forecasting"
+author: "Jose Zuniga"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 2
+  word_document:
+    toc: yes
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview
+
+This project covers material in *Forecasting: Principles and Practice* by Hyndman and Athanasopoulos.
+
+> [The project is] a time series forecasting assignment. You [are] given a data set with basic information and basic objectives. Very much like a busy boss that does not have time to spell everything out. You can add your creativity. You can use additional tools beside R (however you should use some R). You will want to come up with a very nice report that is readable in Word. I care about technical accuracy, but presentation matters! I used think flash and flare were false and fake for analysts without substance. While I still think that (to a lesser extent), so what! It does in the real world! There are many things in the world or system that we don't agree with, but that is reality. You have to work within the system. So, oftentimes your job output will be judged on flash as well as technical accuracy, so be good at both. [This is a] single Effort, no interaction with others outside of meetups on this assignment.
+
+**Submission**: Word readable document for report (all in one), Excel readable for outputs (all in one, separate sheets).
+
+# System Setup
+
+```{r eval=F}
+if (!require("xts")) install.packages("xts")
+if (!require("xlsx")) install.packages("xlsx")
+if (!require("tseries")) install.packages("tseries")
+if (!require("forecast")) install.packages("forecast")
+```
+
+To use the `xlsx` package on a Linux system the system must have `RJava` and `Rgdal` installed.
+
+```{bash eval=F}
+sudo apt-get update
+sudo apt-get install default-jre # Install Java
+sudo apt-get install default-jdk # Install JDK
+sudo R CMD javareconf # Assotiate the JDK installed with R
+sudo apt-get install r-cran-rjava # Install RJava
+sudo apt-get install libgdal-dev libproj-dev # Install Rgdal
+```
+
+# ATM Forecast
+
+In part A, I want you to forecast how much cash is taken out of 4 different ATM machines for May 2010. The data is given in a single file. The variable 'Cash' is provided in hundreds of dollars, other than that it is straight forward. I am being somewhat ambiguous on purpose. I am giving you data, please provide your written report on your findings, visuals, discussion and your R code all within a Word readable document, except the forecast which you will put in an Excel readable file.  I must be able to cut and paste your R code and run it in R studio or other interpreter.
+
+## Import Data
+
+There are several packages for importing Excel files into R. The native method in `r R.Version()$version.string` uses the `readxl` package. The `readxl` library translates Excel cell/column `date` types into R `POSIXct` types. This enhanced date format is not compatible with the current version of many packages. The `read.xls()` function from the ` openxlsx` package does not currently support https. It therefore requires use of `gsub()`. The `xlsx` package is versatile and has a function to write files which is needed for exporting results.
+
+```{r warning=F, message=F, cache=T}
+github <- "https://raw.githubusercontent.com/jzuniga123"
+file <- "/SPS/master/DATA%20624/ATM624Data.xlsx"
+download.file(paste0(github, file), "temp.xlsx", mode="wb")
+atm <- xlsx::read.xlsx("temp.xlsx", sheetIndex=1, header=T)
+invisible(file.remove("temp.xlsx"))
+```
+
+## Explore Data
+
+### Number Summaries
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+summary(atm)
+xts::periodicity(unique(atm$DATE)) # sampling Frequency
+atm[!complete.cases(atm), ] # look at NAs
+summary(factor(atm$ATM)[!is.na(atm$Cash) & atm$Cash %% 1 != 0]) # not integers?
+```
+
+### Visualizations
+
+Charges \$1 or Less, \$20 or Less, \$100 or Less, over \$100
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+par(mfrow=c(4, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
+for(i in 1:length(levels(atm$ATM))) {
+  atm_sub <- subset(atm, ATM == paste0("ATM", i))
+  atm_ts <- xts::xts(atm_sub$Cash, order.by=atm_sub$DATE)
+  n <- nrow(atm_ts); l <- rep(1, n); m <- rep(20, n); h <- rep(100, n)
+  print(plot(cbind(atm_ts, l, m,h), main=paste0("ATM", i)))
+  hist(atm_ts, col="steelblue", xlab="", main="")
+}
+```
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+par(mfrow=c(4, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
+for(i in 1:length(levels(atm$ATM))) {
+  atm_sub <- subset(atm, ATM == paste0("ATM", i))
+  atm_ts <- xts::xts(atm_sub$Cash, order.by=atm_sub$DATE)
+  acf(na.omit(atm_ts), ylab=paste0("ACF ATM", i), main="") 
+  pacf(na.omit(atm_ts), ylab=paste0("PACF ATM", i), main="")
+}
+```
+
+## Clean Data
+
+Remove Outliers, NAs. 
+
+>The value of argument frequency is used when the series is sampled an integral number of times in each unit time interval. For example, one could use a value of 7 for frequency when the data are sampled daily, and the natural time period is a week, or 12 when the data are sampled monthly and the natural time period is a year. Values of 4 and 12 are assumed in (e.g.) print methods to imply a quarterly and monthly series respectively.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+for(i in 1:length(levels(atm$ATM))) {
+  atm_num <- paste0("ATM", i)
+  atm_sub <- subset(atm, ATM == atm_num, select=-2)
+  atm_sub$Cash <- forecast::tsclean(atm_sub$Cash, replace.missing=T)
+  assign(atm_num, ts(atm_sub$Cash, frequency = 7, start=start(atm_sub$DATE)))
+}
+```
+
+### Examine Trend
+
+MA Smoothing --- looks absent/stochastic
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+par(mfrow=c(3, 1), mar = c(0, 4, 0, 0), oma = c(0, 0, 0.5, 0.5))
+plot(ATM1, col=8, xaxt = "n", ylab="ATM1")
+lines(forecast::ma(ATM1, order=7), col=2)
+lines(forecast::ma(ATM1, order=30), col=4)
+plot(ATM2, col=8, xaxt = "n", ylab="ATM3")
+lines(forecast::ma(ATM2, order=7), col=2)
+lines(forecast::ma(ATM2, order=30), col=4)
+plot(ATM4, col=8, xaxt = "n", ylab="ATM4")
+lines(forecast::ma(ATM4, order=7), col=2)
+lines(forecast::ma(ATM4, order=30), col=4)
+```
+
+### Decomposition
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+plot(decompose(ATM1))
+plot(decompose(ATM2))
+plot(decompose(ATM4))
+```
+
+### Dickey-Fuller Test
+
+null hypothesis is non-stationarity (deterministic trend). If stochastic, do not difference.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+tseries::adf.test(ATM1)
+tseries::adf.test(ATM2)
+tseries::adf.test(ATM4)
+```
+
+## Model Data
+
+### Train-Test Split
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+index_train <- 1:(length(ATM1) - 30)
+ATM1_train <- ts(ATM1[index_train], frequency=7)
+ATM1_test <- ts(ATM1[-index_train], frequency=7)
+ATM2_train <- ts(ATM2[index_train], frequency=7)
+ATM2_test <- ts(ATM2[-index_train], frequency=7)
+ATM3_train <- ts(ATM3[index_train], frequency=7)
+ATM3_test <- ts(ATM3[-index_train], frequency=7)
+ATM4_train <- ts(ATM4[index_train], frequency=7)
+ATM4_test <- ts(ATM4[-index_train], frequency=7)
+```
+
+### Transformation
+
+no forecast::seasadj(ATM1w) since should be included in model
+no diff(ATM1w) after due to adf test
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+(lambda1 <- forecast::BoxCox.lambda(ATM1_train))
+(lambda2 <- forecast::BoxCox.lambda(ATM2_train))
+(lambda4 <- forecast::BoxCox.lambda(ATM4_train))
+```
+
+### ARIMA Model
+
+ARIMA Model. The number of seasonal differences is sometimes poorly chosen. If your data shows strong seasonality, try setting D=1 rather than relying on the automatic selection of D.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+(fit1 <- forecast::auto.arima(ATM1_train, stepwise=F, approximation=F, d=0, lambda=lambda1))
+(fit2 <- forecast::auto.arima(ATM2_train, stepwise=F, approximation=F, d=0, lambda=lambda2))
+(fit4 <- forecast::auto.arima(ATM4_train, stepwise=F, approximation=F, d=0, lambda=lambda4))
+```
+
+## Evaluate Model
+
+### ACF and PACF
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+par(mfrow=c(3, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
+acf(residuals(fit1), ylab="ACF ATM1"); pacf(residuals(fit1), ylab="PACF ATM1")
+acf(residuals(fit2), ylab="ACF ATM2"); pacf(residuals(fit2), ylab="PACF ATM2")
+acf(residuals(fit4), ylab="ACF ATM4"); pacf(residuals(fit4), ylab="PACF ATM4")
+```
+
+### Box-Ljung Test
+
+null hypothesis independce (white noise)
+arma: p,q,P,Q,period,d,D
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+Box.test(residuals(fit1), lag=7, fitdf=sum(fit1$arma[1:2]), type="Ljung-Box")
+Box.test(residuals(fit2), lag=7, fitdf=sum(fit1$arma[1:2]), type="Ljung-Box")
+Box.test(residuals(fit4), lag=7, fitdf=sum(fit1$arma[1:2]), type="Ljung-Box")
+```
+
+## Forecast
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+c(mean(ATM1), mean(ATM2), mean(ATM3[ATM3!=0]), mean(ATM4))
+```
+
+### In-Sample
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+fcast1 <- forecast::forecast(fit1, h=30)
+fcast2 <- forecast::forecast(fit2, h=30)
+fcast3 <- forecast::forecast(forecast::Arima(ATM3_train, model=fit1), h=30)
+fcast4 <- forecast::forecast(fit4, h=30)
+par(mfrow=c(4, 1), mar = c(0, 4, 0, 0), oma = c(4, 4, 2, 0.5))
+plot(fcast1, ylab="Cash ATM1", main="", xaxt="n"); 
+lines(lag(ATM1_test, -length(ATM1_train)), col="red")
+plot(fcast2, ylab="Cash ATM2", main="", xaxt="n"); 
+lines(lag(ATM2_test, -length(ATM2_train)), col="red")
+plot(fcast3, ylab="Cash ATM3", main="", xaxt="n")
+lines(lag(ATM3_test, -length(ATM3_train)), col="red")
+plot(fcast4, ylab="Cash ATM4", main="", xaxt="n")
+lines(lag(ATM4_test, -length(ATM4_train)), col="red")
+title("ATM Predictions", outer=TRUE)
+```
+
+### Model Accuracy
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+round(forecast::accuracy(fcast1, length(ATM1_test)), 3)
+round(forecast::accuracy(fcast2, length(ATM2_test)), 3)
+round(forecast::accuracy(fcast4, length(ATM4_test)), 3)
+```
+
+### Out-of-Sample
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+fcast1 <- forecast::forecast(forecast::Arima(ATM1, model=fit1), h=30)
+fcast2 <- forecast::forecast(forecast::Arima(ATM2, model=fit2), h=30)
+fcast3 <- forecast::forecast(forecast::Arima(ATM3, model=fit1), h=30)
+fcast4 <- forecast::forecast(forecast::Arima(ATM4, model=fit4), h=30)
+```
+
+## Export Results
+
+```{r warning=F, message=F, cache=T}
+xlsx::write.xlsx(fcast1, file="DATA624_Project1.xlsx", 
+  sheetName="ATM1", col.names = T, row.names = T, append = F)
+xlsx::write.xlsx(fcast2, file="DATA624_Project1.xlsx", 
+  sheetName="ATM2", col.names = T, row.names = T, append = T)
+xlsx::write.xlsx(fcast3, file="DATA624_Project1.xlsx", 
+  sheetName="ATM3", col.names = T, row.names = T, append = T)
+xlsx::write.xlsx(fcast4, file="DATA624_Project1.xlsx", 
+  sheetName="ATM4", col.names = T, row.names = T, append = T)
+```
+
+```{r echo=F}
+# Clear Memory
+rm(list=ls())
+```
+
+# Power Forecast
+
+Part B consists of a simple dataset of residential power usage for January 1998 until December 2013. Your assignment is to model these data and a monthly forecast for 2014. The data is given in a single file. The variable `KWH` is power consumption in Kilowatt hours, the rest is straight forward. Add this to your existing files above.
+
+## Import Data
+
+There are several packages for importing Excel files into R. The native method in `r R.Version()$version.string` uses the `readxl` package. The `readxl` library translates Excel cell/column `date` types into R `POSIXct` types. This enhanced date format is not compatible with the current version of many packages. The `read.xls()` function from the ` openxlsx` package does not currently support https. It therefore requires use of `gsub()`. The `xlsx` package is versatile and has a function to write files which is needed for exporting results.
+
+```{r warning=F, message=F, cache=T}
+github <- "https://raw.githubusercontent.com/jzuniga123"
+file <- "/SPS/master/DATA%20624/ResidentialCustomerForecastLoad-624.xlsx"
+download.file(paste0(github, file), "temp.xlsx", mode="wb")
+power <- xlsx::read.xlsx("temp.xlsx", sheetIndex=1, header=T)
+power$YYYY.MMM <- as.Date(paste0(power$YYYY.MMM,"-01"), format = "%Y-%b-%d")
+invisible(file.remove("temp.xlsx"))
+```
+
+The ambiguous "YYYY-MMM" format dates in this file are interpreted as factors. They must be converted to dates.
+
+## Explore Data
+
+### Number Summaries
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+summary(power)
+xts::periodicity(unique(power$YYYY.MMM)) # sampling Frequency
+power[!complete.cases(power), ] # look at NAs
+```
+
+### Visualizations
+
+Charges \$1 or Less, \$20 or Less, \$100 or Less, over \$100
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+kWh <- xts::xts(power$KWH, order.by=power$YYYY.MMM)
+par(mfrow=c(2, 1), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
+plot(kWh, main="kWh")
+hist(kWh, col="steelblue", xlab="", main="")
+```
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+par(mfrow=c(2, 1), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
+acf(na.omit(kWh), ylab="kWh", main="") 
+pacf(na.omit(kWh), ylab="kWh", main="")
+```
+
+## Clean Data
+
+Remove Outliers, NAs. 
+
+>The value of argument frequency is used when the series is sampled an integral number of times in each unit time interval. For example, one could use a value of 7 for frequency when the data are sampled daily, and the natural time period is a week, or 12 when the data are sampled monthly and the natural time period is a year. Values of 4 and 12 are assumed in (e.g.) print methods to imply a quarterly and monthly series respectively.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+kWh <- ts(forecast::tsclean(power$KWH, replace.missing=T), 
+          frequency = 12, start=start(power$YYYY.MMM))
+kWh[kWh==min(kWh)] <- mean(kWh) # outlier wasnt removed
+```
+
+### Examine Trend
+
+MA Smoothing --- looks absent/stochastic
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+plot(kWh, col=8, xaxt = "n", ylab="ATM1")
+lines(forecast::ma(kWh, order=6), col=2)
+lines(forecast::ma(kWh, order=12), col=4)
+```
+
+### Decomposition
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+plot(decompose(kWh))
+```
+
+### Dickey-Fuller Test
+
+null hypothesis is non-stationarity (deterministic trend). If stochastic, do not difference.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+tseries::adf.test(kWh)
+```
+
+## Model Data
+
+### Train-Test Split
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+index_train <- 1:(length(kWh) - 12)
+kWh_train <- ts(kWh[index_train], frequency=12)
+kWh_test <- ts(kWh[-index_train], frequency=12)
+```
+
+### Transformation
+
+no forecast::seasadj(ATM1w) since should be included in model
+no diff(ATM1w) after due to adf test
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+(lambda <- forecast::BoxCox.lambda(kWh_train))
+```
+
+### ARIMA Model
+
+ARIMA Model. The number of seasonal differences is sometimes poorly chosen. If your data shows strong seasonality, try setting D=1 rather than relying on the automatic selection of D.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+(fit <- forecast::auto.arima(kWh_train, stepwise=F, approximation=F, d=0, lambda=lambda))
+```
+
+## Evaluate Model
+
+### ACF and PACF
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+par(mfrow=c(2, 1), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
+acf(residuals(fit), ylab="ACF kWh"); pacf(residuals(fit), ylab="PACF kWh")
+```
+
+### Box-Ljung Test
+
+null hypothesis independce (white noise)
+arma: p,q,P,Q,period,d,D
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+Box.test(residuals(fit), lag=7, fitdf=sum(fit$arma[1:2]), type="Ljung-Box")
+```
+
+## Forecast
+
+### In-Sample
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+fcast <- forecast::forecast(fit, h=12)
+plot(fcast, ylab="kWh", main="kWh Predictions", xaxt="n")
+lines(lag(kWh_test, -length(kWh_train)), col="red")
+```
+
+### Model Accuracy
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+round(forecast::accuracy(fcast, length(kWh_test)), 3)
+```
+
+### Out-of-Sample
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+fcast <- forecast::forecast(forecast::Arima(kWh, model=fit), h=12)
+```
+
+## Export Results
+
+```{r warning=F, message=F, cache=T}
+xlsx::write.xlsx(fcast, file="DATA624_Project1.xlsx", 
+  sheetName="kWh", col.names = T, row.names = T, append = T)
+```
+
+```{r echo=F}
+# Clear Memory
+rm(list=ls())
+```
+
+# Waterflow Forecast
+
+Part C consists of two data sets.  These are simple 2 columns sets, however they have different time stamps.  Your optional assignment is to time-base sequence the data and aggregate based on hour (example of what this looks like, follows).  Note for multiple recordings within an hour, take the mean.  Then to determine if the data is stationary and can it be forecast.  If so, provide a week forward forecast and present results as above in a Word readable file and the forecast in an Excel readable file.
+
+## Import Data
+
+There are several packages for importing Excel files into R. The native method in `r R.Version()$version.string` uses the `readxl` package. The `readxl` library translates Excel cell/column `date` types into R `POSIXct` types. This enhanced date format is not compatible with the current version of many packages. The `read.xls()` function from the ` openxlsx` package does not currently support https. It therefore requires use of `gsub()`. The `xlsx` package is versatile and has a function to write files which is needed for exporting results.
+
+```{r warning=F, message=F, cache=T}
+github <- "https://raw.githubusercontent.com/jzuniga123"
+file <- "/SPS/master/DATA%20624/Waterflow_Pipe1.xlsx"
+download.file(paste0(github, file), "temp.xlsx", mode="wb")
+pipe1 <- xlsx::read.xlsx("temp.xlsx", sheetIndex=1, header=T)
+file <- "/SPS/master/DATA%20624/Waterflow_Pipe2.xlsx"
+download.file(paste0(github, file), "temp.xlsx", mode="wb")
+pipe2 <- xlsx::read.xlsx("temp.xlsx", sheetIndex=1, header=T)
+invisible(file.remove("temp.xlsx"))
+```
+
+## Explore Data
+
+### Number Summaries
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+summary(pipe1)
+summary(pipe2)
+xts::periodicity(unique(pipe1$Date.Time)) # sampling Frequency
+xts::periodicity(unique(pipe2$Date.Time)) # sampling Frequency
+```
+
+## Sequence
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+Pipe1 <- xts::xts(pipe1$WaterFlow, order.by=pipe2$Date.Time)
+Pipe1h <- xts::period.apply(Pipe1, xts::endpoints(Pipe1, "hours"), mean)
+xts::periodicity(Pipe1h)
+```
+
+## Aggregate
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+Pipe2 <- xts::xts(pipe2$WaterFlow, order.by=pipe2$Date.Time)
+Pipes <- merge(merge(Pipe1, Pipe2, join='inner'), Pipe1+Pipe2, join='inner')
+head(Pipes)
+```
+
+### Visualizations
+
+Charges \$1 or Less, \$20 or Less, \$100 or Less, over \$100
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+par(mfrow=c(3, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
+plot(Pipe1, main="Pipe 1")
+hist(Pipe1, col="steelblue", xlab="", main="")
+plot(Pipe1h, main="Pipe 1 Hourly")
+hist(Pipe1h, col="steelblue", xlab="", main="")
+plot(Pipe2, main="Pipe 2")
+hist(Pipe2, col="steelblue", xlab="", main="")
+```
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+par(mfrow=c(3, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
+acf(Pipe1, ylab="ACF Pipe 1", main="") 
+pacf(Pipe1, ylab="PACF Pipe 1", main="")
+acf(Pipe1h, ylab="ACF Pipe 1 Hourly", main="") 
+pacf(Pipe1h, ylab="PACF Pipe 1 Hourly", main="")
+acf(Pipe2, ylab="ACF Pipe 2", main="") 
+pacf(Pipe2, ylab="PACF Pipe 2", main="")
+```
+
+## Clean Data
+
+Remove Outliers, NAs. 
+
+>The value of argument frequency is used when the series is sampled an integral number of times in each unit time interval. For example, one could use a value of 7 for frequency when the data are sampled daily, and the natural time period is a week, or 12 when the data are sampled monthly and the natural time period is a year. Values of 4 and 12 are assumed in (e.g.) print methods to imply a quarterly and monthly series respectively.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+Pipe1 <- ts(Pipe1h, frequency = 12, start=start(Pipe1h))
+Pipe2 <- ts(pipe2$WaterFlow, frequency = 12, start=start(pipe2$Date.Time))
+```
+
+### Examine Trend
+
+MA Smoothing --- looks absent/stochastic
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+par(mfrow=c(2, 1), mar = c(0, 4, 0, 0), oma = c(0, 0, 0.5, 0.5))
+plot(Pipe1, col=8, xaxt = "n", ylab="Pipe 1 Hourly")
+lines(forecast::ma(Pipe1, order=7), col=2)
+lines(forecast::ma(Pipe1, order=30), col=4)
+plot(Pipe2, col=8, xaxt = "n", ylab="Pipe 2")
+lines(forecast::ma(Pipe2, order=7), col=2)
+lines(forecast::ma(Pipe2, order=30), col=4)
+```
+
+### Decomposition
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+plot(decompose(Pipe1))
+plot(decompose(Pipe2))
+```
+
+### Dickey-Fuller Test
+
+null hypothesis is non-stationarity (deterministic trend). If stochastic, do not difference.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+tseries::adf.test(Pipe1)
+tseries::adf.test(Pipe2)
+```
+
+## Model Data
+
+### Train-Test Split
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+index_train <- 1:(length(Pipe1) - 24*7)
+Pipe1_train <- ts(Pipe1[index_train], frequency=12)
+Pipe1_test <- ts(Pipe1[-index_train], frequency=12)
+index_train <- 1:(length(Pipe2) - 24*7)
+Pipe2_train <- ts(Pipe2[index_train], frequency=12)
+Pipe2_test <- ts(Pipe2[-index_train], frequency=12)
+```
+
+### Transformation
+
+no forecast::seasadj(ATM1w) since should be included in model
+no diff(ATM1w) after due to adf test
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+(lambda1 <- forecast::BoxCox.lambda(Pipe1_train))
+(lambda2 <- forecast::BoxCox.lambda(Pipe2_train))
+```
+
+### ARIMA Model
+
+ARIMA Model. The number of seasonal differences is sometimes poorly chosen. If your data shows strong seasonality, try setting D=1 rather than relying on the automatic selection of D.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+(fit1 <- forecast::auto.arima(Pipe1_train, stepwise=F, approximation=F, d=0, lambda=lambda1))
+(fit2 <- forecast::auto.arima(Pipe2_train, stepwise=F, approximation=F, d=0, lambda=lambda2))
+```
+
+## Evaluate Model
+
+### ACF and PACF
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+par(mfrow=c(2, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
+acf(residuals(fit1), ylab="ACF Pipe 1"); pacf(residuals(fit1), ylab="PACF Pipe 1")
+acf(residuals(fit2), ylab="ACF Pipe 2"); pacf(residuals(fit2), ylab="PACF Pipe 2")
+```
+
+### Box-Ljung Test
+
+null hypothesis independce (white noise)
+arma: p,q,P,Q,period,d,D
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+Box.test(residuals(fit1), lag=7, fitdf=sum(fit1$arma[1:2]), type="Ljung-Box")
+Box.test(residuals(fit2), lag=7, fitdf=sum(fit1$arma[1:2]), type="Ljung-Box")
+```
+
+## Forecast
+
+### In-Sample
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+fcast1 <- forecast::forecast(fit1, h=24*7)
+fcast2 <- forecast::forecast(fit2, h=24*7)
+par(mfrow=c(2, 1), mar = c(0, 4, 0, 0), oma = c(4, 4, 2, 0.5))
+plot(fcast1, ylab="Waterflow Pipe 1", main="", xaxt="n")
+lines(lag(Pipe1_test, -length(Pipe1_train)), col="red")
+plot(fcast2, ylab="Waterflow Pipe 2", main="", xaxt="n")
+lines(lag(Pipe2_test, -length(Pipe2_train)), col="red")
+title("Waterflow Predictions", outer=TRUE)
+```
+
+### Model Accuracy
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+round(forecast::accuracy(fcast1, length(Pipe1_test)), 3)
+round(forecast::accuracy(fcast2, length(Pipe2_test)), 3)
+```
+
+### Out-of-Sample
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+fcast1 <- forecast::forecast(forecast::Arima(Pipe1, model=fit1), h=30)
+fcast2 <- forecast::forecast(forecast::Arima(Pipe2, model=fit2), h=30)
+```
+
+## Export Results
+
+```{r warning=F, message=F, cache=T}
+xlsx::write.xlsx(fcast1, file="DATA624_Project1.xlsx", 
+  sheetName="Pipe1", col.names = T, row.names = T, append = T)
+xlsx::write.xlsx(fcast2, file="DATA624_Project1.xlsx", 
+  sheetName="Pipe2", col.names = T, row.names = T, append = T)
+xlsx::write.xlsx(Pipes, file="DATA624_Project1.xlsx", 
+  sheetName="PipeMerge", col.names = T, row.names = T, append = T)
+```
+
+```{r echo=F}
+# Clear Memory
+rm(list=ls())
+```
+
+# References
+
+https://www.otexts.org/fpp/
+
+http://rpubs.com/josezuniga/282349
+
+http://rpubs.com/josezuniga/358602
+
+http://rpubs.com/josezuniga/362102
+
+http://rpubs.com/josezuniga/363796
+
+http://rpubs.com/josezuniga/366918
+
+https://www.statmethods.net/input/dates.html
+
+https://www.statmethods.net/advstats/timeseries.html
+
+http://readxl.tidyverse.org/articles/cell-and-column-types.html
+
+https://www.rdocumentation.org/packages/stats/versions/3.4.3/topics/ts
+
+https://github.com/hannarud/r-best-practices/wiki/Installing-RJava-(Ubuntu)
+
+https://s3.amazonaws.com/assets.datacamp.com/blog_assets/xts_Cheat_Sheet_R.pdf
+
+https://www.today.com/money/forget-20-minimum-atms-dispense-1-5-bills-1B8050058
+
+https://www.valuepenguin.com/banking/atm-withdrawal-limits-daily-debit-purchase-limit
+
+https://www.datascience.com/blog/introduction-to-forecasting-with-arima-in-r-learn-data-science-tutorials
