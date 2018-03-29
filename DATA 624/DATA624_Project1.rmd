@@ -202,7 +202,7 @@ The Augmented Dickey-Fuller Test supports the results that no differencing shoul
 (lambda4 <- forecast::BoxCox.lambda(ATM4_train))
 ```
 
-The Box-Cox transformations suggested are around $\lambda=0.5$. This, more interpretable, rounding is suggestive of a ${ 1 }/{ \sqrt { y_t } }$ transformation. This Box-Cox transformation stabilizes the variance and makes the series look relatively homoskedastic with equal variance. 
+The Box-Cox transformation parameters suggested are around $\lambda=0.5$. This more interpretable (rounded) value is suggestive of a ${ 1 }/{ \sqrt { y_t } }$ transformation. This Box-Cox transformation stabilizes the variance and makes the series look relatively homoskedastic with equal variance. 
 
 ### ARIMA Model
 
@@ -356,6 +356,8 @@ xts::periodicity(unique(power$YYYY.MMM)) # sampling Frequency
 power[!complete.cases(power), ] # look at NAs
 ```
 
+This is a time series spanning January 1, 1998 to December 1, 2013. The time series contains kWh usage. There is only one missing value.
+
 ### Visualizations
 
 Visualizations consists of Time Plots, Histograms, ACF, and PACF plots. 
@@ -371,6 +373,8 @@ plot(kWh, main="kWh")
 hist(kWh, col="steelblue", xlab="", main="")
 ```
 
+The Time Plot and Histogram of ATM4 shows an outlier around the three-quarter mark of the series. 
+
 #### ACF and PACF
 
 The *ACF* plot shows the autocorrelations between each observation and its immediate predecessor (lagged observation). The *PACF* plot shows the autocorrelations between the current observation and each lagged observation individually. The ` xts::xts()`function converts data to a time series object which displays better in visualizations than time series objects created using other packages.
@@ -380,6 +384,8 @@ par(mfrow=c(2, 1), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
 acf(na.omit(kWh), ylab="kWh", main="") 
 pacf(na.omit(kWh), ylab="kWh", main="")
 ```
+
+The ACF and PACF plots show autocorrelation between each observation and its immediate predecessor and autocorrelation between the current observation and other individual lagged observations. 
 
 ## Clean Data
 
@@ -391,6 +397,10 @@ kWh <- ts(forecast::tsclean(power$KWH, replace.missing=T),
 kWh[kWh==min(kWh)] <- mean(kWh) # outlier wasnt removed
 ```
 
+The `tsclean()` function removed the missing value but did not remove the outlier. The outlier was manually replaced with the mean of the series. The `frequency` parameter was selected in accordance with the documentation accompanying the `ts()` function:
+
+> The value of argument frequency is used when the series is sampled an integral number of times in each unit time interval. For example, one could use a value of 7 for frequency when the data are sampled daily, and the natural time period is a week, or 12 when the data are sampled monthly and the natural time period is a year. Values of 4 and 12 are assumed in (e.g.) print methods to imply a quarterly and monthly series respectively.
+
 ### Examine Trend
 
 A moving average smoother is helpful in examining what kind of trend is involved in a series. Moving average models should not be confused with moving average smoothing. A moving average model is used for forecasting future values while moving average smoothing is used for estimating the trend-cycle of past values. The `ma()` function computes a simple moving average smoother of a given time series.
@@ -401,6 +411,8 @@ lines(forecast::ma(kWh, order=6), col=2)
 lines(forecast::ma(kWh, order=12), col=4)
 ```
 
+The 6-month and 12-month (year) moving average smoother line shows that the data only a slight apparent trend.
+
 ### Decomposition
 
 The Decomposition Plot decomposes and plots the observed values, the underlying trend, seasonality, and randomness of the time series data.
@@ -409,6 +421,8 @@ The Decomposition Plot decomposes and plots the observed values, the underlying 
 plot(decompose(kWh))
 ```
 
+Plotting the trend-cycle and seasonal indices computed by additive decomposition shows that the data have a slight apparent trend, seasonal fluctuations, and fairly random residuals.
+
 ### Dickey-Fuller Test
 
 An augmented Dickey-Fuller unit root test evaluates if the data exhibit a Stationarity process with deterministic trend or a Stationarity process with stochastic trend.
@@ -416,6 +430,8 @@ An augmented Dickey-Fuller unit root test evaluates if the data exhibit a Statio
 ```{r warning=F, message=F, fig.align='center', cache=T}
 tseries::adf.test(kWh)
 ```
+
+The augmented Dickey-Fuller unit root test $p$-values are far below $\alpha=0.05$. Therefore, the null hypothesis that the model has unit roots is rejected. The data exhibit stochastic trend which suggests using regression (AR) in lieu of differencing. Autoregressive (AR) modeling acts like partial differencing when $\phi<1$. When $\phi=1$ the AR(1) model is like a first-order difference.
 
 ## Model Data
 
@@ -429,6 +445,8 @@ kWh_train <- ts(kWh[index_train], frequency=12)
 kWh_test <- ts(kWh[-index_train], frequency=12)
 ```
 
+The indexed rows for the test set are a window at the end of the times series the size of the desired prediction. The training set window is comprised of the complement of indexes.
+
 ### Transformation
 
 The Augmented Dickey-Fuller Test supports the results that no differencing should be performed. The data will not be seasonal adjusted so that seasonal components evaluated by the model are reflected in predictions. Heteroskedasticity refers to the circumstance in which the variability of a variable is unequal across the range of values of a second variable. Box-Cox transformations can help to stabilize the variance of a time series. Some typical Box-Cox transformations are: $$-2\Rightarrow \frac { 1 }{ y_t^{ 2 } }, \quad -1\Rightarrow \frac { 1 }{ y_t }, \quad -0.5\Rightarrow \frac { 1 }{ \sqrt { y_t }  }, \quad 0\Rightarrow \log { \left( y_t \right)  }, \quad 0.5\Rightarrow \sqrt { y_t }, \quad 1\Rightarrow y_t, \quad 2\Rightarrow  y_t^{ 2 }$$
@@ -437,6 +455,8 @@ The Augmented Dickey-Fuller Test supports the results that no differencing shoul
 (lambda <- forecast::BoxCox.lambda(kWh_train))
 ```
 
+The Box-Cox transformation parameter suggested is about $\lambda=-0.2$. This Box-Cox transformation stabilizes the variance and makes the series look relatively homoskedastic with equal variance. 
+
 ### ARIMA Model
 
 The `auto.arima()` function chooses an ARIMA model automatically. It uses a variation of the Hyndman and Khandakar algorithm which combines unit root tests, minimization of the AICc, and MLE to obtain an ARIMA model. The function takes some short-cuts in order to speed up the computation and will not always yield the best model. Setting `stepwise` and `approximation` to `FALSE` prevents the function from taking short-cuts.
@@ -444,6 +464,8 @@ The `auto.arima()` function chooses an ARIMA model automatically. It uses a vari
 ```{r warning=F, message=F, fig.align='center', cache=T}
 (fit <- forecast::auto.arima(kWh_train, stepwise=F, approximation=F, d=0, lambda=lambda))
 ```
+
+The `auto.arima()` function suggests an $\textrm{ARIMA}(0,0,3)(2,1,0)_{12}$  model. 
 
 ## Evaluate Model
 
@@ -456,6 +478,8 @@ par(mfrow=c(2, 1), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
 acf(residuals(fit), ylab="ACF kWh"); pacf(residuals(fit), ylab="PACF kWh")
 ```
 
+The residuals of the models appear to display the characteristics of White Noise in the ACF and PACF plots.
+
 ### Box-Ljung Test
 
 The Box-Ljung test is helpful in assessing if data follow a White Noise pattern. The `arma` parameter of the fit returns a vector containing the ARIMA model parameters $p$, $q$, $P$, $Q$, period, $d$, and $D$ in that order.
@@ -463,6 +487,8 @@ The Box-Ljung test is helpful in assessing if data follow a White Noise pattern.
 ```{r warning=F, message=F, fig.align='center', cache=T}
 Box.test(residuals(fit), lag=7, fitdf=sum(fit$arma[1:2]), type="Ljung-Box")
 ```
+
+The null hypothesis of independence is not rejected. The Box-Ljung shows that the autocorrelations of the residuals from the model is not significantly different from zero. The residuals of the models display the characteristics of White Noise. The model passes the required checks and is therefore suitable for forecasting.
 
 ## Forecast
 
@@ -476,6 +502,8 @@ plot(fcast, ylab="kWh", main="kWh Predictions", xaxt="n")
 lines(lag(kWh_test, -length(kWh_train)), col="red")
 ```
 
+The prediction appears to produce a useful forecasts that reflect patterns in the original data. 
+
 ### Model Accuracy
 
 The accuracy() function is helful for obtaining summary measures of the forecast accuracy: Mean Error (ME), Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), Mean Percentage Error (MPE), Mean Absolute Percentage Error (MAPE), Mean Absolute Scaled Error (MASE), and Autocorrelation of errors at lag 1 (ACF1).
@@ -483,6 +511,8 @@ The accuracy() function is helful for obtaining summary measures of the forecast
 ```{r warning=F, message=F, fig.align='center', cache=T}
 round(forecast::accuracy(fcast, length(kWh_test)), 3)
 ```
+
+These accuracy for the predications is fair. The large RMSE and other metric are representative of the large values found in the data. 
 
 ### Out-of-Sample
 
