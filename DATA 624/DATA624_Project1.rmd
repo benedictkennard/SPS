@@ -64,7 +64,7 @@ The Time Series data are first explored through number summaries and visualizati
 
 ### Number Summaries
 
-The `summary()` function provides descriptive statistics on quantitative and qualitative variables. The `xts::preiodocity()` function describes the periods of the dates in the time series. The `complete.cases()` function returns observations in the datasets that have no missing values.
+The `summary()` function provides descriptive statistics on quantitative and qualitative variables. The `xts::periodocity()` function describes the periods of the dates in the time series. The `complete.cases()` function returns observations in the datasets that have no missing values.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 summary(atm)
@@ -348,7 +348,7 @@ The Time Series data are first explored through number summaries and visualizati
 
 ### Number Summaries
 
-The `summary()` function provides descriptive statistics on quantitative and qualitative variables. The `xts::preiodocity()` function describes the periods of the dates in the time series. The `complete.cases()` function returns observations in the datasets that have no missing values.
+The `summary()` function provides descriptive statistics on quantitative and qualitative variables. The `xts::periodocity()` function describes the periods of the dates in the time series. The `complete.cases()` function returns observations in the datasets that have no missing values.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 summary(power)
@@ -531,7 +531,7 @@ The Time Series data are first explored through number summaries and visualizati
 
 ### Number Summaries
 
-The `summary()` function provides descriptive statistics on quantitative and qualitative variables. The `xts::preiodocity()` function describes the periods of the dates in the time series. The `complete.cases()` function returns observations in the datasets that have no missing values.
+The `summary()` function provides descriptive statistics on quantitative and qualitative variables. The `xts::periodocity()` function describes the periods of the dates in the time series. The `complete.cases()` function returns observations in the datasets that have no missing values.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 summary(pipe1)
@@ -542,19 +542,27 @@ xts::periodicity(unique(pipe2$Date.Time)) # sampling Frequency
 
 ## Sequence
 
+The `xts:: period.apply()` function groups an `xts` time series object into a specified period and applies an aggregate function. It is similar to the `apply()` function except that it " applies a function to non-overlapping intervals along a vector." The `xts::periodocity()` function describes the periods of the dates in the time series.
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 Pipe1 <- xts::xts(pipe1$WaterFlow, order.by=pipe2$Date.Time)
 Pipe1h <- xts::period.apply(Pipe1, xts::endpoints(Pipe1, "hours"), mean)
 xts::periodicity(Pipe1h)
 ```
 
+The data for Pipe 1 which have a period of very ten minutes were converted to hourly with the `mean()` function applied to the aggregated hourly periods.
+
 ## Aggregate
+
+The `merge()` function can be used to join two time series objects.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 Pipe2 <- xts::xts(pipe2$WaterFlow, order.by=pipe2$Date.Time)
 Pipes <- merge(merge(Pipe1, Pipe2, join='inner'), Pipe1+Pipe2, join='inner')
 head(Pipes)
 ```
+
+The `merge()` function takes two arguments. Therefore, `Pipe1` and `Pipe2` are first merged using an inner join, then there sum of the Pipes was merged to resultant multi-series.
 
 ### Visualizations
 
