@@ -570,6 +570,8 @@ xts::periodicity(unique(pipe1$Date.Time)) # sampling Frequency
 xts::periodicity(unique(pipe2$Date.Time)) # sampling Frequency
 ```
 
+These are time series' spanning October 23, 2015 to November 1, 2015 for Pipe 1 and to December 3, 2015 for Pipe 2. The time series contains water flow measurements for two pipes. The datasets do not contain any missing values or apparent outliers.
+
 ## Sequence
 
 The `xts:: period.apply()` function groups an `xts` time series object into a specified period and applies an aggregate function. It is similar to the `apply()` function except that it " applies a function to non-overlapping intervals along a vector." The `xts::periodocity()` function describes the periods of the dates in the time series.
@@ -612,6 +614,8 @@ plot(Pipe2, main="Pipe 2")
 hist(Pipe2, col="steelblue", xlab="", main="")
 ```
 
+The Time Plots and Histograms for the Pipes and the hourly aggregate of Pipe 1 are remarkable insofar as the data following what appears to be a Gaussian distribution. 
+
 #### ACF and PACF
 
 The *ACF* plot shows the autocorrelations between each observation and its immediate predecessor (lagged observation). The *PACF* plot shows the autocorrelations between the current observation and each lagged observation individually. The ` xts::xts()`function converts data to a time series object which displays better in visualizations than time series objects created using other packages.
@@ -626,6 +630,8 @@ acf(Pipe2, ylab="ACF Pipe 2", main="")
 pacf(Pipe2, ylab="PACF Pipe 2", main="")
 ```
 
+The ACF and PACF plots for Pipes and the hourly aggregate of Pipe 1 show little if any autocorrelation between each observation and its immediate predecessor and little if any autocorrelation between the current observation and other individual lagged observations. 
+
 ## Clean Data
 
 Data are cleaned using ` forecast::tsclean()` and then converted to a time series object using the `ts()` function. The `tsclean()` function imputes nulls and removes outliers. The ` ts()`function converts data to a time series object which is compatible with the `forecast` package.
@@ -634,6 +640,10 @@ Data are cleaned using ` forecast::tsclean()` and then converted to a time serie
 Pipe1 <- ts(Pipe1h, frequency = 12, start=start(Pipe1h))
 Pipe2 <- ts(pipe2$WaterFlow, frequency = 12, start=start(pipe2$Date.Time))
 ```
+
+The hourly aggregate of Pipe 1 is being used in this analysis. The `frequency` parameter was selected in accordance with the documentation accompanying the `ts()` function:
+
+> The value of argument frequency is used when the series is sampled an integral number of times in each unit time interval. For example, one could use a value of 7 for frequency when the data are sampled daily, and the natural time period is a week, or 12 when the data are sampled monthly and the natural time period is a year. Values of 4 and 12 are assumed in (e.g.) print methods to imply a quarterly and monthly series respectively.
 
 ### Examine Trend
 
@@ -649,6 +659,8 @@ lines(forecast::ma(Pipe2, order=7), col=2)
 lines(forecast::ma(Pipe2, order=30), col=4)
 ```
 
+The 3.5-day (1/2 week) and 15-day (1/2 month) moving average smoother line shows that the data for the ATMs have no apparent trend.
+
 ### Decomposition
 
 The Decomposition Plot decomposes and plots the observed values, the underlying trend, seasonality, and randomness of the time series data.
@@ -658,6 +670,8 @@ plot(decompose(Pipe1))
 plot(decompose(Pipe2))
 ```
 
+Plotting the trend-cycle and seasonal indices computed by additive decomposition shows that the data have no apparent trend, some seasonal fluctuations, and fairly random residuals.
+
 ### Dickey-Fuller Test
 
 An augmented Dickey-Fuller unit root test evaluates if the data exhibit a Stationarity process with deterministic trend or a Stationarity process with stochastic trend.
@@ -666,6 +680,8 @@ An augmented Dickey-Fuller unit root test evaluates if the data exhibit a Statio
 tseries::adf.test(Pipe1)
 tseries::adf.test(Pipe2)
 ```
+
+The augmented Dickey-Fuller unit root test $p$-values are far below $\alpha=0.05$. Therefore, the null hypothesis that the model has unit roots is rejected. The data exhibit stochastic trend which suggests using regression (AR) in lieu of differencing. Autoregressive (AR) modeling acts like partial differencing when $\phi<1$. When $\phi=1$ the AR(1) model is like a first-order difference.
 
 ## Model Data
 
@@ -682,6 +698,8 @@ Pipe2_train <- ts(Pipe2[index_train], frequency=12)
 Pipe2_test <- ts(Pipe2[-index_train], frequency=12)
 ```
 
+The indexed rows for the test set are a window at the end of the times series the size of the desired prediction. The training set window is comprised of the complement of indexes.
+
 ### Transformation
 
 The Augmented Dickey-Fuller Test supports the results that no differencing should be performed. The data will not be seasonal adjusted so that seasonal components evaluated by the model are reflected in predictions. Heteroskedasticity refers to the circumstance in which the variability of a variable is unequal across the range of values of a second variable. Box-Cox transformations can help to stabilize the variance of a time series. Some typical Box-Cox transformations are: $$-2\Rightarrow \frac { 1 }{ y_t^{ 2 } }, \quad -1\Rightarrow \frac { 1 }{ y_t }, \quad -0.5\Rightarrow \frac { 1 }{ \sqrt { y_t }  }, \quad 0\Rightarrow \log { \left( y_t \right)  }, \quad 0.5\Rightarrow \sqrt { y_t }, \quad 1\Rightarrow y_t, \quad 2\Rightarrow  y_t^{ 2 }$$
@@ -691,6 +709,8 @@ The Augmented Dickey-Fuller Test supports the results that no differencing shoul
 (lambda2 <- forecast::BoxCox.lambda(Pipe2_train))
 ```
 
+The Box-Cox transformations suggested are around $\lambda=1$. This more interpretable (rounded) value is suggestive of no transformation. It will still be applied however since Box-Cox transformations stabilizes the variance and make the series look relatively homoskedastic with equal variance. 
+
 ### ARIMA Model
 
 The `auto.arima()` function chooses an ARIMA model automatically. It uses a variation of the Hyndman and Khandakar algorithm which combines unit root tests, minimization of the AICc, and MLE to obtain an ARIMA model. The function takes some short-cuts in order to speed up the computation and will not always yield the best model. Setting `stepwise` and `approximation` to `FALSE` prevents the function from taking short-cuts.
@@ -699,6 +719,8 @@ The `auto.arima()` function chooses an ARIMA model automatically. It uses a vari
 (fit1 <- forecast::auto.arima(Pipe1_train, stepwise=F, approximation=F, d=0, lambda=lambda1))
 (fit2 <- forecast::auto.arima(Pipe2_train, stepwise=F, approximation=F, d=0, lambda=lambda2))
 ```
+
+The `auto.arima()` function suggests an $\textrm{ARIMA}(0,0,0)(2,0,2)_{12}$  model for Pipe 1, and an $\textrm{ARIMA}(0,0,0)(2,0,0)_{12}$ model for Pipe 2. 
 
 ## Evaluate Model
 
@@ -712,6 +734,8 @@ acf(residuals(fit1), ylab="ACF Pipe 1"); pacf(residuals(fit1), ylab="PACF Pipe 1
 acf(residuals(fit2), ylab="ACF Pipe 2"); pacf(residuals(fit2), ylab="PACF Pipe 2")
 ```
 
+The residuals of the models appear to display the characteristics of White Noise in the ACF and PACF plots with under one of the twenty residuals (or 0.05%) being significant. At a 95% confidence interval this is within probabilistic expectations.
+
 ### Box-Ljung Test
 
 The Box-Ljung test is helpful in assessing if data follow a White Noise pattern. The `arma` parameter of the fit returns a vector containing the ARIMA model parameters $p$, $q$, $P$, $Q$, period, $d$, and $D$ in that order.
@@ -720,6 +744,8 @@ The Box-Ljung test is helpful in assessing if data follow a White Noise pattern.
 Box.test(residuals(fit1), lag=7, fitdf=sum(fit1$arma[1:2]), type="Ljung-Box")
 Box.test(residuals(fit2), lag=7, fitdf=sum(fit1$arma[1:2]), type="Ljung-Box")
 ```
+
+The null hypothesis of independence is not rejected. The Box-Ljung shows that the autocorrelations of the residuals from the models are not significantly different from zero. The residuals of the models display the characteristics of White Noise. The models pass the required checks and are therefore suitable for forecasting.
 
 ## Forecast
 
@@ -737,6 +763,8 @@ plot(fcast2, ylab="Waterflow Pipe 2", main="", xaxt="n")
 lines(lag(Pipe2_test, -length(Pipe2_train)), col="red")
 title("Waterflow Predictions", outer=TRUE)
 ```
+
+The predictions appear to produce a useful forecasts that do not reflect patterns in the original data. The predictions intervals capture the actual data but the point estimates revert to the mean. This is likely due to the original data being Gaussian White Noise.
 
 ### Model Accuracy
 
@@ -756,7 +784,9 @@ fcast1 <- forecast::forecast(forecast::Arima(Pipe1, model=fit1), h=30)
 fcast2 <- forecast::forecast(forecast::Arima(Pipe2, model=fit2), h=30)
 ```
 
-## Export Results
+The closer data are to being White Noise, the less accurate the predictions. White Noise is not predicable. The accuracy for these predications is without meaning. 
+
+# Export Results
 
 Results are exported to an Excel file using the ` xlsx::write.xlsx()` function which includes an option for appending a worksheet to an existing file.
 
