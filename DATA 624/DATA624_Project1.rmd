@@ -31,7 +31,7 @@ if (!require("tseries")) install.packages("tseries")
 if (!require("forecast")) install.packages("forecast")
 ```
 
-To use the `xlsx` package on a Linux system the system must have `RJava` and `Rgdal` installed.
+To use the `xlsx` package on Linux, `RJava` and `Rgdal` must be installed.
 
 ```{bash eval=F}
 sudo apt-get update
