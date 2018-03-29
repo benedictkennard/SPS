@@ -60,7 +60,11 @@ invisible(file.remove("temp.xlsx"))
 
 ## Explore Data
 
+The Time Series data are first explored through number summaries and visualizations.
+
 ### Number Summaries
+
+The `summary()` function provides descriptive statistics on quantitative and qualitative variables. The `xts::preiodocity()` function describes the periods of the dates in the time series. The `complete.cases()` function returns observations in the datasets that have no missing values.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 summary(atm)
@@ -69,9 +73,15 @@ atm[!complete.cases(atm), ] # look at NAs
 summary(factor(atm$ATM)[!is.na(atm$Cash) & atm$Cash %% 1 != 0]) # not integers?
 ```
 
+This is a time series spanning May 1, 2009 to April 30, 2010. The time series contains cash transaction amounts for four ATMs. The cash transactions have missing values and skewed distribution since the mean is higher than the third quartile. There are also non-integer transactions at ATM 4 implying that these data may represent debit card purchase.
+
 ### Visualizations
 
-Charges \$1 or Less, \$20 or Less, \$100 or Less, over \$100
+Visualizations consists of Time Plots, Histograms, ACF, and PACF plots. 
+
+#### Time Plot and Histogram
+
+The *Time Plot* is a line graph that plots each observed value against the time of the observation, with a single line connecting each observation across the entire period. The *Histogram* displays the frequency at which values occur. 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 par(mfrow=c(4, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
@@ -84,6 +94,12 @@ for(i in 1:length(levels(atm$ATM))) {
 }
 ```
 
+The Time Plots and Histograms for ATM1 and ATM2 are unremarkable. The Time Plot and Histogram of ATM3 shows the data consists mostly of zero values with a handful of transactions occurring at the end of the series. ATM3 will not be modelled due to these degenerative properties. The Time Plot and Histogram of ATM4 shows an extreme outlier around the three-quarter mark of the series. The horizontal lines in the Time Plots represent $1 (red), $20 (green), and $100 (blue).
+
+#### ACF and PACF
+
+The *ACF* plot shows the autocorrelations between each observation and its immediate predecessor (lagged observation). The *PACF* plot shows the autocorrelations between the current observation and each lagged observation individually. The ` xts::xts()`function converts data to a time series object which displays better in visualizations than time series objects created using other packages.
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 par(mfrow=c(4, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
 for(i in 1:length(levels(atm$ATM))) {
@@ -94,11 +110,11 @@ for(i in 1:length(levels(atm$ATM))) {
 }
 ```
 
+The ACF and PACF plots for ATM1, ATM2, and ATM3 show autocorrelation between each observation and its immediate predecessor and autocorrelation between the current observation and other individual lagged observations. The ACF and PACF plots for ATM3 however, are not reliable due to the dearth of observations. 
+
 ## Clean Data
 
-Remove Outliers, NAs. 
-
->The value of argument frequency is used when the series is sampled an integral number of times in each unit time interval. For example, one could use a value of 7 for frequency when the data are sampled daily, and the natural time period is a week, or 12 when the data are sampled monthly and the natural time period is a year. Values of 4 and 12 are assumed in (e.g.) print methods to imply a quarterly and monthly series respectively.
+Data are cleaned using ` forecast::tsclean()` and then converted to a time series object using the `ts()` function. The `tsclean()` function imputes nulls and removes outliers. The ` ts()`function converts data to a time series object which is compatible with the `forecast` package.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 for(i in 1:length(levels(atm$ATM))) {
@@ -109,9 +125,13 @@ for(i in 1:length(levels(atm$ATM))) {
 }
 ```
 
+The `frequency` parameter was selected in accordance with the documentation accompanying the `ts()` function:
+
+> The value of argument frequency is used when the series is sampled an integral number of times in each unit time interval. For example, one could use a value of 7 for frequency when the data are sampled daily, and the natural time period is a week, or 12 when the data are sampled monthly and the natural time period is a year. Values of 4 and 12 are assumed in (e.g.) print methods to imply a quarterly and monthly series respectively.
+
 ### Examine Trend
 
-MA Smoothing --- looks absent/stochastic
+A moving average smoother is helpful in examining what kind of trend is involved in a series. Moving average models should not be confused with moving average smoothing. A moving average model is used for forecasting future values while moving average smoothing is used for estimating the trend-cycle of past values. The `ma()` function computes a simple moving average smoother of a given time series.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 par(mfrow=c(3, 1), mar = c(0, 4, 0, 0), oma = c(0, 0, 0.5, 0.5))
@@ -126,7 +146,11 @@ lines(forecast::ma(ATM4, order=7), col=2)
 lines(forecast::ma(ATM4, order=30), col=4)
 ```
 
+The 7-day (week) and 30-day (month) moving average smoother line shows that the data for the ATMs have no apparent trend.
+
 ### Decomposition
+
+The Decomposition Plot decomposes and plots the observed values, the underlying trend, seasonality, and randomness of the time series data.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 plot(decompose(ATM1))
@@ -134,9 +158,11 @@ plot(decompose(ATM2))
 plot(decompose(ATM4))
 ```
 
+Plotting the trend-cycle and seasonal indices computed by additive decomposition shows that the data have no apparent trend, seasonal fluctuations, and fairly random residuals.
+
 ### Dickey-Fuller Test
 
-null hypothesis is non-stationarity (deterministic trend). If stochastic, do not difference.
+An augmented Dickey-Fuller unit root test evaluates if the data exhibit a Stationarity process with deterministic trend or a Stationarity process with stochastic trend.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 tseries::adf.test(ATM1)
@@ -144,9 +170,13 @@ tseries::adf.test(ATM2)
 tseries::adf.test(ATM4)
 ```
 
+The augmented Dickey-Fuller unit root test $p$-values are far below $\alpha=0.05$. Therefore, the null hypothesis that the model has unit roots is rejected. The data exhibit stochastic trend which suggests using regression (AR) in lieu of differencing. Autoregressive (AR) modeling acts like partial differencing when $\phi<1$. When $\phi=1$ the AR(1) model is like a first-order difference.
+
 ## Model Data
 
 ### Train-Test Split
+
+The train and test sets are created by referencing rows by index.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 index_train <- 1:(length(ATM1) - 30)
@@ -160,10 +190,11 @@ ATM4_train <- ts(ATM4[index_train], frequency=7)
 ATM4_test <- ts(ATM4[-index_train], frequency=7)
 ```
 
+The indexed rows for the test set are a window at the end of the times series the size of the desired prediction. The training set window is comprised of the complement of indexes.
+
 ### Transformation
 
-no forecast::seasadj(ATM1w) since should be included in model
-no diff(ATM1w) after due to adf test
+The Augmented Dickey-Fuller Test supports the results that no differencing should be performed. The data will not be seasonal adjusted so that seasonal components evaluated by the model are reflected in predictions. Heteroskedasticity refers to the circumstance in which the variability of a variable is unequal across the range of values of a second variable. Box-Cox transformations can help to stabilize the variance of a time series. Some typical Box-Cox transformations are: $$-2\Rightarrow \frac { 1 }{ y_t^{ 2 } }, \quad -1\Rightarrow \frac { 1 }{ y_t }, \quad -0.5\Rightarrow \frac { 1 }{ \sqrt { y_t }  }, \quad 0\Rightarrow \log { \left( y_t \right)  }, \quad 0.5\Rightarrow \sqrt { y_t }, \quad 1\Rightarrow y_t, \quad 2\Rightarrow  y_t^{ 2 }$$
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 (lambda1 <- forecast::BoxCox.lambda(ATM1_train))
@@ -171,9 +202,11 @@ no diff(ATM1w) after due to adf test
 (lambda4 <- forecast::BoxCox.lambda(ATM4_train))
 ```
 
+The Box-Cox transformations suggested are around $\lambda=0.5$. This, more interpretable, rounding is suggestive of a ${ 1 }/{ \sqrt { y_t } }$ transformation. This Box-Cox transformation stabilizes the variance and makes the series look relatively homoskedastic with equal variance. 
+
 ### ARIMA Model
 
-ARIMA Model. The number of seasonal differences is sometimes poorly chosen. If your data shows strong seasonality, try setting D=1 rather than relying on the automatic selection of D.
+The `auto.arima()` function chooses an ARIMA model automatically. It uses a variation of the Hyndman and Khandakar algorithm which combines unit root tests, minimization of the AICc, and MLE to obtain an ARIMA model. The function takes some short-cuts in order to speed up the computation and will not always yield the best model. Setting `stepwise` and `approximation` to `FALSE` prevents the function from taking short-cuts. 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 (fit1 <- forecast::auto.arima(ATM1_train, stepwise=F, approximation=F, d=0, lambda=lambda1))
@@ -181,9 +214,13 @@ ARIMA Model. The number of seasonal differences is sometimes poorly chosen. If y
 (fit4 <- forecast::auto.arima(ATM4_train, stepwise=F, approximation=F, d=0, lambda=lambda4))
 ```
 
+The `auto.arima()` function suggests an $\textrm{ARIMA}(0,0,1)(2,0,0)_{7}$  model for ATM1, an $\textrm{ARIMA}(0,0,0)(2,0,0)_{7}$ model for ATM2, and an $\textrm{ARIMA}(1,0,0)(2,0,0)_{7}$ model for ATM4. 
+
 ## Evaluate Model
 
 ### ACF and PACF
+
+The *ACF* plot shows the autocorrelations between each observation and its immediate predecessor (lagged observation). The *PACF* plot shows the autocorrelations between the current observation and each lagged observation individually.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 par(mfrow=c(3, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
@@ -192,10 +229,11 @@ acf(residuals(fit2), ylab="ACF ATM2"); pacf(residuals(fit2), ylab="PACF ATM2")
 acf(residuals(fit4), ylab="ACF ATM4"); pacf(residuals(fit4), ylab="PACF ATM4")
 ```
 
+The residuals of the models appear to display the characteristics of White Noise in the ACF and PACF plots with only one of the twenty residuals (or 0.05%) being significant. At a 95% confidence interval this is within probabilistic expectations.
+
 ### Box-Ljung Test
 
-null hypothesis independce (white noise)
-arma: p,q,P,Q,period,d,D
+The Box-Ljung test is helpful in assessing if data follow a White Noise pattern. The `arma` parameter of the fit returns a vector containing the ARIMA model parameters $p$, $q$, $P$, $Q$, period, $d$, and $D$ in that order.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 Box.test(residuals(fit1), lag=7, fitdf=sum(fit1$arma[1:2]), type="Ljung-Box")
@@ -203,18 +241,30 @@ Box.test(residuals(fit2), lag=7, fitdf=sum(fit1$arma[1:2]), type="Ljung-Box")
 Box.test(residuals(fit4), lag=7, fitdf=sum(fit1$arma[1:2]), type="Ljung-Box")
 ```
 
+The null hypothesis of independence is not rejected. The Box-Ljung shows that the autocorrelations of the residuals from the models are not significantly different from zero. The residuals of the models display the characteristics of White Noise. The models pass the required checks and are therefore suitable for forecasting.
+
 ## Forecast
+
+ATM3 was not modelled due to its degenerative properties. To forecast values for ATM3, the model for an ATM with a similar mean will be used.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 c(mean(ATM1), mean(ATM2), mean(ATM3[ATM3!=0]), mean(ATM4))
 ```
 
+The mean of ATM1 is very close to the mean of the few values in ATM3. Therefore, the $\textrm{ARIMA}(0,0,1)(2,0,0)_{7}$  model for ATM1 will be used to make predictions for ATM3.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+fit3 <- forecast::Arima(ATM3_train, model=fit1)
+```
+
 ### In-Sample
+
+Forecasts are done using the `forecast::forecast()` function. Since the data were not seasonally adjusted, they need not be "reseasonalized" prior to forecast. Prediction point estimates are represented by a blue line, prediction intervals are represented by blue bands, and actual values are represented by a red line.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 fcast1 <- forecast::forecast(fit1, h=30)
 fcast2 <- forecast::forecast(fit2, h=30)
-fcast3 <- forecast::forecast(forecast::Arima(ATM3_train, model=fit1), h=30)
+fcast3 <- forecast::forecast(fit3, h=30)
 fcast4 <- forecast::forecast(fit4, h=30)
 par(mfrow=c(4, 1), mar = c(0, 4, 0, 0), oma = c(4, 4, 2, 0.5))
 plot(fcast1, ylab="Cash ATM1", main="", xaxt="n"); 
@@ -228,7 +278,11 @@ lines(lag(ATM4_test, -length(ATM4_train)), col="red")
 title("ATM Predictions", outer=TRUE)
 ```
 
+The predictions appear to produce a useful forecasts that reflect patterns in the original data. 
+
 ### Model Accuracy
+
+The accuracy() function is helful for obtaining summary measures of the forecast accuracy: Mean Error (ME), Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), Mean Percentage Error (MPE), Mean Absolute Percentage Error (MAPE), Mean Absolute Scaled Error (MASE), and Autocorrelation of errors at lag 1 (ACF1).
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 round(forecast::accuracy(fcast1, length(ATM1_test)), 3)
@@ -236,7 +290,11 @@ round(forecast::accuracy(fcast2, length(ATM2_test)), 3)
 round(forecast::accuracy(fcast4, length(ATM4_test)), 3)
 ```
 
+These accuracy for the predications vary. ATM1 and ATM2 predictions are more accurate than AT4 predictions. The closer the original data were to being White Noise, the less accurate the predictions. 
+
 ### Out-of-Sample
+
+Forecasts are done using the `forecast::forecast()` function. Since the data were not seasonally adjusted, they need not be "reseasonalized" prior to forecast.  These out-of-sample predictions and for exporting.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 fcast1 <- forecast::forecast(forecast::Arima(ATM1, model=fit1), h=30)
@@ -246,6 +304,8 @@ fcast4 <- forecast::forecast(forecast::Arima(ATM4, model=fit4), h=30)
 ```
 
 ## Export Results
+
+Results are exported to an Excel file using the ` xlsx::write.xlsx()` function which includes an option for appending a worksheet to an existing file.
 
 ```{r warning=F, message=F, cache=T}
 xlsx::write.xlsx(fcast1, file="DATA624_Project1.xlsx", 
@@ -284,7 +344,11 @@ The ambiguous "YYYY-MMM" format dates in this file are interpreted as factors. T
 
 ## Explore Data
 
+The Time Series data are first explored through number summaries and visualizations.
+
 ### Number Summaries
+
+The `summary()` function provides descriptive statistics on quantitative and qualitative variables. The `xts::preiodocity()` function describes the periods of the dates in the time series. The `complete.cases()` function returns observations in the datasets that have no missing values.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 summary(power)
@@ -294,7 +358,7 @@ power[!complete.cases(power), ] # look at NAs
 
 ### Visualizations
 
-Charges \$1 or Less, \$20 or Less, \$100 or Less, over \$100
+Visualizations consists of Time Plots, Histograms, ACF, and PACF plots. The *Time Plot* is a line graph that plots each observed value against the time of the observation, with a single line connecting each observation across the entire period. The *Histogram* displays the frequency at which values occur. 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 kWh <- xts::xts(power$KWH, order.by=power$YYYY.MMM)
@@ -302,6 +366,8 @@ par(mfrow=c(2, 1), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
 plot(kWh, main="kWh")
 hist(kWh, col="steelblue", xlab="", main="")
 ```
+
+The *ACF* plot shows the autocorrelations between each observation and its immediate predecessor (lagged observation). The *PACF* plot shows the autocorrelations between the current observation and each lagged observation individually. The ` xts::xts()`function converts data to a time series object which displays better in visualizations than time series objects created using other packages.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 par(mfrow=c(2, 1), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
@@ -445,7 +511,11 @@ invisible(file.remove("temp.xlsx"))
 
 ## Explore Data
 
+The Time Series data are first explored through number summaries and visualizations.
+
 ### Number Summaries
+
+The `summary()` function provides descriptive statistics on quantitative and qualitative variables. The `xts::preiodocity()` function describes the periods of the dates in the time series. The `complete.cases()` function returns observations in the datasets that have no missing values.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 summary(pipe1)
@@ -472,7 +542,7 @@ head(Pipes)
 
 ### Visualizations
 
-Charges \$1 or Less, \$20 or Less, \$100 or Less, over \$100
+Visualizations consists of Time Plots, Histograms, ACF, and PACF plots. The *Time Plot* is a line graph that plots each observed value against the time of the observation, with a single line connecting each observation across the entire period. The *Histogram* displays the frequency at which values occur. 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 par(mfrow=c(3, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
@@ -483,6 +553,8 @@ hist(Pipe1h, col="steelblue", xlab="", main="")
 plot(Pipe2, main="Pipe 2")
 hist(Pipe2, col="steelblue", xlab="", main="")
 ```
+
+The *ACF* plot shows the autocorrelations between each observation and its immediate predecessor (lagged observation). The *PACF* plot shows the autocorrelations between the current observation and each lagged observation individually. The ` xts::xts()`function converts data to a time series object which displays better in visualizations than time series objects created using other packages.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 par(mfrow=c(3, 2), mar = c(3, 5, 0, 0), oma = c(0, 0, 0.5, 0.5))
