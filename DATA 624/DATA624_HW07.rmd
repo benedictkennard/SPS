@@ -48,13 +48,13 @@ The KNN approach predicts a new sample using the $K$-closest samples from the tr
 
 ## Exercise 7.2
 
-Friedman (1991) introduced several benchmark data sets create by simulation. One of these simulations used the following nonlinear equation to create data: $y=10\sin { \left( \pi x_{ 1 }x_{ 2 } \right)  } +20\left( x_{ 3 }-0.5 \right) ^{ 2 }+10x_{ 4 }+5x_{ 5 }+N(0,\sigma ^{ 2 })$ where the x values are random variables uniformly distributed between $[0,1]$ (there are also 5 other non-informative variables also created in the simulation). The package mlbench contains a function called mlbench.friedman1 that simulates these data:
+Friedman (1991) introduced several benchmark data sets create by simulation. One of these simulations used the following nonlinear equation to create data: $y=10\sin { \left( \pi x_{ 1 }x_{ 2 } \right)  } +20\left( x_{ 3 }-0.5 \right) ^{ 2 }+10x_{ 4 }+5x_{ 5 }+N(0,\sigma ^{ 2 })$ where the $x$ values are random variables uniformly distributed between $[0,1]$ (there are also 5 other non-informative variables also created in the simulation). The package `mlbench` contains a function called `mlbench.friedman1` that simulates these data:
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 trainingData <- mlbench.friedman1(200, sd = 1)
 ```
 
-We convert the `x` data from a matrix to a data frame. One reason is that this will give the columns names.
+We convert the $x$ data from a matrix to a data frame. One reason is that this will give the columns names.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 trainingData$x <- data.frame(trainingData$x)
@@ -66,7 +66,7 @@ Look at the data using [the below] or other methods.
 featurePlot(trainingData$x, trainingData$y, auto.key=list(rows=2))
 ```
 
-This creates a list with a vector `y` and a matrix of predictors `x`. Also simulate a large test set to estimate the true error rate with good precision:
+This creates a list with a vector $y$ and a matrix of predictors $x$. Also simulate a large test set to estimate the true error rate with good precision:
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 testData <- mlbench.friedman1(5000, sd = 1)
@@ -80,7 +80,7 @@ Tune several models on these data. For example:
   method = "knn", preProc = c("center", "scale"), tuneLength = 10))
 ```
 
-The function 'postResample' can be used to get the test set perforamnce values
+The function `postResample` can be used to get the test set perforamnce values
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 knnPred <- predict(knnModel, newdata = testData$x)
@@ -112,7 +112,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 ## Exercise 7.5
 
-Exercise [6.3.f](http://rpubs.com/josezuniga/366918) describes data for a chemical manufacturing process. Use the same data imputation, data splitting, and pre-processing steps as before and train several nonlinear regression models.
+Exercise [6.3](http://rpubs.com/josezuniga/366918) describes data for a chemical manufacturing process. Use the same data imputation, data splitting, and pre-processing steps as before and train several nonlinear regression models.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 CMP <- get(data(ChemicalManufacturingProcess))
@@ -133,7 +133,7 @@ ctrl <- trainControl(method = "boot", number = 25)
 
 #### Artificial Neural Networks (ANN)
 
-The `avNNet` function uses model averaging instead of `nnet` which creates a single model. For regression, the linear relationship between the hidden neurons and the prediction can be used with the option `linout = TRUE`. To reduce the amount of printed output use `trace = FALSE`. The parameter `maxit = 500` expands the number of iterations to find neuron estimates. `MaxNWts` specifies the number of neurons used by the model. The `.bag = FALSE` option makes the model use different random seeds instead of bagging.
+The [`avNNet` function](https://www.rdocumentation.org/packages/caret/versions/6.0-78/topics/avNNet) uses model averaging unlike the [`Nnet` function](https://www.rdocumentation.org/packages/RcmdrPlugin.BCA/versions/0.9-8/topics/Nnet) which creates a single model. The `.bag = FALSE` option makes the model use different random seeds instead of bagging. For regression, the linear relationship between the hidden neurons and the prediction can be used with the option `linout = TRUE`. To reduce the amount of printed output use `trace = FALSE`. The number of neurons used by the model is specified in the `MaxNWts` parameter. The parameter `maxit = 500` expands the number of iterations to find neuron estimates.  
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
@@ -145,7 +145,7 @@ tune1 <- train(x = CMP_train_X, y = CMP_train$Yield,
 
 #### Multivariate Adaptive Regression Splines (MARS)
 
-MARS models are in several packages, but the most extensive implementation is in the `earth` package. 
+MARS models are [available] in several packages, but the most extensive implementation is in the [`earth` package](https://www.rdocumentation.org/packages/earth/versions/4.6.0/topics/earth). 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
@@ -156,7 +156,7 @@ tune2 <- train(x = CMP_train_X, y = CMP_train$Yield,
 
 #### Support Vector Machines (SVM)
 
-The `kernlab` package has comprehensive implementation of SVM models for regression. Its `ksvm` function is available for regression models and many kernel functions. The radial basis function is the default kernel function. Other kernel functions can be used, including the polynomial ("polydot") and linear ("vanilladot").  If the appropriate values of the cost and kernel parameters are unknown, they can be estimated through resampling. In `train`, the `method` values of `svmRadial`, `svmLinear`, or `svmPoly` fit different kernels
+The `kernlab` package has comprehensive implementation of SVM models for regression. Its [`ksvm` function](https://www.rdocumentation.org/packages/kernlab/versions/0.9-25/topics/ksvm) is available for regression models and uses the Guassian radial basis (`rbfdot`) function as the default kernel function. Other kernel functions can be used, including the polynomial (`polydot`) and linear (`vanilladot`). If the appropriate values of the cost and kernel parameters are unknown, they can be estimated through resampling. In `train`, the `method` values of `svmRadial`, `svmLinear`, or `svmPoly` fit different kernels
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(614)
@@ -167,7 +167,7 @@ tune3 <- train(x = CMP_train_X, y = CMP_train$Yield,
 
 #### $K$-Nearest Neighbors (KNN)
 
-The `knnreg` function in the caret package fits the KNN regression model; train tunes the model over $K$.
+The [`knnreg` function](https://www.rdocumentation.org/packages/caret/versions/6.0-78/topics/knnreg) in the caret package fits the KNN regression model; train tunes the model over $K$.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
