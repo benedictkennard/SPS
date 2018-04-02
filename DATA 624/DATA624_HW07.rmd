@@ -28,7 +28,7 @@ library(AppliedPredictiveModeling)
 
 ## Artificial Neural Networks (ANN)
 
-Neural networks are powerful nonlinear regression techniques inspired by theories about how the brain works. Like [Partial Least squares]((http://rpubs.com/josezuniga/366918)) (PLS), the outcome is modeled by an intermediary set of unobserved variables (called hidden variables or hidden units here). These hidden units are linear combinations of the original predictors. Unlike PLS models however, there are no constraints that help define these linear combinations and the linear combinations are not estimated in a hierarchical fashion. See the exercise on [this page](http://rpubs.com/josezuniga/340596) for further details on this method.
+Neural networks are powerful nonlinear regression techniques inspired by theories about how the brain works. Like [Partial Least squares]((http://rpubs.com/josezuniga/366918)) (PLS), the outcome is modeled by an intermediary set of unobserved variables (called hidden variables, hidden units, or hidden neurons). These hidden neurons are linear combinations of the original predictors. Unlike PLS models however, there are no constraints that help define these linear combinations and the linear combinations are not estimated in a hierarchical fashion. See the exercise on [this page](http://rpubs.com/josezuniga/340596) for further details on this technique.
 
 ## Multivariate Adaptive Regression Splines (MARS)
 
@@ -133,7 +133,7 @@ ctrl <- trainControl(method = "boot", number = 25)
 
 #### Artificial Neural Networks (ANN)
 
-The `avNNet` function uses model averaging instead of `nnet` which creates a single model. For regression, the linear relationship between the hidden units and the prediction can be used with the option `linout = TRUE`. To reduce the amount of printed output use `trace = FALSE`. The parameter `maxit = 500` expands the number of iterations to find neuron estimates. `MaxNWts` specifies the number of neurons used by the model. The `.bag = FALSE` option makes the model use different random seeds instead of bagging.
+The `avNNet` function uses model averaging instead of `nnet` which creates a single model. For regression, the linear relationship between the hidden neurons and the prediction can be used with the option `linout = TRUE`. To reduce the amount of printed output use `trace = FALSE`. The parameter `maxit = 500` expands the number of iterations to find neuron estimates. `MaxNWts` specifies the number of neurons used by the model. The `.bag = FALSE` option makes the model use different random seeds instead of bagging.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
