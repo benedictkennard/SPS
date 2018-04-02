@@ -1,0 +1,276 @@
+---
+title: "Nonlinear Regression Models"
+author: "Jose Zuniga"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+if (!require("pls")) install.packages("pls")
+if (!require("nnet")) install.packages("nnet")
+if (!require("caret")) install.packages("caret")
+if (!require("earth")) install.packages("eart")
+if (!require("mlbench")) install.packages("mlbench")
+if (!require("AppliedPredictiveModeling")) install.packages("AppliedPredictiveModeling")
+library(pls)
+library(nnet)
+library(earth)
+library(caret)
+library(mlbench)
+library(AppliedPredictiveModeling)
+```
+
+## Artificial Neural Networks (ANN)
+
+Neural networks are powerful nonlinear regression techniques inspired by theories about how the brain works. Like [Partial Least squares]((http://rpubs.com/josezuniga/366918)) (PLS), the outcome is modeled by an intermediary set of unobserved variables (called hidden variables or hidden units here). These hidden units are linear combinations of the original predictors. Unlike PLS models however, there are no constraints that help define these linear combinations and the linear combinations are not estimated in a hierarchical fashion. See the exercise on [this page](http://rpubs.com/josezuniga/340596) for further details on this method.
+
+## Multivariate Adaptive Regression Splines (MARS)
+
+Like [Neural Networks](http://rpubs.com/josezuniga/340596) and [Partial Least squares]((http://rpubs.com/josezuniga/366918)), MARS uses surrogate features instead of the original predictors. However, whereas PLS and Neural Networks are based on linear combinations of the predictors, MARS creates two contrasted versions of a predictor to enter the model. Also, the surrogate features in MARS are usually a function of only one or two predictors at a time. The nature of the MARS features breaks the predictor into two groups and models linear relationships between the predictor and the outcome in each group. In effect, this scheme creates a piecewise linear model where each new feature models an isolated portion of the original data. Each data point for each predictor is evaluated as a candidate cut point (hinge) by creating a linear regression model with the candidate features, and the corresponding model error is calculated. The predictor/cut point combination that achieves the smallest error is then used for the model.
+
+## Support Vector Machines (SVM)
+
+SVMs are a class of powerful, highly flexible modeling techniques. The theory behind SVMs was originally developed in the [context of classification models](https://rpubs.com/josezuniga/223076).
+
+> Support Vector Machine (SVM) is currently one of the most well-known and most commonly applied classifiers in supervised learning. The SVM employs a spatial representation of the data. SVMs fit vectors between the document features that best separate the documents into the various groups. Specifically, vectors are selected in a way that they maximize the space between the groups. After the estimation new documents are classified by checking on which sides of the vectors the features of unlabeled documents come to lie.
+
+There are several flavors of Support Vector Regression. The focus here is on robust regression which seeks to minimize the effect of outliers on the regression equations. Specifically, the technique called $\epsilon$-insensitive regression. Recall that linear regression seeks to find parameter estimates that minimize SSE. One drawback of minimizing SSE is that the parameter estimates can be influenced by just one observation that falls far from the overall trend in the data. When data may contain influential observations, an alternative minimization metric that is less sensitive can be used to find the best parameter estimates. The Huber function uses the squared residuals when they are "small" and uses the absolute residuals when the residuals are large. SVMs for regression use a function similar to the Huber function, with an important difference. Data points with residuals within a threshold set by the user (denoted as $\epsilon$) do not contribute to the regression fit. Data points with an absolute difference greater than the threshold contribute a linear-scale amount.
+
+## $K$-Nearest Neighbors (KNN)
+
+The KNN approach simply predicts a new sample using the $K$-closest samples from the training set. Unlike the other methods, KNN cannot be cleanly summarized by a model. Instead, its construction is solely based on the individual samples from the training data. To predict a new sample for regression, KNN identifies that sample's KNNs in the predictor space. The predicted response for the new sample is then the mean of the K neighbors' responses. Other summary statistics, such as the median, can also be used in place of the mean to predict the new sample.
+
+## Exercise 7.2
+
+Friedman (1991) introduced several benchmark data sets create by simulation. One of these simulations used the following nonlinear equation to create data: $y=10\sin { \left( \pi x_{ 1 }x_{ 2 } \right)  } +20\left( x_{ 3 }-0.5 \right) ^{ 2 }+10x_{ 4 }+5x_{ 5 }+N(0,\sigma ^{ 2 })$ where the x values are random variables uniformly distributed between $[0,1]$ (there are also 5 other non-informative variables also created in the simulation). The package mlbench contains a function called mlbench.friedman1 that simulates these data:
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+trainingData <- mlbench.friedman1(200, sd = 1)
+```
+
+We convert the `x` data from a matrix to a data frame. One reason is that this will give the columns names.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+trainingData$x <- data.frame(trainingData$x)
+```
+
+Look at the data using [the below] or other methods.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+featurePlot(trainingData$x, trainingData$y, auto.key=list(rows=2))
+```
+
+This creates a list with a vector `y` and a matrix of predictors `x`. Also simulate a large test set to estimate the true error rate with good precision:
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+testData <- mlbench.friedman1(5000, sd = 1)
+testData$x <- data.frame(testData$x)
+```
+
+Tune several models on these data. For example:
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+(knnModel <- train(x = trainingData$x, y = trainingData$y,
+  method = "knn", preProc = c("center", "scale"), tuneLength = 10))
+```
+
+The function 'postResample' can be used to get the test set perforamnce values
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+knnPred <- predict(knnModel, newdata = testData$x)
+postResample(pred = knnPred, obs = testData$y)
+```
+
+Which models appear to give the best performance? Does MARS select the informative predictors (those named `X1`-`X5`)?
+
+#### Approach
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg <- expand.grid(degree = 1:2, nprune = seq(2,14,by=2))
+tune <- train(x = trainingData$x, y = trainingData$y, method = "earth",
+  preProcess = c("center", "scale"), tuneGrid = tg)
+plot(tune)
+fcast <- predict(tune, newdata = testData$x)
+postResample(pred = fcast, obs = testData$y)
+varImp(tune)
+```
+
+#### Interpretation
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+## Exercise 7.5
+
+Exercise [6.3.f](http://rpubs.com/josezuniga/366918) describes data for a chemical manufacturing process. Use the same data imputation, data splitting, and pre-processing steps as before and train several nonlinear regression models.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+CMP <- get(data(ChemicalManufacturingProcess))
+rm(ChemicalManufacturingProcess) # list not needed
+set.seed(624)
+rows_train <- createDataPartition(CMP$Yield, p=0.75, list=F)
+CMP_train <- CMP[rows_train, ]
+CMP_test <- CMP[-rows_train, ]
+prepro <- preProcess(subset(CMP_train, select = - Yield),
+  method=c("BoxCox", "center", "scale", "knnImpute"))
+CMP_train_X <- predict(prepro, CMP_train[ , -1])
+nzv <- nearZeroVar(CMP_train_X)
+mcl <- findCorrelation(cor(CMP_train_X))
+CMP_train_X <- CMP_train_X[ ,-c(nzv, mcl)] 
+set.seed(517)
+ctrl <- trainControl(method = "boot", number = 25)
+```
+
+#### Artificial Neural Networks (ANN)
+
+The `avNNet` function uses model averaging instead of `nnet` which creates a single model. For regression, the linear relationship between the hidden units and the prediction can be used with the option `linout = TRUE`. To reduce the amount of printed output use `trace = FALSE`. The parameter `maxit = 500` expands the number of iterations to find neuron estimates. `MaxNWts` specifies the number of neurons used by the model. The `.bag = FALSE` option makes the model use different random seeds instead of bagging.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg1 <- expand.grid(.decay = c(0, 0.01, .1), .size = c(1:10), .bag = F)
+tune1 <- train(x = CMP_train_X, y = CMP_train$Yield,
+  method = "avNNet", tuneGrid = tg1, trControl = ctrl, linout = T, 
+  trace = F, MaxNWts = 10 * (ncol(CMP_train_X) + 1) + 10 + 1, maxit = 500)
+```
+
+#### Multivariate Adaptive Regression Splines (MARS)
+
+MARS models are in several packages, but the most extensive implementation is in the `earth` package. 
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg2 <- expand.grid(degree = c(1:2), nprune = c(2:10))
+tune2 <- train(x = CMP_train_X, y = CMP_train$Yield,
+  method = "earth", tuneGrid = tg2, trControl = ctrl)
+```
+
+#### Support Vector Machines (SVM)
+
+The `kernlab` package has comprehensive implementation of SVM models for regression. Its `ksvm` function is available for regression models and many kernel functions. The radial basis function is the default kernel function. Other kernel functions can be used, including the polynomial ("polydot") and linear ("vanilladot").  If the appropriate values of the cost and kernel parameters are unknown, they can be estimated through resampling. In `train`, the `method` values of `svmRadial`, `svmLinear`, or `svmPoly` fit different kernels
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(614)
+tg3 <- expand.grid(C=c(0.01,0.05,0.1), degree=c(1,2), scale=c(0.25,0.5,1))
+tune3 <- train(x = CMP_train_X, y = CMP_train$Yield,
+  method = "svmPoly",  tuneGrid = tg3,  trControl = ctrl)
+```
+
+#### $K$-Nearest Neighbors (KNN)
+
+The `knnreg` function in the caret package fits the KNN regression model; train tunes the model over $K$.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg4 <- data.frame(.k = 1:20)
+tune4 <- train(x = CMP_train_X, y = CMP_train$Yield,
+  method = "knn", tuneGrid = tg4, trControl = trainControl(method = "cv"))
+```
+
+### Exercise 7.5.a
+
+Which nonlinear regression model gives the optimal resampling and test set performance?
+
+#### Approach
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+plot(tune1)
+```
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+plot(tune2)
+```
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+plot(tune3)
+```
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+plot(tune4)
+```
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+plot(tune1)
+plot(tune2)
+plot(tune3)
+plot(tune4)
+CMP_test_X <- predict(prepro, CMP_test[ , -1])
+CMP_test_X <- CMP_test_X[ ,-c(nzv, mcl)] 
+CMP_test_X[CMP_test_X[,35] == -Inf, 35] <- min(CMP_test_X[is.finite(CMP_test_X[,35]), 35])
+fcast1 <- predict(tune1, newdata = CMP_test_X)
+fcast2 <- predict(tune2, newdata = CMP_test_X)
+fcast3 <- predict(tune3, newdata = CMP_test_X)
+fcast4 <- predict(tune4, newdata = CMP_test_X)
+data.frame(rbind(postResample(pred = fcast1, obs = CMP_test$Yield), 
+  postResample(pred = fcast2, obs = CMP_test$Yield), 
+  postResample(pred = fcast3, obs = CMP_test$Yield), 
+  postResample(pred = fcast4, obs = CMP_test$Yield)), 
+  row.names = c("ANN","MARS","SVM","KNN"))
+```
+
+#### Interpretation
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+### Exercise 7.5.b
+
+Which predictors are most important in the optimal nonlinear regression model? Do either the biological or process variables dominate the list? How do the top ten important predictors compare to the top ten predictors from the optimal linear model?
+
+#### Approach
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+dotPlot(varImp(tune4), top=15)
+tune5 <- train(x = CMP_train_X, y = CMP_train$Yield,
+  method="pls", tuneLength=15, trControl=ctrl)
+cbind(varImp(tune4)$importance, varImp(tune5)$importance)
+```
+
+#### Interpretation
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+### Exercise 7.5.c
+
+Explore the relationships between the top predictors and the response for the predictors that are unique to the optimal nonlinear regression model. Do these plots reveal intuition about the biological or process predictors and their relationship with yield?
+
+#### Approach
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+important <- c('ManufacturingProcess32',
+               'ManufacturingProcess06',
+               'ManufacturingProcess31',
+               'ManufacturingProcess13')
+featurePlot(CMP_train_X[, important], CMP_train$Yield)
+cor(CMP_train_X[, important], CMP_train$Yield, use="complete.obs")
+```
+
+#### Interpretation
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+# References
+
+http://appliedpredictivemodeling.com/
+
+http://appliedpredictivemodeling.com/blog/2014/11/12/solutions-on-github 
