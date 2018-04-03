@@ -234,7 +234,7 @@ imp[order(imp$KNN,decreasing = T), ]
 
 #### Interpretation
 
-For the KNN model which was found to be the optimal nonlinear regression model, the most important predictors are process variables. The PLS model which [was found](http://rpubs.com/josezuniga/366918) to be the optimal linear model also supports the conclusion that the most important predictors are process variables. Both models agree on the most important predictor being `ManufacturingProcess32`, but the agreement stops there. The ranking of the other predictors is very different. When looking at the top 15 most important variables, the KNN model lists fewer biological process variables, but they are more important to the KNN model than the PLS model.
+The KNN model which was found to be the optimal nonlinear regression model and the PLS model which [was found](http://rpubs.com/josezuniga/366918) to be the optimal linear model agree that the most important predictors are process variables and that `ManufacturingProcess32` is the most important predictor. The ranking of the other predictors is very different however. When looking at the top 15 most important variables, the KNN model lists fewer biological process variables, but they are more important to the KNN model than the PLS model.
 
 ### Exercise 7.5.c
 
