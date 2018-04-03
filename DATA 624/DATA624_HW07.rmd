@@ -269,8 +269,28 @@ The intuition that is potentially revealed about the predictors and their relati
 
 # References
 
+https://www.rdocumentation.org/
+
+http://rpubs.com/josezuniga/366918
+
+http://rpubs.com/josezuniga/340596
+
+https://rpubs.com/josezuniga/223076
+
 http://appliedpredictivemodeling.com/
 
 https://github.com/topepo/APM_Exercises
 
-http://appliedpredictivemodeling.com/blog/2014/11/12/solutions-on-github 
+http://appliedpredictivemodeling.com/blog/2014/11/12/solutions-on-github
+
+https://www.rdocumentation.org/packages/earth/versions/4.6.0/topics/earth
+
+https://www.rdocumentation.org/packages/caret/versions/6.0-78/topics/avNNet
+
+https://www.rdocumentation.org/packages/kernlab/versions/0.9-25/topics/ksvm
+
+https://www.rdocumentation.org/packages/caret/versions/6.0-78/topics/knnreg
+
+https://www.rdocumentation.org/packages/RcmdrPlugin.BCA/versions/0.9-8/topics/Nnet
+
+https://www.rdocumentation.org/packages/AppliedPredictiveModeling/versions/1.1-6/topics/ChemicalManufacturingProcess
