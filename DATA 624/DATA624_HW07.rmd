@@ -176,11 +176,16 @@ The pre-processing steps applied to the training set are applied to the training
 #### Results
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-plot(tune1); summary(tune1)
-plot(tune2); summary(tune2)
-plot(tune3); summary(tune3)
-plot(tune4); summary(tune4)
-plot(tune5); summary(tune5)
+tune1
+plot(tune1)
+tune2
+plot(tune2)
+tune3
+plot(tune3)
+tune4
+plot(tune4)
+tune5
+plot(tune5)
 ```
 
 optimal resampling
@@ -224,7 +229,7 @@ imp <- data.frame(varImp(tune1)$importance,
   varImp(tune2)$importance, varImp(tune3)$importance, 
   varImp(tune4)$importance, varImp(tune5)$importance)
 colnames(imp) <- c("PLS","ANN","MARS","SVM","KNN")
-imp[order(imp$KNN,decreasing = T), ]
+round(imp[order(imp$KNN,decreasing = T), ], 5)
 ```
 
 #### Interpretation
