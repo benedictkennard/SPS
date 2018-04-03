@@ -48,39 +48,26 @@ The KNN approach predicts a new sample using the $K$-closest samples from the tr
 
 ## Exercise 7.2
 
-Friedman (1991) introduced several benchmark data sets create by simulation. One of these simulations used the following nonlinear equation to create data: $y=10\sin { \left( \pi x_{ 1 }x_{ 2 } \right)  } +20\left( x_{ 3 }-0.5 \right) ^{ 2 }+10x_{ 4 }+5x_{ 5 }+N(0,\sigma ^{ 2 })$ where the $x$ values are random variables uniformly distributed between $[0,1]$ (there are also 5 other non-informative variables also created in the simulation). The package `mlbench` contains a function called `mlbench.friedman1` that simulates these data:
+Friedman (1991) introduced several benchmark data sets create by simulation. One of these simulations used the following nonlinear equation to create data: $y=10\sin { \left( \pi x_{ 1 }x_{ 2 } \right)  } +20\left( x_{ 3 }-0.5 \right) ^{ 2 }+10x_{ 4 }+5x_{ 5 }+N(0,\sigma ^{ 2 })$ where the $x$ values are random variables uniformly distributed between $[0,1]$ (there are also 5 other non-informative variables also created in the simulation). The package `mlbench` contains a function called `mlbench.friedman1` that simulates these data. [The function] creates a list with a vector $y$ and a matrix of predictors $x$. The $x$ data [are converted] from a matrix to a data frame [to, amongst other reasons,] give the columns names.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(200)
 trainingData <- mlbench.friedman1(200, sd = 1)
-```
-
-We convert the $x$ data from a matrix to a data frame. One reason is that this will give the columns names.
-
-```{r warning=F, message=F, fig.align='center', cache=T}
 trainingData$x <- data.frame(trainingData$x)
+featurePlot(trainingData$x, trainingData$y, layout=c(5,2))
 ```
 
-Look at the data using [the below] or other methods.
-
-```{r warning=F, message=F, fig.align='center', cache=T}
-featurePlot(trainingData$x, trainingData$y, auto.key=list(rows=2))
-```
-
-This creates a list with a vector $y$ and a matrix of predictors $x$. Also simulate a large test set to estimate the true error rate with good precision:
+A large test set [is simulated] to estimate the true error rate with good precision: [Then,] several models [are tuned] on these data.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 testData <- mlbench.friedman1(5000, sd = 1)
 testData$x <- data.frame(testData$x)
-```
-
-Tune several models on these data. For example:
-
-```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(921)
 (knnModel <- train(x = trainingData$x, y = trainingData$y,
   method = "knn", preProc = c("center", "scale"), tuneLength = 10))
 ```
 
-The function `postResample` can be used to get the test set perforamnce values
+The function `postResample` [is] used to get the test set perforamnce [sic] values.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 knnPred <- predict(knnModel, newdata = testData$x)
@@ -91,15 +78,15 @@ Which models appear to give the best performance? Does MARS select the informati
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+In addition to the KNN models tuned on these data in the question setup, multiple MARS models are tuned the answer the question specific to MARS models. The `expand.grid()` function create a data frame consisting of all combinations (Cartesian product) of the supplied vectors or factors. The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure.  The `tuneGrid` parameter of the `train()` function is fed a data frame with values in columns named after the parameters being tuned. The `predict()` function applies a fitted model to data consisting of predictor variables. The `postResample()` function takes two vectors as its inputs and computes the RMSE, $R^2$, and MAE performance metrics. The `varImp()` function calculates the variable importance for a given model.
 
 #### Results
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
 tg <- expand.grid(degree = 1:2, nprune = seq(2,14,by=2))
-tune <- train(x = trainingData$x, y = trainingData$y, method = "earth",
-  preProcess = c("center", "scale"), tuneGrid = tg)
+(tune <- train(x = trainingData$x, y = trainingData$y, method = "earth",
+  preProcess = c("center", "scale"), tuneGrid = tg))
 plot(tune)
 fcast <- predict(tune, newdata = testData$x)
 postResample(pred = fcast, obs = testData$y)
@@ -108,7 +95,7 @@ varImp(tune)
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The MARS models outperform the KNN models tuned in the question setup. This is true for every performance metric. Most of the MARS models have a lower RMSE, a higher $R^2$, and a lower MAE. MARS also selects the informative predictors `X1`-`X5` and assigns zero importance to the non-informative predictors `X6`-`X10`.
 
 ## Exercise 7.5
 
@@ -127,8 +114,10 @@ CMP_train_X <- predict(prepro, CMP_train[ , -1])
 nzv <- nearZeroVar(CMP_train_X)
 mcl <- findCorrelation(cor(CMP_train_X))
 CMP_train_X <- CMP_train_X[ ,-c(nzv, mcl)] 
-set.seed(517)
+set.seed(624)
 ctrl <- trainControl(method = "boot", number = 25)
+tune1 <- train(x = CMP_train_X, y = CMP_train$Yield,
+  method="pls", tuneLength=15, trControl=ctrl)
 ```
 
 #### Artificial Neural Networks (ANN)
@@ -137,9 +126,9 @@ The [`avNNet`](https://www.rdocumentation.org/packages/caret/versions/6.0-78/top
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
-tg1 <- expand.grid(.decay = c(0, 0.01, .1), .size = c(1:10), .bag = F)
-tune1 <- train(x = CMP_train_X, y = CMP_train$Yield,
-  method = "avNNet", tuneGrid = tg1, trControl = ctrl, linout = T, 
+tg2 <- expand.grid(.decay = c(0, 0.01, .1), .size = c(1:10), .bag = F)
+tune2 <- train(x = CMP_train_X, y = CMP_train$Yield,
+  method = "avNNet", tuneGrid = tg2, trControl = ctrl, linout = T, 
   trace = F, MaxNWts = 10 * (ncol(CMP_train_X) + 1) + 10 + 1, maxit = 500)
 ```
 
@@ -149,20 +138,20 @@ MARS models are [available] in several packages, but the most extensive implemen
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
-tg2 <- expand.grid(degree = c(1:2), nprune = c(2:10))
-tune2 <- train(x = CMP_train_X, y = CMP_train$Yield,
-  method = "earth", tuneGrid = tg2, trControl = ctrl)
+tg3 <- expand.grid(degree = c(1:2), nprune = c(2:10))
+tune3 <- train(x = CMP_train_X, y = CMP_train$Yield,
+  method = "earth", tuneGrid = tg3, trControl = ctrl)
 ```
 
 #### Support Vector Machines (SVM)
 
-The `kernlab` package has comprehensive implementation of SVM models for regression. Its [`ksvm`](https://www.rdocumentation.org/packages/kernlab/versions/0.9-25/topics/ksvm) function is available for regression models and uses the Guassian radial basis (`rbfdot`) function as the default kernel function. Other kernel functions can be used, including the polynomial (`polydot`) and linear (`vanilladot`). If the appropriate values of the cost and kernel parameters are unknown, they can be estimated through resampling. In `train`, the `method` values of `svmRadial`, `svmLinear`, or `svmPoly` fit different kernels
+The `kernlab` package has comprehensive implementation of SVM models for regression. Its [`ksvm`](https://www.rdocumentation.org/packages/kernlab/versions/0.9-25/topics/ksvm) function is available for regression models and uses the Guassian radial basis (`rbfdot`) function as the default kernel function. Other kernel functions can be used, including the polynomial (`polydot`) and linear (`vanilladot`). If the appropriate values of the cost and kernel parameters are unknown, they can be estimated through resampling. In `train`, the `method` values of `svmRadial`, `svmLinear`, or `svmPoly` fit different kernels.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(614)
-tg3 <- expand.grid(C=c(0.01,0.05,0.1), degree=c(1,2), scale=c(0.25,0.5,1))
-tune3 <- train(x = CMP_train_X, y = CMP_train$Yield,
-  method = "svmPoly",  tuneGrid = tg3,  trControl = ctrl)
+tg4 <- expand.grid(C=c(0.01,0.05,0.1), degree=c(1,2), scale=c(0.25,0.5,1))
+tune4 <- train(x = CMP_train_X, y = CMP_train$Yield,
+  method = "svmPoly",  tuneGrid = tg4,  trControl = ctrl)
 ```
 
 #### $K$-Nearest Neighbors (KNN)
@@ -171,9 +160,9 @@ The [`knnreg`](https://www.rdocumentation.org/packages/caret/versions/6.0-78/top
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
-tg4 <- data.frame(.k = 1:20)
-tune4 <- train(x = CMP_train_X, y = CMP_train$Yield,
-  method = "knn", tuneGrid = tg4, trControl = trainControl(method = "cv"))
+tg5 <- data.frame(.k = 1:20)
+tune5 <- train(x = CMP_train_X, y = CMP_train$Yield,
+  method = "knn", tuneGrid = tg5, trControl = trainControl(method = "cv"))
 ```
 
 ### Exercise 7.5.a
@@ -182,31 +171,21 @@ Which nonlinear regression model gives the optimal resampling and test set perfo
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The pre-processing steps applied to the training set are applied to the training set. Then the same non-zero variance and highly correlated columns removed from the training set are removed from the test set. A slight issue arises during forecasting due to a value of $-\infty$ remaining in the pre-processed dataset. This infinite value hinders forecasting with the Neural Network and $K$-Nearest Neighbor models but does not affect the Multivariate Adaptive Regression Splines and Support Vector Machine models. For the sake of completeness in model comparison, the value of $-\infty$ is replaced with the minimum finite value of the variable to which the infinite value belongs. The `predict()` function applies a fitted model to data consisting of predictor variables. The `postResample()` function takes two vectors as its inputs and computes the RMSE, $R^2$, and MAE performance metrics. 
 
 #### Results
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-plot(tune1)
+plot(tune1); summary(tune1)
+plot(tune2); summary(tune2)
+plot(tune3); summary(tune3)
+plot(tune4); summary(tune4)
+plot(tune5); summary(tune5)
 ```
 
-```{r warning=F, message=F, fig.align='center', cache=T}
-plot(tune2)
-```
+optimal resampling
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-plot(tune3)
-```
-
-```{r warning=F, message=F, fig.align='center', cache=T}
-plot(tune4)
-```
-
-```{r warning=F, message=F, fig.align='center', cache=T}
-plot(tune1)
-plot(tune2)
-plot(tune3)
-plot(tune4)
 CMP_test_X <- predict(prepro, CMP_test[ , -1])
 CMP_test_X <- CMP_test_X[ ,-c(nzv, mcl)] 
 CMP_test_X[CMP_test_X[,35] == -Inf, 35] <- min(CMP_test_X[is.finite(CMP_test_X[,35]), 35])
@@ -214,16 +193,20 @@ fcast1 <- predict(tune1, newdata = CMP_test_X)
 fcast2 <- predict(tune2, newdata = CMP_test_X)
 fcast3 <- predict(tune3, newdata = CMP_test_X)
 fcast4 <- predict(tune4, newdata = CMP_test_X)
+fcast5 <- predict(tune5, newdata = CMP_test_X)
 data.frame(rbind(postResample(pred = fcast1, obs = CMP_test$Yield), 
   postResample(pred = fcast2, obs = CMP_test$Yield), 
-  postResample(pred = fcast3, obs = CMP_test$Yield), 
-  postResample(pred = fcast4, obs = CMP_test$Yield)), 
-  row.names = c("ANN","MARS","SVM","KNN"))
+  postResample(pred = fcast3, obs = CMP_test$Yield),
+  postResample(pred = fcast4, obs = CMP_test$Yield),
+  postResample(pred = fcast5, obs = CMP_test$Yield)), 
+  row.names = c("PLS","ANN","MARS","SVM","KNN"))
 ```
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The optimal RMSE, $R^2$, and MAE resampling performance metrics are associated with the MARS model. The performance metrics from the resampled training set are highly optimistic because they are based on resampling. The optimal RMSE, $R^2$, and MAE test set performance metrics are associated with the KNN model. This is interesting because the author states:
+
+> $K$-Nearest Neighbors models have better performance when the underlying relationship between predictors and the response relies is dependent on samples' proximity in the predictor space. *Geographic information is not part of the data generation scheme for this particular data set. Hence, we would expect another type of model to perform better then KNN.*
 
 ### Exercise 7.5.b
 
@@ -231,15 +214,17 @@ Which predictors are most important in the optimal nonlinear regression model? D
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The `dotPlot()` function create a dotplot of variable importance values. The `varImp()` function calculates the variable importance for a given model.
 
 #### Results
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-dotPlot(varImp(tune4), top=15)
-tune5 <- train(x = CMP_train_X, y = CMP_train$Yield,
-  method="pls", tuneLength=15, trControl=ctrl)
-cbind(varImp(tune4)$importance, varImp(tune5)$importance)
+dotPlot(varImp(tune5), top=15)
+imp <- data.frame(varImp(tune1)$importance, 
+  varImp(tune2)$importance, varImp(tune3)$importance, 
+  varImp(tune4)$importance, varImp(tune5)$importance)
+colnames(imp) <- c("PLS","ANN","MARS","SVM","KNN")
+imp[order(imp$KNN,decreasing = T), ]
 ```
 
 #### Interpretation
@@ -252,7 +237,11 @@ Explore the relationships between the top predictors and the response for the pr
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The `featurePlot()` function produces lattice graphs containing scatter plots of the specified predictor variables against the target variable. Correlation measures the relationship between two variables. The most commonly used measure of correlation is Pearson correlation ($r$). Pearson correlation measures the relationship between normal linear homoskedastic variables. Measuring relationships between variables that are not normal, linear, or homoskedastic (inherently or through transformation) with the Pearson correlation formula produces misleading results. Spearman correlation ($\rho$) and Kendall correlation ($\tau$) are non-parametric measures of correlation based on monotonic rank. Spearman correlation is more computationally efficient than Kendall correlation, but less robust. For this analysis, the accuracy of Kendall correlation is being prioritized over the speed of Spearman correlation. 
+
+$$r = \frac{\sum{(x-m_x)(y-m_y)}}{\sqrt{\sum{(x-m_x)^2}\sum{(y-m_y)^2}}} \tag{Pearson}$$
+$$\rho = \frac{\sum(x' - m_{x'})(y'_i - m_{y'})}{\sqrt{\sum(x' - m_{x'})^2 \sum(y' - m_{y'})^2}} \tag{Spearman}$$
+$$\tau = \frac{n_c - n_d}{\frac{1}{2}n(n-1)} \tag{Kendall}$$
 
 #### Results
 
@@ -262,7 +251,7 @@ important <- c('ManufacturingProcess32',
                'ManufacturingProcess31',
                'ManufacturingProcess13')
 featurePlot(CMP_train_X[, important], CMP_train$Yield)
-cor(CMP_train_X[, important], CMP_train$Yield, use="complete.obs")
+cor(CMP_train_X[, important], CMP_train$Yield, method="kendall")
 ```
 
 #### Interpretation
@@ -272,5 +261,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 # References
 
 http://appliedpredictivemodeling.com/
+
+https://github.com/topepo/APM_Exercises
 
 http://appliedpredictivemodeling.com/blog/2014/11/12/solutions-on-github 
