@@ -211,9 +211,9 @@ data.frame(rbind(postResample(pred = fcast1, obs = CMP_test$Yield),
 
 #### Interpretation
 
-The optimal RMSE, $R^2$, and MAE resampling performance metrics are associated with the MARS model. The performance metrics from the resampled training set are highly optimistic because they are based on resampling. The optimal RMSE, $R^2$, and MAE test set performance metrics are associated with the KNN model. This is interesting because the author states:
+The optimal RMSE, $R^2$, and MAE resampling performance metrics are associated with the KNN model followed by the MARS, PLS, SVM, and ANN models in that order. The minimum RMSE has a range of 0.35 between the KNN resampled model and the ANN resampled model. The RMSE of the KNN, MARS, and PLS resampled models cluster around the low end of the range. The RMSE of the SVM resampled model sits around the midpoint of the range. At the high end of the range rests the RMSE of the ANN resampled model. The optimal RMSE, $R^2$, and MAE test set performance metrics are also associated with the KNN model. The range of the RMSE between the best and worst performing models is much large for the test set because performance metrics from resampled training sets are highly optimistic as a result of the repeated sampling.  These results are interesting because the author states:
 
-> $K$-Nearest Neighbors models have better performance when the underlying relationship between predictors and the response relies is dependent on samples' proximity in the predictor space. *Geographic information is not part of the data generation scheme for this particular data set. Hence, we would expect another type of model to perform better then KNN.*
+> $K$-Nearest Neighbors models have better performance when the underlying relationship between predictors and the response relies is dependent on samples' proximity in the predictor space. Geographic information is not part of the data generation scheme for this particular data set. Hence, we would expect another type of model to perform better then KNN.
 
 ### Exercise 7.5.b
 
