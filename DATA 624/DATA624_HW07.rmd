@@ -26,6 +26,8 @@ library(mlbench)
 library(AppliedPredictiveModeling)
 ```
 
+**Note**: Model descriptions are from *Applied Predictive Modeling* by Max Kuhn and Kjell Johnson. Solutions are modifications of those posted by Max Kuhn on his public [GitHub](https://github.com/topepo/APM_Exercises) page. Function descriptions are from the [RDocumentation](https://www.rdocumentation.org) website. 
+
 ## Artificial Neural Networks (ANN)
 
 Neural networks are powerful nonlinear regression techniques inspired by theories about how the brain works. Like [Partial Least squares](http://rpubs.com/josezuniga/366918) (PLS), the outcome is modeled by an intermediary set of unobserved variables (called hidden variables, hidden units, or hidden neurons). These hidden neurons are linear combinations of the original predictors. Unlike PLS models however, there are no constraints that help define these linear combinations and the linear combinations are not estimated in a hierarchical fashion. See the exercise on [this page](http://rpubs.com/josezuniga/340596) for further details on this technique.
