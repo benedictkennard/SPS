@@ -50,7 +50,7 @@ The KNN approach predicts a new sample using the $K$-closest samples from the tr
 
 ## Exercise 7.2
 
-Friedman (1991) introduced several benchmark data sets create by simulation. One of these simulations used the following nonlinear equation to create data: $y=10\sin { \left( \pi x_{ 1 }x_{ 2 } \right)  } +20\left( x_{ 3 }-0.5 \right) ^{ 2 }+10x_{ 4 }+5x_{ 5 }+N(0,\sigma ^{ 2 })$ where the $x$ values are random variables uniformly distributed between $[0,1]$ (there are also 5 other non-informative variables also created in the simulation). The package `mlbench` contains a function called `mlbench.friedman1` that simulates these data. [The function] creates a list with a vector $y$ and a matrix of predictors $x$. The $x$ data [are converted] from a matrix to a data frame [to, amongst other reasons,] give the columns names.
+Friedman (1991) introduced several benchmark data sets created by simulation. One of these simulations used the following nonlinear equation to create data: $y=10\sin { \left( \pi x_{ 1 }x_{ 2 } \right)  } +20\left( x_{ 3 }-0.5 \right) ^{ 2 }+10x_{ 4 }+5x_{ 5 }+N(0,\sigma ^{ 2 })$ where the $x$ values are random variables uniformly distributed between $[0,1]$ (there are also 5 other non-informative variables also created in the simulation). The package `mlbench` contains a function called `mlbench.friedman1` that simulates these data. [The function] creates a list with a vector $y$ and a matrix of predictors $x$. The $x$ data [are converted] from a matrix to a data frame [to, amongst other reasons,] give the columns names.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(200)
@@ -97,7 +97,7 @@ varImp(tune)
 
 #### Interpretation
 
-The MARS models outperform the KNN models tuned in the question setup. This is true for every performance metric. Most of the MARS models have a lower RMSE, a higher $R^2$, and a lower MAE. MARS also selects the informative predictors `X1`-`X5` and assigns zero importance to the non-informative predictors `X6`-`X10`.
+The MARS models outperform the KNN models tuned in the question setup. This is true by every performance metric as most of the MARS models have a lower RMSE, higher $R^2$, and lower MAE. MARS does select the informative predictors `X1`-`X5` and assigns zero importance to the non-informative predictors `X6`-`X10`. A second-degree MARS model with 14 terms (including the intercept) provides the most appropriate fit for these data. The second degree implies that a product of two variables is included as one or more of the terms in the model.
 
 ## Exercise 7.5
 
