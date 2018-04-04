@@ -1,5 +1,5 @@
 ---
-title: "Regression Trees Models"
+title: "Regression Tree Models"
 author: "Jose Zuniga"
 output:
   html_document:
