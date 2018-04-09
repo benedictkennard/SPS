@@ -197,21 +197,30 @@ fit4 <- bagging(y ~ ., duplicated, nbag = 50)
 ```
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
-fit5 <- cubist(x=simulated[,-11], y=simulated[,11], committees = 100)
-fit6 <- cubist(x=duplicated[,-11], y=duplicated[,11], committees = 100)
+fit5 <- gbm(y ~ ., simulated, distribution = "gaussian")
+fit6 <- gbm(y ~ ., duplicated, distribution = "gaussian")
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+fit7 <- cubist(x=simulated[,-11], y=simulated[,11], committees = 100)
+fit8 <- cubist(x=duplicated[,-11], y=duplicated[,11], committees = 100)
 ```
 ```{r warning=F, message=F, fig.align='center', cache=T}
 varimp1 <- varImp(fit3)
 varimp2 <- varImp(fit4)
 varimp3 <- varImp(fit5)
 varimp4 <- varImp(fit6)
-colnames(varimp1) <- "Simulated_BAG" 
-colnames(varimp2) <- "Correlated_BAG"
-colnames(varimp3) <- "Simulated_CUBE"
-colnames(varimp4) <- "Correlated_CUBE"
-padding1 <- data.frame(Simulated_BAG=NA, row.names="V11")
-padding2 <- data.frame(Simulated_CUBE=NA, row.names="V11")
-data.frame(rbind(varimp1, padding1), varimp2, rbind(varimp3, padding2), varimp4)
+varimp5 <- varImp(fit7)
+varimp6 <- varImp(fit8)
+colnames(varimp1) <- "Sim_BAG"; colnames(varimp2) <- "Cor_BAG"
+colnames(varimp3) <- "Sim_SGB"; colnames(varimp4) <- "Cor_SGB"
+colnames(varimp5) <- "Sim_CUBE"; colnames(varimp6) <- "Cor_CUBE"
+padding1 <- data.frame(Sim_BAG=NA, row.names="V11")
+padding2 <- data.frame(Sim_SGB=NA, row.names="V11")
+padding3 <- data.frame(Sim_CUBE=NA, row.names="V11")
+data.frame(rbind(varimp1, padding1), varimp2, 
+  rbind(varimp3, padding2), varimp4,
+  rbind(varimp5, padding3), varimp6)
 ```
 
 #### Interpretation
