@@ -40,37 +40,33 @@ library(AppliedPredictiveModeling)
 
 **Note**: Model descriptions are from *Applied Predictive Modeling* by Max Kuhn and Kjell Johnson. Solutions are modifications of those posted by Max Kuhn on his public [GitHub](https://github.com/topepo/APM_Exercises) page. Function descriptions are from the [RDocumentation](https://www.rdocumentation.org) website. 
 
-## Single: Regression Tree (CART)
+## Regression Tree (CART)
 
-Tree-based models generate a set of conditions that are highly interpretable and are easy to implement. They can effectively handle many types of predictors (sparse, skewed, continuous, categorical, etc.) without the need to pre-process them (imputation, feature selection, etc.). In addition, these models do not require the user to specify the form of the predictors relationship to the response like, for example, a linear regression model requires. There are many techniques for constructing regression trees. One of the oldest and most utilized is the Classification and Regression Tree (CART) methodology also known as recursive partitioning. For regression, the model begins with the entire data set and searches every distinct value of every predictor to find the predictor and split value that partitions the data into two groups such that the overall sums of squares error are minimized. Then within each of [the] groups, this method searches for the predictor and split value that best reduces SSE until the number of samples in the splits falls below some threshold. The fully grown tree is then pruned back to a potentially smaller depth [to mitigate over-fitting]. If a predictor is never used in a split, the prediction equation is independent of those data.
+**Single Decision Tree**. Tree-based models generate a set of conditions that are highly interpretable and are easy to implement. They can effectively handle many types of predictors (sparse, skewed, continuous, categorical, etc.) without the need to pre-process them (imputation, feature selection, etc.). In addition, these models do not require the user to specify the form of the predictors relationship to the response like, for example, a linear regression model requires. There are many techniques for constructing regression trees. One of the oldest and most utilized is the Classification and Regression Tree (CART) methodology also known as recursive partitioning. For regression, the model begins with the entire data set and searches every distinct value of every predictor to find the predictor and split value that partitions the data into two groups such that the overall sums of squares error are minimized. Then within each of [the] groups, this method searches for the predictor and split value that best reduces SSE until the number of samples in the splits falls below some threshold. The fully grown tree is then pruned back to a potentially smaller depth [to mitigate over-fitting]. If a predictor is never used in a split, the prediction equation is independent of those data.
 
-## Single: Conditional Inference Tree (CIT)
+## Conditional Inference Tree (CIT)
 
-Conditional Inference Trees (CIT) describe a unified framework for unbiased tree-based models for regression, classification, and other scenarios. Statistical hypothesis tests are used to do an exhaustive search across the predictors and their possible split points. For a candidate split, a statistical test is used to evaluate the difference between the means of the two groups created by the split and a $p$-value can be computed for the test. Multiple comparison corrections reduce the number of false-positive test results that are incurred by conducting [several] statistical hypothesis tests. This reduces bias for highly granular data. This algorithm does not use pruning. As data sets are split, the decrease in the number of samples reduces the power of the hypothesis tests. This results in higher $p$-values and a lower likelihood of a new split (and over-fitting). Statistical hypothesis tests are not directly related to predictive performance and it is therefore still advisable to choose the complexity of the tree on the basis of performance (via resampling or some other means).
+**Single Decision Tree**. Conditional Inference Trees (CIT) describe a unified framework for unbiased tree-based models for regression, classification, and other scenarios. Statistical hypothesis tests are used to do an exhaustive search across the predictors and their possible split points. For a candidate split, a statistical test is used to evaluate the difference between the means of the two groups created by the split and a $p$-value can be computed for the test. Multiple comparison corrections reduce the number of false-positive test results that are incurred by conducting [several] statistical hypothesis tests. This reduces bias for highly granular data. This algorithm does not use pruning. As data sets are split, the decrease in the number of samples reduces the power of the hypothesis tests. This results in higher $p$-values and a lower likelihood of a new split (and over-fitting). Statistical hypothesis tests are not directly related to predictive performance and it is therefore still advisable to choose the complexity of the tree on the basis of performance (via resampling or some other means).
 
-## Single: Rule-Based Model (RBM)
+## Regression Model Tree (M5)
 
-A rule is defined as a distinct path through a tree. A new sample can only travel down a single path through the tree defined by these rules. The number of samples affected by a rule is called its coverage. The complexity of the model tree can be reduced by [pruning], removing entire rules, or removing some of the conditions that define the rule. The "separate and conquer" strategy derives rules from many different model trees instead of from a single tree. An initial [unsmoothed] model tree is created [and] only the rule with the largest coverage is saved from this model. The samples covered by the rule are removed from the training set and another model tree is created with the remaining data. Again, only the rule with the maximum coverage is retained. This process repeats until all the training set data have been covered by at least one rule. A new sample is predicted by determining which rule(s) it falls under then applies the linear model associated with the largest coverage. As with the model trees, pruning has a large effect on the model and smoothing has a larger impact on unpruned models.
+**Single Decision Tree**. In Simple Regression Trees each terminal node uses the average of the training set outcomes in that node for prediction and therefore may not do a good job predicting samples whose true outcomes are extremely high or low.  The Regression Model Tree approach implemented with the M5 algorithm uses different splitting criterion, predicts the outcome using a linear model, and results in a model that is often a combination of the predictions from different models along the same path through the tree. Like Simple Regression Trees, the initial split is found using an exhaustive search over the predictors and training set samples, but, unlike those models, the expected reduction in the node's error rate is used. Model Trees also incorporate a type of smoothing to decrease the potential for over-fitting. This smoothing can have a significant positive effect on the Model Tree when the linear models across nodes are very different.
 
-## Single: Model Tree (M5)
+## Bagged Trees (BAG)
 
-In Simple Regression Trees each terminal node uses the average of the training set outcomes in that node for prediction and therefore may not do a good job predicting samples whose true outcomes are extremely high or low.  The Regression Model Tree approach implemented with the M5 algorithm uses different splitting criterion, predicts the outcome using a linear model, and results in a model that is often a combination of the predictions from different models along the same path through the tree. Like Simple Regression Trees, the initial split is found using an exhaustive search over the predictors and training set samples, but, unlike those models, the expected reduction in the node's error rate is used. Model Trees also incorporate a type of smoothing to decrease the potential for over-fitting. This smoothing can have a significant positive effect on the Model Tree when the linear models across nodes are very different.
+**Ensemble Method**. Models based on single trees have particular weaknesses: (1) model instability (i.e., slight changes in the data can drastically change the structure of the tree or rules and, hence, the interpretation) and (2) less-than-optimal predictive performance. To combat these problems, researchers developed ensemble methods that combine many trees into one model. In the 1990s, ensemble techniques (methods that combine many models' predictions) began to appear. Bagging, short for **b**ootstrap **agg**regation, was one of the earliest developed ensemble techniques. Bagging is a general approach that uses bootstrapping in conjunction with any regression (or classification) model to construct an ensemble. Each model in the ensemble is used to generate a prediction for a new sample and these $m$ predictions are averaged to give the bagged model's prediction. For models that produce an unstable prediction, like regression trees, aggregating over many versions of the training data reduces the variance in the prediction and, hence, makes the prediction more stable. Bagging stable, lower variance models like [linear regression](https://rpubs.com/josezuniga/253955) and [MARS](https://rpubs.com/josezuniga/376348) offers less improvement in predictive performance. Although Bagging usually improves predictive performance for unstable models, results are less interpretable and computational costs are higher. CART (or conditional inference trees) can be used as the base learner in random forests.
 
-## Ensemble: Bagged Trees (BAG)
+## Random Forest (RF)
 
-Models based on single trees have particular weaknesses: (1) model instability (i.e., slight changes in the data can drastically change the structure of the tree or rules and, hence, the interpretation) and (2) less-than-optimal predictive performance. To combat these problems, researchers developed ensemble methods that combine many trees into one model. In the 1990s, ensemble techniques (methods that combine many models' predictions) began to appear. Bagging, short for **b**ootstrap **agg**regation, was one of the earliest developed ensemble techniques. Bagging is a general approach that uses bootstrapping in conjunction with any regression (or classification) model to construct an ensemble. Each model in the ensemble is used to generate a prediction for a new sample and these $m$ predictions are averaged to give the bagged model's prediction. For models that produce an unstable prediction, like regression trees, aggregating over many versions of the training data reduces the variance in the prediction and, hence, makes the prediction more stable. Bagging stable, lower variance models like [linear regression](https://rpubs.com/josezuniga/253955) and [MARS](https://rpubs.com/josezuniga/376348) offers less improvement in predictive performance. Although Bagging usually improves predictive performance for unstable models, results are less interpretable and computational costs are higher. CART (or conditional inference trees) can be used as the base learner in random forests.
+**Ensemble Method**. Generating bootstrap samples introduces a random component into the tree building process, which induces a distribution of trees, and therefore also a distribution of predicted values for each sample. The trees in Bagging, however, are not completely independent of each other since all the original predictors are considered at every split of every tree. This characteristic is known as tree correlation and prevents Bagging from optimally reducing variance of the predicted values. Random Forests are a unified model that [de-correlates trees by] adding randomness to the tree construction (learning) process [through implementation of] random split selection[, building] entire trees based on random subsets of descriptors[, and] adding noise to the response in order to perturb tree structure. This ensemble of many independent, strong learners yields an improvement in error rates that is robust to a noisy response. At the same time, the independence of learners can underfit data when the response is not noisy. Compared to Bagging, Random Forests is more computationally efficient on a tree-by-tree basis. The ensemble nature of Random Forests makes it impossible to gain an understanding of the relationship between the predictors and the response. CART (or conditional inference trees) can be used as the base learner in random forests.
 
-## Ensemble: Random Forest (RF)
+## Boosted Trees (SGB)
 
-Generating bootstrap samples introduces a random component into the tree building process, which induces a distribution of trees, and therefore also a distribution of predicted values for each sample. The trees in Bagging, however, are not completely independent of each other since all the original predictors are considered at every split of every tree. This characteristic is known as tree correlation and prevents Bagging from optimally reducing variance of the predicted values. Random Forests are a unified model that [de-correlates trees by] adding randomness to the tree construction (learning) process [through implementation of] random split selection[, building] entire trees based on random subsets of descriptors[, and] adding noise to the response in order to perturb tree structure. This ensemble of many independent, strong learners yields an improvement in error rates that is robust to a noisy response. At the same time, the independence of learners can underfit data when the response is not noisy. Compared to Bagging, Random Forests is more computationally efficient on a tree-by-tree basis. The ensemble nature of Random Forests makes it impossible to gain an understanding of the relationship between the predictors and the response. CART (or conditional inference trees) can be used as the base learner in random forests.
+**Ensemble Method**. Boosting models were originally developed for classification problems and were later extended to the regression setting. Boosting algorithms (gradient boosting machines) are influenced by learning theory [where] weak classifiers that predict marginally better than random are combined (or boosted) to produce an ensemble classifier with a superior generalized misclassification error rate. The basic principles of gradient boosting are as follows: given a loss function (e.g., squared error for regression) and a weak learner (e.g., regression trees), the algorithm seeks to find an additive model that minimizes the loss function. The algorithm is typically initialized with the best guess of the response (e.g., the mean of the response in regression). The gradient (e.g., residual) is calculated, and a model is then fit to the residuals to minimize the loss function. The current model is added to the previous model, and the procedure continues for a user-specified number of iterations. To remedy for greediness (choosing the optimal weak learner at each stage) is to constrain the learning process by employing regularization, or shrinkage [where] only a fraction of the current predicted value (commonly referred to as the learning rate) is added to the previous iteration's predicted value. Stochastic Gradient Boosting (SGB) implements this all using random sampling during selection the of training data. This [final] modification improves the prediction accuracy of Boosting while also reducing the required computational resources.
 
-## Ensemble: Boosted Trees (SGB)
+## Rule-Based Cubist (CUBE)
 
-Boosting models were originally developed for classification problems and were later extended to the regression setting. Boosting algorithms (gradient boosting machines) are influenced by learning theory [where] weak classifiers that predict marginally better than random are combined (or boosted) to produce an ensemble classifier with a superior generalized misclassification error rate. The basic principles of gradient boosting are as follows: given a loss function (e.g., squared error for regression) and a weak learner (e.g., regression trees), the algorithm seeks to find an additive model that minimizes the loss function. The algorithm is typically initialized with the best guess of the response (e.g., the mean of the response in regression). The gradient (e.g., residual) is calculated, and a model is then fit to the residuals to minimize the loss function. The current model is added to the previous model, and the procedure continues for a user-specified number of iterations. To remedy for greediness (choosing the optimal weak learner at each stage) is to constrain the learning process by employing regularization, or shrinkage [where] only a fraction of the current predicted value (commonly referred to as the learning rate) is added to the previous iteration's predicted value. Stochastic Gradient Boosting (SGB) implements this all using random sampling during selection the of training data. This [final] modification improves the prediction accuracy of Boosting while also reducing the required computational resources.
-
-## Ensemble: Rule-Based Cubist (RBC)
-
-Cubist (RBC) is a rule-based model that is an amalgamation of several methodologies. [Previously] Cubist was only available in a commercial capacity, but in 2011 the [source code](http://www.rulequest.com) was released under an open-source license. Differences between Cubist and the previously described approaches for model trees and their rule-based variants are different techniques for linear model smoothing, creating rules, and pruning; an optional Boosting-like procedure called committees; predictions generated by the model rules can be adjusted using nearby points from the training set data. Cubist uses Manhattan (a.k.a. city block) distances to determine the nearest neighbors. Also, neighbors are only included if they are [not over the average distance] to the prediction sample.
+**Single Decision Tree or Ensemble Method**. A rule is defined as a distinct path through a tree. The number of samples affected by a rule is called its coverage. An initial [unsmoothed] model tree is created [and] only the rule with the largest coverage is saved from this model. The samples covered by the rule are removed from the training set and another model tree is created with the remaining data. Again, only the rule with the maximum coverage is retained. This process repeats until all the training set data have been covered by at least one rule. A new sample is predicted by determining which rule(s) it falls under then the linear model associated with the largest coverage is applied. Pruning has a large effect on the model and smoothing has a larger impact on unpruned models. Cubist (CUBE) is a rule-based model that is an amalgamation of several methodologies. [Previously] Cubist was only available in a commercial capacity, but in 2011 the [source code](http://www.rulequest.com) was released under an open-source license. Differences between Cubist and the previously described approaches for model trees and their rule-based variants are different techniques for linear model smoothing, creating rules, and pruning; an optional Boosting-like [ensemble] procedure called committees; predictions generated by the model rules can be adjusted using nearby points from the training set data. Cubist uses Manhattan (a.k.a. city block) distances to determine the nearest neighbors. Also, neighbors are only included if they are [not over the average distance] to the prediction sample.
 
 ## Exercise 8.1
 
@@ -214,10 +210,10 @@ varimp3 <- varImp(fit5)
 varimp4 <- varImp(fit6)
 colnames(varimp1) <- "Simulated_BAG" 
 colnames(varimp2) <- "Correlated_BAG"
-colnames(varimp3) <- "Simulated_RBC"
-colnames(varimp4) <- "Correlated_RBC"
+colnames(varimp3) <- "Simulated_CUBE"
+colnames(varimp4) <- "Correlated_CUBE"
 padding1 <- data.frame(Simulated_BAG=NA, row.names="V11")
-padding2 <- data.frame(Simulated_RBC=NA, row.names="V11")
+padding2 <- data.frame(Simulated_CUBE=NA, row.names="V11")
 data.frame(rbind(varimp1, padding1), varimp2, rbind(varimp3, padding2), varimp4)
 ```
 
@@ -458,7 +454,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 #### Results
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-models <- c("CART","RF","RBC_1.0","RBC_1.n","RBC_C.0","RBC_C.n")
+models <- c("CART","RF","CUBE_1.0","CUBE_1.n","CUBE_C.0","CUBE_C.n")
 fcast1 <- predict(tune1, newdata = SOL_test_X)
 fcast2 <- predict(tune2, newdata = SOL_test_X)
 fcast3 <- predict(tune3, newdata = SOL_test_X)
@@ -554,8 +550,8 @@ metrics <- function(tune) {
   return(cbind(RMSE, Rsquared, MAE)) }
 data.frame(rbind(metrics(tune1), metrics(tune2), metrics(tune3), 
   metrics(tune4), metrics(tune5), metrics(tune6)), 
-  row.names = c("PLS","CART","BAG","RF","SGB","RBC"))
-fits <- list(PLS=tune1, CART=tune2, BAG=tune3, RF=tune4, SGB=tune5, RBC=tune6)
+  row.names = c("PLS","CART","BAG","RF","SGB","CUBE"))
+fits <- list(PLS=tune1, CART=tune2, BAG=tune3, RF=tune4, SGB=tune5, CUBE=tune6)
 bwplot(resamples(fits))
 ```
 
@@ -738,7 +734,7 @@ tune2 <- train(x = CMP_train_X, y = CMP_train$Yield,
   method = "knn", tuneGrid = tg2, trControl = ctrl2)
 ```
 
-#### Single: Regression Tree (CART)
+#### Regression Tree (CART)
 
 To tune an CART tree over the complexity parameter, the method option in the train function should be set to `rpart`. To tune over maximum depth, the method option should be set to `rpart2`.
 
@@ -750,7 +746,7 @@ tune3 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "rpart2",
   metric = "Rsquared", tuneGrid = tg3, trControl = ctrl3)
 ```
 
-#### Single: Conditional Inference Tree (CIT)
+#### Conditional Inference Tree (CIT)
 
 The number of randomly selected predictors to choose from at each split is set by `mtry`. since random forests is computationally intensive, tune `mtry` with around five values that are somewhat evenly spaced across the range from 2 to $P$, where $P$ is the number of predictors.
 
@@ -762,7 +758,7 @@ tune4 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "ctree2",
   metric = "Rsquared", tuneGrid = tg4, trControl = ctrl4)
 ```
 
-#### Single: Model Tree (M5)
+#### Regression Model Tree (M5)
 
 Specify the minimum number of samples needed to further splits with $M$.
 
@@ -775,7 +771,7 @@ tune5 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "M5",
   metric = "Rsquared", tuneGrid = tg5, trControl = ctrl5)
 ```
 
-#### Ensemble: Bagged Trees (BAG)
+#### Bagged Trees (BAG)
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 n <- ncol(CMP_train_X)
@@ -788,7 +784,7 @@ tune6 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "bag", B = 25,
   metric = "Rsquared", tuneGrid = tg6, trControl = ctrl6, bagControl = bag6)
 ```
 
-#### Ensemble: Random Forest (RF)
+#### Random Forest (RF)
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
@@ -798,7 +794,7 @@ tune7 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "rf",
   metric = "Rsquared", tuneGrid = tg7, trControl = ctrl7)
 ```
 
-#### Ensemble: Boosted Trees (SGB)
+#### Boosted Trees (SGB)
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
@@ -809,7 +805,7 @@ tune8 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "gbm",
   metric = "Rsquared", tuneGrid = tg8, trControl = ctrl8, verbose=F)
 ```
 
-#### Ensemble: Rule-Based Cubist (RBC)
+#### Rule-Based Cubist (CUBE)
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
@@ -861,7 +857,7 @@ plot(tune8)
 ```
 ```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
 tune9$modelInfo$label
-data.frame(model="RBC", tune9$bestTune, RMSE=min(tune9$results$RMSE), row.names="")
+data.frame(model="CUBE", tune9$bestTune, RMSE=min(tune9$results$RMSE), row.names="")
 plot(tune9)
 ```
 
@@ -876,7 +872,7 @@ metrics <- function(tune) {
 data.frame(rbind(metrics(tune1), metrics(tune2),
   metrics(tune3), metrics(tune4), metrics(tune5),
   metrics(tune6), metrics(tune7), metrics(tune8), metrics(tune9)),
-  row.names = c("PLS","KNN","CART","CIT","M5","BAG","RF","SGB","RBC"))
+  row.names = c("PLS","KNN","CART","CIT","M5","BAG","RF","SGB","CUBE"))
 ```
 
 ##### Validation on Test Set 
@@ -904,7 +900,7 @@ data.frame(rbind(postResample(pred = fcast1, obs = CMP_test$Yield),
   postResample(pred = fcast7, obs = CMP_test$Yield),
   postResample(pred = fcast8, obs = CMP_test$Yield),
   postResample(pred = fcast9, obs = CMP_test$Yield)), 
-  row.names =  c("PLS","KNN","CART","CIT","M5","BAG","RF","SGB","RBC"))
+  row.names =  c("PLS","KNN","CART","CIT","M5","BAG","RF","SGB","CUBE"))
 ```
 
 #### Interpretation
@@ -926,11 +922,11 @@ dotPlot(varImp(tune6), top=15)
 varimp1 <- varImp(tune9)$importance
 varimp2 <- varImp(tune1)$importance
 varimp3 <- varImp(tune2)$importance
-colnames(varimp1) <- "RBC"
+colnames(varimp1) <- "CUBE"
 colnames(varimp2) <- "PLS"
 colnames(varimp3) <- "KNN"
 imp <- data.frame(varimp1, varimp2, varimp3)
-head(imp[order(imp$RBC, decreasing = T), ], 15)
+head(imp[order(imp$CUBE, decreasing = T), ], 15)
 ```
 
 #### Interpretation
