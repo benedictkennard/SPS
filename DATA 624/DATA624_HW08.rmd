@@ -52,7 +52,7 @@ library(AppliedPredictiveModeling)
 
 **Single Decision Tree**. In Simple Regression Trees each terminal node uses the average of the training set outcomes in that node for prediction and therefore may not do a good job predicting samples whose true outcomes are extremely high or low.  The Regression Model Tree approach implemented with the **M5** algorithm uses different splitting criterion, predicts the outcome using a linear model, and results in a model that is often a combination of the predictions from different models along the same path through the tree. Like Simple Regression Trees, the initial split is found using an exhaustive search over the predictors and training set samples, but, unlike those models, the expected reduction in the node's error rate is used. Model Trees also incorporate a type of smoothing to decrease the potential for over-fitting. This smoothing can have a significant positive effect on the Model Tree when the linear models across nodes are very different.
 
-## Bagged Trees (BAG)
+## Bootstrap Aggregation (BAG)
 
 **Ensemble Method**. Models based on single trees have particular weaknesses: (1) model instability (i.e., slight changes in the data can drastically change the structure of the tree or rules and, hence, the interpretation) and (2) less-than-optimal predictive performance. To combat these problems, researchers developed ensemble methods that combine many trees into one model. In the 1990s, ensemble techniques (methods that combine many models' predictions) began to appear. Bagging (**BAG**), short for <u>b</u>ootstrap <u>agg</u>regation, was one of the earliest developed ensemble techniques. Bagging is a general approach that uses bootstrapping in conjunction with any regression (or classification) model to construct an ensemble. Each model in the ensemble is used to generate a prediction for a new sample and these $m$ predictions are averaged to give the bagged model's prediction. For models that produce an unstable prediction, like regression trees, aggregating over many versions of the training data reduces the variance in the prediction and, hence, makes the prediction more stable. Bagging stable, lower variance models like [linear regression](https://rpubs.com/josezuniga/253955) and [MARS](https://rpubs.com/josezuniga/376348) offers less improvement in predictive performance. Although Bagging usually improves predictive performance for unstable models, results are less interpretable and computational costs are higher. CART (or conditional inference trees) can be used as the base learner in random forests.
 
@@ -60,7 +60,7 @@ library(AppliedPredictiveModeling)
 
 **Ensemble Method**. Generating bootstrap samples introduces a random component into the tree building process, which induces a distribution of trees, and therefore also a distribution of predicted values for each sample. The trees in Bagging, however, are not completely independent of each other since all the original predictors are considered at every split of every tree. This characteristic is known as tree correlation and prevents Bagging from optimally reducing variance of the predicted values. Random Forests (**RF**) are a unified model that [de-correlates trees by] adding randomness to the tree construction (learning) process [through implementation of] random split selection[, building] entire trees based on random subsets of descriptors[, and] adding noise to the response in order to perturb tree structure. This ensemble of many independent, strong learners yields an improvement in error rates that is robust to a noisy response. At the same time, the independence of learners can underfit data when the response is not noisy. Compared to Bagging, Random Forests is more computationally efficient on a tree-by-tree basis. The ensemble nature of Random Forests makes it impossible to gain an understanding of the relationship between the predictors and the response. CART (or conditional inference trees) can be used as the base learner in random forests.
 
-## Boosted Trees (SGB)
+## Stochastic Gradient Boosting (SGB)
 
 **Ensemble Method**. Boosting models were originally developed for classification problems and were later extended to the regression setting. Boosting algorithms (gradient boosting machines) are influenced by learning theory [where] weak classifiers that predict marginally better than random are combined (or boosted) to produce an ensemble classifier with a superior generalized misclassification error rate. The basic principles of gradient boosting are as follows: given a loss function (e.g., squared error for regression) and a weak learner (e.g., regression trees), the algorithm seeks to find an additive model that minimizes the loss function. The algorithm is typically initialized with the best guess of the response (e.g., the mean of the response in regression). The gradient (e.g., residual) is calculated, and a model is then fit to the residuals to minimize the loss function. The current model is added to the previous model, and the procedure continues for a user-specified number of iterations. To remedy for greediness (choosing the optimal weak learner at each stage) is to constrain the learning process by employing regularization, or shrinkage [where] only a fraction of the current predicted value (commonly referred to as the learning rate) is added to the previous iteration's predicted value. Stochastic Gradient Boosting (**SGB**) implements this all using random sampling during selection the of training data. This [final] modification improves the prediction accuracy of Boosting while also reducing the required computational resources.
 
@@ -734,7 +734,7 @@ tune2 <- train(x = CMP_train_X, y = CMP_train$Yield,
   method = "knn", tuneGrid = tg2, trControl = ctrl2)
 ```
 
-#### Regression Tree (CART)
+#### Classification and Regression Tree (CART)
 
 To tune an CART tree over the complexity parameter, the method option in the train function should be set to `rpart`. To tune over maximum depth, the method option should be set to `rpart2`.
 
@@ -771,7 +771,7 @@ tune5 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "M5",
   metric = "Rsquared", tuneGrid = tg5, trControl = ctrl5)
 ```
 
-#### Bagged Trees (BAG)
+#### Bootstrap Aggregation (BAG)
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 n <- ncol(CMP_train_X)
@@ -794,7 +794,7 @@ tune7 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "rf",
   metric = "Rsquared", tuneGrid = tg7, trControl = ctrl7)
 ```
 
-#### Boosted Trees (SGB)
+#### Stochastic Gradient Boosting (SGB)
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
