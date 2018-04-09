@@ -96,11 +96,12 @@ Did the random forest model significantly use the uninformative predictors (`V6`
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Methods for fitting the random forest model and the variable importance score calculations are given in the question setup. The function `randomForest()` is used for fitting the model. The parameter values `importance=TRUE` and `ntree=1000` dictate that the importance of predictors should be assessed and that the model should grow 1000 trees. The `varImp()` function calculates the variable importance for the model. The `dotPlot()` function create a dotplot of variable importance values. 
 
 #### Results
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
+dotPlot(varimp1, top=15)
 varimp1
 ```
 
@@ -115,7 +116,7 @@ Now add an additional predictor that is highly correlated with one of the inform
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
 duplicated <- simulated
-duplicated$V11 <- duplicated$V1 + rnorm(200) * .1
+duplicated$V11 <- duplicated$V1 + rnorm(200) * 0.1
 cor(duplicated$V11, duplicated$V1)
 ```
 
@@ -123,7 +124,7 @@ Fit another random forest model to these data. Did the importance score for `V1`
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Methods for adding an additional predictor that is highly correlated with one of the informative predictors are given in the question setup. This is done using the `rnorm()` function which produces pseudo-random Gaussian numbers. Specifically, the question setup adds 200 random numbers multiplied by 10% to `V1` to create `V11`. The correlation between `V1` and `V11` is then confirmed with the base R `cor()` function. This new dataset from the question setup is fitted with a Random Forest model using the same `randomForest()` function. Again, the parameter values `importance=TRUE` and `ntree=1000` dictate that the importance of predictors should be assessed and that the model should grow 1000 trees. The `varImp()` function then calculates the variable importance for the new model. The variable importance calculations for both models are then output is a data frame for comparison. To create the data frame the first model needs to be padded with a `V11` predictor that has a variable importance value of `NA`.
 
 #### Results
 
@@ -151,10 +152,6 @@ Use the `cforest` function in the party package to fit a random forest model usi
 #### Approach
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-Standard and conditional variable importance for `cforest`, following the permutation principle of the "mean decrease in accuracy"" importance in `randomForest`. `conditional` is a logical determining whether unconditional or conditional computation of the importance is performed.
-
-https://www.rdocumentation.org/packages/party/versions/1.2-4/topics/varimp
 
 #### Results
 
@@ -985,5 +982,7 @@ https://github.com/topepo/caret/blob/master/RegressionTests/Code/ctree2.R
 http://www.rdocumentation.org/packages/caret/versions/6.0-79/topics/train
 
 https://github.com/topepo/caret/blob/master/RegressionTests/Code/cforest.R
+
+https://www.rdocumentation.org/packages/party/versions/1.2-4/topics/varimp
 
 https://www.rdocumentation.org/packages/caret/versions/6.0-78/topics/varImp
