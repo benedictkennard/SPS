@@ -1,10 +1,10 @@
 ---
-title: "Regression Tree Models"
+title: "Regression Trees and Rule-Based Models"
 author: "Jose Zuniga"
 output:
   html_document:
     toc: yes
-    toc_depth: 3
+    toc_depth: 2
 ---
 
 ```{r setup, include=FALSE}
@@ -12,20 +12,72 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r message=FALSE, warning=FALSE}
+if (!require("gbm")) install.packages("gbm")
+if (!require("pls")) install.packages("pls")
 if (!require("caret")) install.packages("caret")
+if (!require("ipred")) install.packages("ipred")
+if (!require("party")) install.packages("party")
+if (!require("rpart")) install.packages("rpart")
+if (!require("RWeka")) install.packages("RWeka")
+if (!require("Cubist")) install.packages("caret")
 if (!require("mlbench")) install.packages("mlbench")
+if (!require("elasticnet")) install.packages("elasticnet")
 if (!require("randomForest")) install.packages("randomForest")
+if (!require("AppliedPredictiveModeling")) install.packages("AppliedPredictiveModeling")
+library(gbm)
+library(pls)
 library(caret)
+library(ipred)
+library(party)
+library(rpart)
+library(RWeka)
+library(Cubist)
 library(mlbench)
+library(elasticnet)
 library(randomForest)
+library(AppliedPredictiveModeling)
 ```
+
+**Note**: Model descriptions are from *Applied Predictive Modeling* by Max Kuhn and Kjell Johnson. Solutions are modifications of those posted by Max Kuhn on his public [GitHub](https://github.com/topepo/APM_Exercises) page. Function descriptions are from the [RDocumentation](https://www.rdocumentation.org) website. 
+
+## Single: Regression Tree (CART)
+
+Tree-based models generate a set of conditions that are highly interpretable and are easy to implement. They can effectively handle many types of predictors (sparse, skewed, continuous, categorical, etc.) without the need to pre-process them (imputation, feature selection, etc.). In addition, these models do not require the user to specify the form of the predictors relationship to the response like, for example, a linear regression model requires. There are many techniques for constructing regression trees. One of the oldest and most utilized is the Classification and Regression Tree (CART) methodology also known as recursive partitioning. For regression, the model begins with the entire data set and searches every distinct value of every predictor to find the predictor and split value that partitions the data into two groups such that the overall sums of squares error are minimized. Then within each of [the] groups, this method searches for the predictor and split value that best reduces SSE until the number of samples in the splits falls below some threshold. The fully grown tree is then pruned back to a potentially smaller depth [to mitigate over-fitting]. If a predictor is never used in a split, the prediction equation is independent of those data.
+
+## Single: Conditional Inference Tree (CIT)
+
+Conditional Inference Trees (CIT) describe a unified framework for unbiased tree-based models for regression, classification, and other scenarios. Statistical hypothesis tests are used to do an exhaustive search across the predictors and their possible split points. For a candidate split, a statistical test is used to evaluate the difference between the means of the two groups created by the split and a $p$-value can be computed for the test. Multiple comparison corrections reduce the number of false-positive test results that are incurred by conducting [several] statistical hypothesis tests. This reduces bias for highly granular data. This algorithm does not use pruning. As data sets are split, the decrease in the number of samples reduces the power of the hypothesis tests. This results in higher $p$-values and a lower likelihood of a new split (and over-fitting). Statistical hypothesis tests are not directly related to predictive performance and it is therefore still advisable to choose the complexity of the tree on the basis of performance (via resampling or some other means).
+
+## Single: Rule-Based Model (RBM)
+
+A rule is defined as a distinct path through a tree. A new sample can only travel down a single path through the tree defined by these rules. The number of samples affected by a rule is called its coverage. The complexity of the model tree can be reduced by [pruning], removing entire rules, or removing some of the conditions that define the rule. The "separate and conquer" strategy derives rules from many different model trees instead of from a single tree. An initial [unsmoothed] model tree is created [and] only the rule with the largest coverage is saved from this model. The samples covered by the rule are removed from the training set and another model tree is created with the remaining data. Again, only the rule with the maximum coverage is retained. This process repeats until all the training set data have been covered by at least one rule. A new sample is predicted by determining which rule(s) it falls under then applies the linear model associated with the largest coverage. As with the model trees, pruning has a large effect on the model and smoothing has a larger impact on unpruned models.
+
+## Single: Model Tree (M5)
+
+In Simple Regression Trees each terminal node uses the average of the training set outcomes in that node for prediction and therefore may not do a good job predicting samples whose true outcomes are extremely high or low.  The Regression Model Tree approach implemented with the M5 algorithm uses different splitting criterion, predicts the outcome using a linear model, and results in a model that is often a combination of the predictions from different models along the same path through the tree. Like Simple Regression Trees, the initial split is found using an exhaustive search over the predictors and training set samples, but, unlike those models, the expected reduction in the node's error rate is used. Model Trees also incorporate a type of smoothing to decrease the potential for over-fitting. This smoothing can have a significant positive effect on the Model Tree when the linear models across nodes are very different.
+
+## Ensemble: Bagged Trees (BAG)
+
+Models based on single trees have particular weaknesses: (1) model instability (i.e., slight changes in the data can drastically change the structure of the tree or rules and, hence, the interpretation) and (2) less-than-optimal predictive performance. To combat these problems, researchers developed ensemble methods that combine many trees into one model. In the 1990s, ensemble techniques (methods that combine many models' predictions) began to appear. Bagging, short for **b**ootstrap **agg**regation, was one of the earliest developed ensemble techniques. Bagging is a general approach that uses bootstrapping in conjunction with any regression (or classification) model to construct an ensemble. Each model in the ensemble is used to generate a prediction for a new sample and these $m$ predictions are averaged to give the bagged model's prediction. For models that produce an unstable prediction, like regression trees, aggregating over many versions of the training data reduces the variance in the prediction and, hence, makes the prediction more stable. Bagging stable, lower variance models like [linear regression](https://rpubs.com/josezuniga/253955) and [MARS](https://rpubs.com/josezuniga/376348) offers less improvement in predictive performance. Although Bagging usually improves predictive performance for unstable models, results are less interpretable and computational costs are higher. CART (or conditional inference trees) can be used as the base learner in random forests.
+
+## Ensemble: Random Forest (RF)
+
+Generating bootstrap samples introduces a random component into the tree building process, which induces a distribution of trees, and therefore also a distribution of predicted values for each sample. The trees in Bagging, however, are not completely independent of each other since all the original predictors are considered at every split of every tree. This characteristic is known as tree correlation and prevents Bagging from optimally reducing variance of the predicted values. Random Forests are a unified model that [de-correlates trees by] adding randomness to the tree construction (learning) process [through implementation of] random split selection[, building] entire trees based on random subsets of descriptors[, and] adding noise to the response in order to perturb tree structure. This ensemble of many independent, strong learners yields an improvement in error rates that is robust to a noisy response. At the same time, the independence of learners can underfit data when the response is not noisy. Compared to Bagging, Random Forests is more computationally efficient on a tree-by-tree basis. The ensemble nature of Random Forests makes it impossible to gain an understanding of the relationship between the predictors and the response. CART (or conditional inference trees) can be used as the base learner in random forests.
+
+## Ensemble: Boosted Trees (SGB)
+
+Boosting models were originally developed for classification problems and were later extended to the regression setting. Boosting algorithms (gradient boosting machines) are influenced by learning theory [where] weak classifiers that predict marginally better than random are combined (or boosted) to produce an ensemble classifier with a superior generalized misclassification error rate. The basic principles of gradient boosting are as follows: given a loss function (e.g., squared error for regression) and a weak learner (e.g., regression trees), the algorithm seeks to find an additive model that minimizes the loss function. The algorithm is typically initialized with the best guess of the response (e.g., the mean of the response in regression). The gradient (e.g., residual) is calculated, and a model is then fit to the residuals to minimize the loss function. The current model is added to the previous model, and the procedure continues for a user-specified number of iterations. To remedy for greediness (choosing the optimal weak learner at each stage) is to constrain the learning process by employing regularization, or shrinkage [where] only a fraction of the current predicted value (commonly referred to as the learning rate) is added to the previous iteration's predicted value. Stochastic Gradient Boosting (SGB) implements this all using random sampling during selection the of training data. This [final] modification improves the prediction accuracy of Boosting while also reducing the required computational resources.
+
+## Ensemble: Rule-Based Cubist (RBC)
+
+Cubist (RBC) is a rule-based model that is an amalgamation of several methodologies. [Previously] Cubist was only available in a commercial capacity, but in 2011 the [source code](www.RuleQuest.com) was released under an open-source license. Differences between Cubist and the previously described approaches for model trees and their rule-based variants are different techniques for linear model smoothing, creating rules, and pruning; an optional Boosting-like procedure called committees; predictions generated by the model rules can be adjusted using nearby points from the training set data. Cubist uses Manhattan (a.k.a. city block) distances to determine the nearest neighbors. Also, neighbors are only included if they are [not over the average distance] to the prediction sample.
 
 ## Exercise 8.1
 
-Recreate the simulated data from Exercise 7.2:
+Recreate the simulated data from [Exercise 7.2](http://rpubs.com/josezuniga/376348):
 
-```{r fig.align='center', cache=TRUE}
-set.seed(200)
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
 simulated <- mlbench.friedman1(200, sd = 1)
 simulated <- cbind(simulated$x, simulated$y)
 simulated <- as.data.frame(simulated)
@@ -36,9 +88,12 @@ colnames(simulated)[ncol(simulated)] <- "y"
 
 Fit a random forest model to all of the predictors, then estimate the variable importance scores:
 
-```{r fig.align='center', cache=TRUE}
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
 model1 <- randomForest(y ~ ., data=simulated, importance=TRUE, ntree=1000)
-rfImp1 <- varImp(model1, scale = FALSE)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+varimp1 <- varImp(model1)
 ```
 
 Did the random forest model significantly use the uninformative predictors (`V6` - `V10`)?
@@ -49,7 +104,8 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 #### Results
 
-```{r fig.align='center', cache=TRUE}
+```{r warning=F, message=F, fig.align='center', cache=T}
+varimp1
 ```
 
 #### Interpretation
@@ -60,9 +116,11 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 Now add an additional predictor that is highly correlated with one of the informative predictors. For example:
 
-```{r fig.align='center', cache=TRUE}
-simulated$duplicate1 <- simulated$V1 + rnorm(200) * .1
-cor(simulated$duplicate1, simulated$V1)
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+duplicated <- simulated
+duplicated$V11 <- duplicated$V1 + rnorm(200) * .1
+cor(duplicated$V11, duplicated$V1)
 ```
 
 Fit another random forest model to these data. Did the importance score for `V1` change? What happens when you add another predictor that is also highly correlated with `V1`?
@@ -73,7 +131,17 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 #### Results
 
-```{r fig.align='center', cache=TRUE}
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+model2 <- randomForest(y ~ ., data=duplicated, importance=TRUE, ntree=1000)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+varimp1 <- varImp(model1)
+varimp2 <- varImp(model2)
+colnames(varimp1) <- "Simulated" 
+colnames(varimp2) <- "Correlated"
+padding <- data.frame(Simulated=NA, row.names="V11")
+data.frame(rbind(varimp1, padding), varimp2)
 ```
 
 #### Interpretation
@@ -88,9 +156,31 @@ Use the `cforest` function in the party package to fit a random forest model usi
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+Standard and conditional variable importance for `cforest`, following the permutation principle of the "mean decrease in accuracy"" importance in `randomForest`. `conditional` is a logical determining whether unconditional or conditional computation of the importance is performed.
+
+https://www.rdocumentation.org/packages/party/versions/1.2-4/topics/varimp
+
 #### Results
 
-```{r fig.align='center', cache=TRUE}
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+ctrl1 <- cforest_control(mtry = ncol(simulated) - 1)
+fit1 <- cforest(y ~ ., data = simulated, controls = ctrl1)
+ctrl2 <- cforest_control(mtry = ncol(duplicated) - 1)
+fit2 <- cforest(y ~ ., data = duplicated, controls = ctrl2)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+varimp1 <- varImp(fit1)
+varimp2 <- varImp(fit2)
+varimp3 <- varImp(fit1, conditional=T)
+varimp4 <- varImp(fit2, conditional=T)
+colnames(varimp1) <- "Simulated_CIT_UI" 
+colnames(varimp2) <- "Correlated_CIT_UI"
+colnames(varimp3) <- "Simulated_CIT_CI" 
+colnames(varimp4) <- "Correlated_CIT_CI"
+padding1 <- data.frame(Simulated_CIT_UI=NA, row.names="V11")
+padding2 <- data.frame(Simulated_CIT_CI=NA, row.names="V11")
+data.frame(rbind(varimp1, padding1), varimp2, rbind(varimp3, padding2), varimp4)
 ```
 
 #### Interpretation
@@ -100,8 +190,6 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ### Exercise 8.1.d
 
 Repeat this process with different tree models, such as boosted trees and Cubist. Does the same pattern occur?
-![](DATA624_HW08.png)
-A comparison of variable importance magnitudes for differing values of the bagging fraction and shrinkage parameters. Both tuning parameters are set to 0.1 in the left figure. Both are set to 0.9 in the right figure
 
 #### Approach
 
@@ -109,7 +197,28 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 #### Results
 
-```{r fig.align='center', cache=TRUE}
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+fit3 <- bagging(y ~ ., simulated, nbag = 50)
+fit4 <- bagging(y ~ ., duplicated, nbag = 50)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+fit5 <- cubist(x=simulated[,-11], y=simulated[,11], committees = 100)
+fit6 <- cubist(x=duplicated[,-11], y=duplicated[,11], committees = 100)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+varimp1 <- varImp(fit3)
+varimp2 <- varImp(fit4)
+varimp3 <- varImp(fit5)
+varimp4 <- varImp(fit6)
+colnames(varimp1) <- "Simulated_BAG" 
+colnames(varimp2) <- "Correlated_BAG"
+colnames(varimp3) <- "Simulated_RBC"
+colnames(varimp4) <- "Correlated_RBC"
+padding1 <- data.frame(Simulated_BAG=NA, row.names="V11")
+padding2 <- data.frame(Simulated_RBC=NA, row.names="V11")
+data.frame(rbind(varimp1, padding1), varimp2, rbind(varimp3, padding2), varimp4)
 ```
 
 #### Interpretation
@@ -124,9 +233,22 @@ Use a simulation to show tree bias with different granularities.
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+Single Regression Trees suffer from selection bias: predictors with a higher number of distinct values are favored over more granular predictors. The danger occurs when a data set consists of a mix of informative and noise variables, and the noise variables have many more splits than the informative variables. Then there is a high probability that the noise variables will be chosen to split the top nodes of the tree. Pruning will produce either a tree with misleading structure or no tree at all.
+
 #### Results
 
-```{r fig.align='center', cache=TRUE}
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+X1 <- rep(1:2, each=100)
+Y <- X1 + rnorm(200, mean=0, sd=4)
+set.seed(624)
+X2 <- rnorm(200, mean=0, sd=2)
+simData <- data.frame(Y=Y, X1=X1, X2=X2)
+set.seed(624)
+fit <- rpart(Y ~ ., data = simData)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+varImp(fit)
 ```
 
 #### Interpretation
@@ -135,7 +257,45 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 ## Exercise 8.3
 
-In stochastic gradient boosting the bagging fraction and learning rate will govern the construction of the trees as they are guided by the gradient. Although the optimal values of these parameters should be obtained through the tuning process, it is helpful to understand how the magnitudes of these parameters affect magnitudes of variable importance. Figure 8.24 provides the variable importance plots for boosting using two extreme values for the bagging fraction (0.1 and 0.9) and the learning rate (0.1 and 0.9) for the solubility data. The left-hand plot has both parameters set to 0.1, and the right-hand plot has both set to 0.9:
+In Stochastic Gradient Boosting the Bagging fraction and learning rate will govern the construction of the trees as they are guided by the gradient. Although the optimal values of these parameters should be obtained through the tuning process, it is helpful to understand how the magnitudes of these parameters affect magnitudes of variable importance. [The below generates] variable importance plots for boosting using two extreme values for the Bagging fraction (0.1 and 0.9) and the learning rate (0.1 and 0.9) for the solubility data.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+data(solubility)
+X <- solTrainXtrans; Y <- solTrainY
+indx <- createFolds(Y, returnTrain = T)
+ctrl <- trainControl(method = "cv", index = indx)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg1 <- expand.grid(interaction.depth=seq(1,7,by=2), 
+  n.trees=seq(100,1000,by=100), shrinkage = c(0.01, 0.1), n.minobsinnode=10)
+tune1 <- train(X, Y, method="gbm", tuneGrid=tg1, trControl=ctrl, verbose=F)
+int_dpth <- tune1$bestTune$interaction.depth
+ntrees <- tune1$bestTune$n.trees
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg2 <- expand.grid(interaction.depth=int_dpth,
+  n.trees=ntrees, shrinkage=0.1, n.minobsinnode=10)
+tune2 <- train(X, Y, method = "gbm", tuneGrid=tg2,
+  trControl=ctrl, bag.fraction=0.1, verbose=F)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg3 <- expand.grid(interaction.depth=int_dpth,
+  n.trees=ntrees, shrinkage=0.9, n.minobsinnode=10)
+tune3 <- train(X, Y, method = "gbm", tuneGrid=tg3, 
+  trControl=ctrl, bag.fraction=0.9, verbose=F)
+```
+
+A comparison of variable importance magnitudes for differing values of the Bagging fraction and shrinkage parameters. The left-hand plot has both [tuning] parameters set to 0.1, and the right-hand plot has both [tuning parameters] set to 0.9:
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+varimp1 <- varImp(tune2, scale=F); varimp2 <- varImp(tune3, scale=F)
+plot1 <- plot(varimp1, top=25, scales=list(y=list(cex=.95)))
+plot2 <- plot(varimp2, top=25, scales=list(y=list(cex=.95)))
+print(plot1, split=c(1,1,2,1), more=T); print(plot2, split=c(2,1,2,1))
+```
 
 ### Exercise 8.3.a
 
@@ -147,7 +307,12 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 #### Results
 
-```{r fig.align='center', cache=TRUE}
+```{r warning=F, message=F, fig.align='center', cache=T}
+varimp1 <- varImp(tune1)$importance
+varimp2 <- varImp(tune2)$importance
+df <- data.frame(sort(varimp1$Overall, T), sort(varimp2$Overall, T))
+colnames(df) <- c("ShrinkBag_0.1" , "ShrinkBag_0.9")
+head(df, 15)
 ```
 
 #### Interpretation
@@ -164,7 +329,9 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 #### Results
 
-```{r fig.align='center', cache=TRUE}
+```{r warning=F, message=F, fig.align='center', cache=T}
+data.frame(model="SGB_0.1", tune2$bestTune, RMSE=min(tune2$results$RMSE), row.names="")
+data.frame(model="SGB_0.9", tune3$bestTune, RMSE=min(tune3$results$RMSE), row.names="")
 ```
 
 #### Interpretation
@@ -173,7 +340,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 ### Exercise 8.3.c
 
-How would increasing interaction depth affect the slope of predictor importance for either model in Fig. 8.24?
+How would increasing interaction depth affect the slope of predictor importance for either model?
 
 #### Approach
 
@@ -181,7 +348,358 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 #### Results
 
-```{r fig.align='center', cache=TRUE}
+```{r warning=F, message=F, fig.align='center', cache=T}
+plot(tune1)
+```
+
+#### Interpretation
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+## Exercise 8.4
+
+Use a single predictor in the solubility data, such as the molecular weight or the number of carbon atoms and fit several models:
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+data(solubility)
+SOL_train_X <- subset(solTrainXtrans, select="MolWeight")
+SOL_train_Y <- solTrainY
+SOL_test_X <- subset(solTestXtrans, select="MolWeight")
+SOL_test_Y <- solTestY
+```
+
+### Exercise 8.4.a
+
+A simple regression tree.
+
+#### Approach
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tune1 <- train(SOL_train_X, SOL_train_Y, method = "rpart2", tuneLength = 1)
+min(tune1$results$RMSE)
+```
+
+#### Interpretation
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+### Exercise 8.4.b
+
+A random forest model.
+
+#### Approach
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tune2 <- train(SOL_train_X, SOL_train_Y, method = "rf", tuneLength = 1)
+min(tune2$results$RMSE)
+```
+
+#### Interpretation
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+### Exercise 8.4.c
+
+Different Cubist models with a single rule or multiple committees (each with and without using neighbor adjustments).
+
+#### Approach
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg3 <- expand.grid(committees = 1, neighbors = 0)
+tune3 <- train(SOL_train_X, SOL_train_Y, method="cubist", verbose=F, metric="Rsquared", tuneGrid=tg3)
+min(tune3$results$RMSE)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg4 <- expand.grid(committees = 1, neighbors = c(1,3,5,7))
+tune4 <- train(SOL_train_X, SOL_train_Y, method="cubist", verbose=F, metric="Rsquared", tuneGrid=tg4)
+min(tune4$results$RMSE)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg5 <- expand.grid(committees = 100, neighbors = 0)
+tune5 <- train(SOL_train_X, SOL_train_Y, method="cubist", verbose=F, metric="Rsquared", tuneGrid=tg5)
+min(tune5$results$RMSE)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg6 <- expand.grid(committees = 100, neighbors = c(1,3,5,7))
+tune6 <- train(SOL_train_X, SOL_train_Y, method="cubist", verbose=F, metric="Rsquared", tuneGrid=tg6)
+min(tune6$results$RMSE)
+```
+
+#### Interpretation
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+### Exercise 8.4.d
+
+Plot the predictor data versus the solubility results for the test set. Overlay the model predictions for the test set. How do the models differ? Does changing the tuning parameter(s) significantly affect the model fit?
+
+#### Approach
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+models <- c("CART","RF","RBC_1.0","RBC_1.n","RBC_C.0","RBC_C.n")
+fcast1 <- predict(tune1, newdata = SOL_test_X)
+fcast2 <- predict(tune2, newdata = SOL_test_X)
+fcast3 <- predict(tune3, newdata = SOL_test_X)
+fcast4 <- predict(tune4, newdata = SOL_test_X)
+fcast5 <- predict(tune5, newdata = SOL_test_X)
+fcast6 <- predict(tune6, newdata = SOL_test_X)
+fcast <- cbind(fcast1, fcast2, fcast3, fcast4, fcast5, fcast6)
+par(mfrow=c(3, 2), mar = c(0, 1, 2, 0), oma = c(0, 0, 0.5, 0.5))
+for (i in 1:6) {
+  X <- SOL_test_X$MolWeight; Y <- SOL_test_Y
+  plot(X, Y, xaxt="n", yaxt="n", xlab="", ylab="", main=models[i])
+  par(new=T); 
+  plot(X, fcast[,i], xaxt="n", yaxt="n", xlab="", ylab="", col="blue")
+  
+}
+data.frame(row.names = models, rbind(
+  postResample(pred = fcast1, obs = SOL_test_Y), 
+  postResample(pred = fcast2, obs = SOL_test_Y), 
+  postResample(pred = fcast3, obs = SOL_test_Y),
+  postResample(pred = fcast4, obs = SOL_test_Y),
+  postResample(pred = fcast5, obs = SOL_test_Y),
+  postResample(pred = fcast6, obs = SOL_test_Y)))
+```
+
+#### Interpretation
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+## Exercise 8.5
+
+Fit different tree- and rule-based models for the Tecator data discussed [below]. How do they compare to linear models? Do the between-predictor correlations seem to affect your models? If so, how would you transform or re-encode the predictor data to mitigate this issue?
+
+> Infrared (IR) spectroscopy technology is used to determine the chemical makeup of a substance. The theory of IR spectroscopy holds that unique molecular structures absorb IR frequencies differently. In practice a spectrometer fires a series of IR frequencies into a sample material, and the device measures the absorbance of the sample at each individual frequency. This series of measurements creates a spectrum profile which can then be used to determine the chemical makeup of the sample material. A Tecator Infratec Food and Feed Analyzer instrument was used to analyze 215 samples of meat across 100 frequencies. In addition to an IR profile, analytical chemistry determined the percent content of water, fat, and protein for each sample. If we can establish a predictive relationship between IR spectrum and fat content, then food scientists could predict a sample's fat content with IR instead of using analytical chemistry. This would provide costs savings, since analytical chemistry is a more expensive, time-consuming process.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+data(tecator)
+set.seed(624)
+rows_train <- createDataPartition(endpoints[, 3], p = 3/4, list= FALSE)
+TEC_train_X <- as.data.frame(absorp[rows_train, ])
+TEC_test_X <- as.data.frame(absorp[-rows_train, ])
+TEC_train_Y <- endpoints[rows_train, 3]
+TEC_test_Y <- endpoints[-rows_train, 3]
+ctrl <- trainControl(method = "repeatedcv", repeats = 5)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tune1 <- train(x = TEC_train_X, y = TEC_train_Y, method="pls",
+  trControl = ctrl, preProcess = c("center", "scale"), tuneLength = 25)
+```
+
+#### Approach
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tune2 <- train(x = TEC_train_X, y = TEC_train_Y, 
+  method="rpart", trControl = ctrl, tuneLength = 25)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tune3<- train(x = TEC_train_X, y = TEC_train_Y, 
+  method="treebag", trControl = ctrl)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tune4<- train(x = TEC_train_X, y = TEC_train_Y, method = "rf",
+  ntree = 1500, tuneLength = 10, trControl = ctrl)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg5 <- expand.grid(interaction.depth = seq(1, 7, by = 2),
+  n.trees = seq(100, 1000, by = 50), shrinkage = c(0.01, 0.1), n.minobsinnode=10)
+tune5 <- train(x = TEC_train_X, y = TEC_train_Y, method = "gbm",
+  verbose = FALSE, tuneGrid = tg5, trControl = ctrl)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg6 <- expand.grid(committees = c(1:10, 20, 50, 75, 100), neighbors = c(0, 1, 5, 9))
+tune6 <- train(x = TEC_train_X, y = TEC_train_Y, method = "cubist",
+  verbose = FALSE, tuneGrid = tg6, trControl = ctrl)
+```
+
+##### Training Set Resampling
+
+```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+metrics <- function(tune) {
+  RMSE = min(tune$results$RMSE)
+  Rsquared = max(tune$results$Rsquared)
+  MAE = min(tune$results$MAE)
+  return(cbind(RMSE, Rsquared, MAE)) }
+data.frame(rbind(metrics(tune1), metrics(tune2), metrics(tune3), 
+  metrics(tune4), metrics(tune5), metrics(tune6)), 
+  row.names = c("PLS","CART","BAG","RF","SGB","RBC"))
+fits <- list(PLS=tune1, CART=tune2, BAG=tune3, RF=tune4, SGB=tune5, RBC=tune6)
+bwplot(resamples(fits))
+```
+
+#### Interpretation
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+## Exercise 8.6
+
+Return to the permeability problem described [below]. Train several tree-based models and evaluate the resampling and test set performance:
+
+> Permeability is the measure of a molecule's ability to cross a membrane. Compounds that appear to be effective for a particular disease in research screening experiments but appear to be poorly permeable may need to be altered in order to improve permeability and thus the compound's ability to reach the desired target. Permeability assays such as PAMPA and Caco-2 have been developed to help measure compounds' permeability. These screens are effective at quantifying a compound's permeability, but the assay is expensive labor intensive. Given a sufficient number of compounds that have been screened, we could develop a predictive model for permeability in an attempt to potentially reduce the need for the assay. In this project there were 165 unique compounds; 1,107 molecular fingerprints were determined for each. A molecular fingerprint is a binary sequence of numbers that represents the presence or absence of a specific molecular substructure. The response is highly skewed, the predictors are sparse, and many predictors are strongly associated. Developing a model to predict permeability could save significant resources for a pharmaceutical company, while at the same time more rapidly identifying molecules that have a sufficient permeability to become a drug.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+library(AppliedPredictiveModeling)
+data(permeability)
+nzv <- nearZeroVar(fingerprints)
+fingerprints <- fingerprints[,-nzv]
+set.seed(624)
+rows_train <- createDataPartition(permeability, p = 0.75, list = FALSE)
+PER_train_X <- fingerprints[rows_train,]
+PER_train_Y <- permeability[rows_train,]
+PER_test_X <- fingerprints[-rows_train,]
+PER_test_Y <- permeability[-rows_train,]
+ctrl <- trainControl(method = "LGOCV")
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg1 <- expand.grid(lambda = c(0, 0.05, .1), fraction = seq(.05, 1, length = 25))
+tune1 <- train(x = PER_train_X, y = log10(PER_train_Y), 
+  method = "enet", tuneGrid = tg1, trControl = ctrl)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg2 <- expand.grid(sigma = c(0.0005,0.001,0.0015), C = seq(1,49,by=6))
+tune2 <- train(x = PER_train_X, y = log10(PER_train_Y), 
+  method = "svmRadial", tuneGrid = tg2, trControl = ctrl)
+```
+
+### Exercise 8.6.a
+
+Which tree-based model gives the optimal resampling and test set performance?
+
+#### Approach
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg3 <- expand.grid(maxdepth= seq(1,10,by=1))
+tune3 <- train(x = PER_train_X, y = log10(PER_train_Y),
+  method = "rpart2", tuneGrid = tg3, trControl = ctrl)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tune4 <- train(x = PER_train_X, y = log10(PER_train_Y),
+  method = "rf", tuneLength = 10, importance = TRUE, trControl = ctrl)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+tg5 <- expand.grid(interaction.depth=seq(1,6,by=1), n.minobsinnode=10, 
+  n.trees=c(25,50,100,200), shrinkage=c(0.01,0.05,0.1))
+tune5 <- train(x = PER_train_X, y = log10(PER_train_Y),
+  method = "gbm", verbose = F, tuneGrid = tg5, trControl = ctrl)
+```
+
+##### Training Set Resampling
+
+```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+metrics <- function(tune) {
+  RMSE = min(tune$results$RMSE)
+  Rsquared = max(tune$results$Rsquared)
+  MAE = min(tune$results$MAE)
+  return(cbind(RMSE, Rsquared, MAE)) }
+data.frame(rbind(metrics(tune1), metrics(tune2), 
+  metrics(tune3), metrics(tune4), metrics(tune5)),
+  row.names = c("ENET","SVM","CART","RF","SGB"))
+fits <- list(ENET=tune1, SVM=tune2, CART=tune3, RF=tune4, SGB=tune5)
+bwplot(resamples(fits))
+```
+
+##### Validation on Test Set 
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+fcast1 <- predict(tune1, newdata = PER_test_X)
+fcast2 <- predict(tune2, newdata = PER_test_X)
+fcast3 <- predict(tune3, newdata = PER_test_X)
+fcast4 <- predict(tune4, newdata = PER_test_X)
+fcast5 <- predict(tune5, newdata = PER_test_X)
+data.frame(rbind(postResample(pred = fcast1, obs = PER_test_Y), 
+  postResample(pred = fcast2, obs = PER_test_Y), 
+  postResample(pred = fcast3, obs = PER_test_Y),
+  postResample(pred = fcast4, obs = PER_test_Y),
+  postResample(pred = fcast5, obs = PER_test_Y)), 
+  row.names = c("ENET","SVM","CART","RF","SGB"))
+```
+
+#### Interpretation
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+### Exercise 8.6.b
+
+Do any of these models outperform the covariance or non-covariance based regression models you have previously developed for these data? What criteria did you use to compare models' performance?
+
+#### Approach
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+metrics <- function(tune) {
+  RMSE = min(tune$results$RMSE)
+  Rsquared = max(tune$results$Rsquared)
+  MAE = min(tune$results$MAE)
+  return(cbind(RMSE, Rsquared, MAE)) }
+data.frame(rbind(metrics(tune1), metrics(tune2), 
+  metrics(tune3), metrics(tune4), metrics(tune5)),
+  row.names = c("ENET","SVM","CART","RF","SGB"))
+fits <- list(ENET=tune1, SVM=tune2, CART=tune3, RF=tune4, SGB=tune5)
+bwplot(resamples(fits))
+```
+
+#### Interpretation
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+### Exercise 8.6.c
+
+Of all the models you have developed thus far, which, if any, would you recommend to replace the permeability laboratory experiment?
+
+#### Approach
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+tune3$modelInfo$label
+data.frame(model="CART", tune3$bestTune, RMSE=min(tune3$results$RMSE), row.names="")
+plot(tune3)
 ```
 
 #### Interpretation
@@ -190,12 +708,120 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 ## Exercise 8.7
 
-Refer to Exercises 6.3 and 7.5 which describe a chemical manufacturing process. Use the same data imputation, data splitting, and pre-processing steps as before and train several tree-based models:
+Refer to Exercise [6.3](http://rpubs.com/josezuniga/366918) and [7.5](https://rpubs.com/josezuniga/376348) which describe a chemical manufacturing process. Use the same data imputation, data splitting, and pre-processing steps as before and train several tree-based models:
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+CMP <- get(data(ChemicalManufacturingProcess))
+rm(ChemicalManufacturingProcess) # list not needed
+set.seed(624)
+rows_train <- createDataPartition(CMP$Yield, p=0.75, list=F)
+CMP_train <- CMP[rows_train, ]
+CMP_test <- CMP[-rows_train, ]
+prepro <- preProcess(subset(CMP_train, select = - Yield),
+  method=c("BoxCox", "center", "scale", "knnImpute"))
+CMP_train_X <- predict(prepro, CMP_train[ , -1])
+nzv <- nearZeroVar(CMP_train_X)
+mcl <- findCorrelation(cor(CMP_train_X))
+CMP_train_X <- CMP_train_X[ ,-c(nzv, mcl)] 
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+ctrl1 <- trainControl(method = "boot", number = 25)
+tune1 <- train(x = CMP_train_X, y = CMP_train$Yield,
+  method="pls", tuneLength=15, trControl=ctrl1)
+```
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+ctrl2 <- trainControl(method = "cv")
+tg2 <- data.frame(.k = 1:20)
+tune2 <- train(x = CMP_train_X, y = CMP_train$Yield,
+  method = "knn", tuneGrid = tg2, trControl = ctrl2)
+```
+
+#### Single: Regression Tree (CART)
+
+To tune an CART tree over the complexity parameter, the method option in the train function should be set to `rpart`. To tune over maximum depth, the method option should be set to `rpart2`.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+ctrl3 <- trainControl(method = "boot", number = 25)
+tg3 <- expand.grid(maxdepth= seq(1,10,by=1))
+tune3 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "rpart2",
+  metric = "Rsquared", tuneGrid = tg3, trControl = ctrl3)
+```
+
+#### Single: Conditional Inference Tree (CIT)
+
+The number of randomly selected predictors to choose from at each split is set by `mtry`. since random forests is computationally intensive, tune `mtry` with around five values that are somewhat evenly spaced across the range from 2 to $P$, where $P$ is the number of predictors.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+ctrl4 <- trainControl(method = "cv")
+tg4 <- expand.grid(maxdepth= seq(1,10,by=1), mincriterion=1-c(0.01, 0.05, 0.1))
+tune4 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "ctree2",
+  metric = "Rsquared", tuneGrid = tg4, trControl = ctrl4)
+```
+
+#### Single: Model Tree (M5)
+
+Specify the minimum number of samples needed to further splits with $M$.
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+yn <- c("Yes","No")
+ctrl5 <- trainControl(method = "cv")
+tg5 <- expand.grid(pruned = yn, smoothed = yn, rules = yn)
+tune5 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "M5",
+  metric = "Rsquared", tuneGrid = tg5, trControl = ctrl5)
+```
+
+#### Ensemble: Bagged Trees (BAG)
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+n <- ncol(CMP_train_X)
+seq_len(abs(n))[n %% seq_len(abs(n)) == 0L]
+set.seed(624)
+bag6 <- bagControl(fit=ctreeBag$fit, predict=ctreeBag$pred, aggregate=ctreeBag$aggregate)
+ctrl6 <-trainControl(method = "cv")
+tg6 <- data.frame(vars = seq(2, n, 11))
+tune6 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "bag", B = 25, 
+  metric = "Rsquared", tuneGrid = tg6, trControl = ctrl6, bagControl = bag6)
+```
+
+#### Ensemble: Random Forest (RF)
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+ctrl7 <- trainControl(method = "boot", number = 25)
+tg7 <- expand.grid(mtry=seq(2,38,by=3))
+tune7 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "rf", 
+  metric = "Rsquared", tuneGrid = tg7, trControl = ctrl7)
+```
+
+#### Ensemble: Boosted Trees (SGB)
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+ctrl8 <- trainControl(method = "boot", number = 25)
+tg8 <- expand.grid(interaction.depth=seq(1,6,by=1), n.trees=c(25,50,100,200),
+  shrinkage=c(0.01,0.05,0.1,0.2), n.minobsinnode=10)
+tune8 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "gbm", 
+  metric = "Rsquared", tuneGrid = tg8, trControl = ctrl8, verbose=F)
+```
+
+#### Ensemble: Rule-Based Cubist (RBC)
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+set.seed(624)
+ctrl9 <- trainControl(method = "boot", number = 25)
+tg9 <- expand.grid(committees = c(1,5,10,20,50,100), neighbors = c(0,1,3,5,7))
+tune9 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "cubist", 
+  metric = "Rsquared", tuneGrid = tg9, trControl = ctrl9)
+```
 
 ### Exercise 8.7.a
 
 Which tree-based regression model gives the optimal resampling and test set performance?
-
 
 #### Approach
 
@@ -203,7 +829,82 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 #### Results
 
-```{r fig.align='center', cache=TRUE}
+```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+tune3$modelInfo$label
+data.frame(model="CART", tune3$bestTune, RMSE=min(tune3$results$RMSE), row.names="")
+plot(tune3)
+```
+```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+tune4$modelInfo$label
+data.frame(model="CIT", tune4$bestTune, RMSE=min(tune4$results$RMSE), row.names="")
+plot(tune4)
+```
+```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+tune5$modelInfo$label
+data.frame(model="M5", tune5$bestTune, RMSE=min(tune5$results$RMSE), row.names="")
+plot(tune5)
+```
+```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+tune6$modelInfo$label
+data.frame(model="BAG", tune5$bestTune, RMSE=min(tune6$results$RMSE), row.names="")
+plot(tune6)
+```
+```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+tune7$modelInfo$label
+data.frame(model="RF", tune7$bestTune, RMSE=min(tune7$results$RMSE), row.names="")
+plot(tune7)
+```
+```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+tune8$modelInfo$label
+data.frame(model="SGB", tune8$bestTune, RMSE=min(tune8$results$RMSE), row.names="")
+plot(tune8)
+```
+```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+tune9$modelInfo$label
+data.frame(model="RBC", tune9$bestTune, RMSE=min(tune9$results$RMSE), row.names="")
+plot(tune9)
+```
+
+##### Training Set Resampling
+
+```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+metrics <- function(tune) {
+  RMSE = min(tune$results$RMSE)
+  Rsquared = max(tune$results$Rsquared)
+  MAE = min(tune$results$MAE)
+  return(cbind(RMSE, Rsquared, MAE)) }
+data.frame(rbind(metrics(tune1), metrics(tune2),
+  metrics(tune3), metrics(tune4), metrics(tune5),
+  metrics(tune6), metrics(tune7), metrics(tune8), metrics(tune9)),
+  row.names = c("PLS","KNN","CART","CIT","M5","BAG","RF","SGB","RBC"))
+```
+
+##### Validation on Test Set 
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+CMP_test_X <- predict(prepro, CMP_test[ , -1])
+CMP_test_X <- CMP_test_X[ ,-c(nzv, mcl)] 
+val <- min(CMP_test_X[is.finite(CMP_test_X[,35]), 35])
+CMP_test_X[CMP_test_X[,35] == -Inf, 35] <- val
+fcast1 <- predict(tune1, newdata = CMP_test_X)
+fcast2 <- predict(tune2, newdata = CMP_test_X)
+fcast3 <- predict(tune3, newdata = CMP_test_X)
+fcast4 <- predict(tune4, newdata = CMP_test_X)
+fcast5 <- predict(tune5, newdata = CMP_test_X)
+fcast6 <- predict(tune6, newdata = CMP_test_X)
+fcast7 <- predict(tune7, newdata = CMP_test_X)
+fcast8 <- predict(tune8, newdata = CMP_test_X)
+fcast9 <- predict(tune9, newdata = CMP_test_X)
+data.frame(rbind(postResample(pred = fcast1, obs = CMP_test$Yield), 
+  postResample(pred = fcast2, obs = CMP_test$Yield), 
+  postResample(pred = fcast3, obs = CMP_test$Yield),
+  postResample(pred = fcast4, obs = CMP_test$Yield),
+  postResample(pred = fcast5, obs = CMP_test$Yield),
+  postResample(pred = fcast6, obs = CMP_test$Yield),
+  postResample(pred = fcast7, obs = CMP_test$Yield),
+  postResample(pred = fcast8, obs = CMP_test$Yield),
+  postResample(pred = fcast9, obs = CMP_test$Yield)), 
+  row.names =  c("PLS","KNN","CART","CIT","M5","BAG","RF","SGB","RBC"))
 ```
 
 #### Interpretation
@@ -220,7 +921,16 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 #### Results
 
-```{r fig.align='center', cache=TRUE}
+```{r warning=F, message=F, fig.align='center', cache=T}
+dotPlot(varImp(tune6), top=15)
+varimp1 <- varImp(tune9)$importance
+varimp2 <- varImp(tune1)$importance
+varimp3 <- varImp(tune2)$importance
+colnames(varimp1) <- "RBC"
+colnames(varimp2) <- "PLS"
+colnames(varimp3) <- "KNN"
+imp <- data.frame(varimp1, varimp2, varimp3)
+head(imp[order(imp$RBC, decreasing = T), ], 15)
 ```
 
 #### Interpretation
@@ -237,7 +947,15 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 #### Results
 
-```{r fig.align='center', cache=TRUE}
+```{r warning=F, message=F, fig.align='center', cache=T}
+important <- c('ManufacturingProcess32',
+              'BiologicalMaterial03',
+              'BiologicalMaterial06',
+              'ManufacturingProcess09',
+              'ManufacturingProcess25',
+              'ManufacturingProcess29')
+featurePlot(CMP_train_X[, important], CMP_train$Yield)
+cor(CMP_train_X[, important], CMP_train$Yield, method="kendall")
 ```
 
 #### Interpretation
@@ -246,6 +964,30 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 # References
 
+https://rpubs.com/josezuniga/376348
+
 http://appliedpredictivemodeling.com/
 
+https://github.com/topepo/APM_Exercises
+
+https://cran.r-project.org/web/packages/gbm/gbm.pdf
+
+https://cran.r-project.org/web/packages/caret/caret.pdf
+
+https://cran.r-project.org/web/packages/RWeka/RWeka.pdf
+
+https://topepo.github.io/caret/train-models-by-tag.html#Bagging
+
+https://github.com/topepo/caret/blob/master/RegressionTests/Code/M5.R
+
+https://github.com/topepo/caret/blob/master/RegressionTests/Code/bag.R
+
 http://appliedpredictivemodeling.com/blog/2014/11/12/solutions-on-github 
+
+https://github.com/topepo/caret/blob/master/RegressionTests/Code/ctree2.R
+
+http://www.rdocumentation.org/packages/caret/versions/6.0-79/topics/train
+
+https://github.com/topepo/caret/blob/master/RegressionTests/Code/cforest.R
+
+https://www.rdocumentation.org/packages/caret/versions/6.0-78/topics/varImp
