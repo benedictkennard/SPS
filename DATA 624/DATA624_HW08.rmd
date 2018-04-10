@@ -123,7 +123,7 @@ Fit another random forest model to these data. Did the importance score for `V1`
 
 #### Approach
 
-Methods for adding an additional predictor that is highly correlated with one of the informative predictors are given in the question setup. This is done using the `rnorm()` function which produces pseudo-random Gaussian numbers. Specifically, the question setup adds a pseudo-random Gaussian number multiplied by 10% to each element in the `V1` vector to create the `V11` vector. The correlation between `V1` and `V11` is then confirmed with the base R `cor()` function. This new dataset from the question setup is fitted with a Random Forest model using the same `randomForest()` function. Again, the parameter values `importance=TRUE` and `ntree=1000` dictate that the importance of predictors should be assessed and that the model should grow 1000 trees. The `varImp()` function then calculates the variable importance for the new model. The variable importance calculations for both models are then output is a data frame for comparison. To create the data frame the first model needs to be padded with a `V11` predictor that has a variable importance value of `NA`.
+Methods for adding an additional predictor that is highly correlated with one of the informative predictors are given in the question setup. This is done using the `rnorm()` function which produces pseudo-random Gaussian numbers. Specifically, the question setup adds a pseudo-random Gaussian number multiplied by 10% to each element in the `V1` vector to create the `V11` vector. The correlation between `V1` and `V11` is then confirmed with the base R `cor()` function. This new dataset from the question setup is fitted with a Random Forest model using the same `randomForest()` function. Again, the parameter values `importance=TRUE` and `ntree=1000` dictate that the importance of predictors should be assessed and that the model should grow 1000 trees. The `varImp()` function then calculates the variable importance for the new model. The variable importance calculations for both models are then output in a data frame for comparison. To create the data frame, the first model needs to be padded with a `V11` predictor that has a variable importance value of `NA`.
 
 #### Results
 
@@ -142,7 +142,7 @@ data.frame(rbind(varimp1, padding), varimp2)
 
 #### Interpretation
 
-Adding the predictor `V11` that is highly correlated with the most informative predictor `V1` does change the variable importance score of `V1` as well as the importance scores of all the other informative and uninformative variables. The importance of this highly correlated `V11` predictor even outranks two of the five informative variables. This highlights a weakness in tree-based models. When variables are highly correlated, the models have a tendency to select more predictors than are actually needed with the choice between highly correlated predictors being nearly random.
+Adding the predictor `V11` that is highly correlated with the most informative predictor `V1` does change the variable importance score of `V1` as well as the importance scores of all the other informative and uninformative variables under the Random Forest (RF) model. The importance of this highly correlated `V11` predictor even outranks two of the five informative variables. This exercise highlights a weakness in tree-based models. When variables are highly correlated, tree-based models have a tendency to select more predictors than are actually needed with the choice between highly correlated predictors being nearly random.
 
 ### Exercise 8.1.c
 
@@ -150,7 +150,7 @@ Use the `cforest` function in the party package to fit a random forest model usi
 
 #### Approach
 
-The `cforest()` implementation of the random forest (and bagging) algorithm differs from `randomForest()` with respect to the base learners used and the aggregation scheme applied. Conditional inference trees are fitted to each of the `ntree` (default 500 or defined via `cforest_control()` bootstrap samples of the learning sample. The only hyperparameter set in `cforest_control()` is `mtry` which dictates the number of randomly preselected variables. This hyperparameter is set to $P-1$, where $P$ is the number of predictors instead of the `cforest()` default of five (in `randomForest()` the default varies with the number of input variables). After a  `cforest()` model is fit, there are two functions that can calculate the importance of the variables. The `varimp()` function with a lowercase **i** from the `party` package calculates the standard and conditional variable importance for `cforest()` following the permutation principle of the "mean decrease in accuracy" importance in `randomForest()`. The `varImp()` function with an uppercase **I** from the `caret` package is a generic method for calculating variable importance for objects produced by `train()` and other specific methods such as `cforest()`. For the sake of consistency, the `varImp()` function with an uppercase **I** is used. Again, the variable importance calculations for all the models are then output is a data frame for comparison. To create the data frame models without the `V11` predictor need to be padded with a `V11` predictor that has a variable importance value of `NA`.
+The `cforest()` implementation of the random forest (and bagging) algorithm differs from `randomForest()` with respect to the base learners used and the aggregation scheme applied. Conditional inference Trees are fitted to each of the `ntree` (500 or defined via `cforest_control`) bootstrap samples of the learning sample. The hyperparameter in `cforest_control()` of `mtry` which dictates the number of randomly preselected variables is set to $P-1$, where $P$ is the number of predictors. After the `cforest()` model is fit, there are two functions that can calculate the importance of the variables. The `varimp()` function spelled all in lowercase from the `party` package calculates the standard and conditional variable importance for `cforest()` models following the permutation principle of the "mean decrease in accuracy" importance found in the `randomForest()` fucntion. The `varImp()` function with an uppercase **I** from the `caret` package is a generic method for calculating variable importance for objects produced by `train()` with other specific methods such as `cforest`. For the sake of consistency, the `varImp()` function with an uppercase **I** is used. Again, the variable importance calculations for all the models are then output in a data frame for comparison. To create the data frame, models without the `V11` predictor need to be padded with a `V11` predictor that has a variable importance value of `NA`.
 
 #### Results
 
@@ -166,18 +166,18 @@ varimp1 <- varImp(fit1)
 varimp2 <- varImp(fit2)
 varimp3 <- varImp(fit1, conditional=T)
 varimp4 <- varImp(fit2, conditional=T)
-colnames(varimp1) <- "Simulated_CIT_UI" 
-colnames(varimp2) <- "Correlated_CIT_UI"
+colnames(varimp1) <- "Simulated_CIT_SI" 
+colnames(varimp2) <- "Correlated_CIT_SI"
 colnames(varimp3) <- "Simulated_CIT_CI" 
 colnames(varimp4) <- "Correlated_CIT_CI"
-padding1 <- data.frame(Simulated_CIT_UI=NA, row.names="V11")
+padding1 <- data.frame(Simulated_CIT_SI=NA, row.names="V11")
 padding2 <- data.frame(Simulated_CIT_CI=NA, row.names="V11")
-data.frame(rbind(varimp1, padding1), varimp2, rbind(varimp3, padding2), varimp4)
+data.frame(rbind(varimp1, padding1), rbind(varimp3, padding2), varimp2, varimp4)
 ```
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Conditional variable importance scores are supposed to reflect “the true impact of each predictor variable more reliably than” the standard variable importance score calculation method. This however, does not seem to be the case here.  For the Conditional Inference Trees (CIT), the conditional importance (CI) scores follow the same ranking pattern, with respect to the informative variables for both the simulated and highly correlated data, as the standard importance (SI) scores. For the informative predictors the pattern is nearly with same as well. Inclusively, the drop in importance of the informative variables is greater when using the conditional importance (CI) scores.
 
 ### Exercise 8.1.d
 
@@ -185,7 +185,7 @@ Repeat this process with different tree models, such as boosted trees and Cubist
 
 #### Approach
 
-The `bagging()` function from the `ipred` package conducts bagging for classification, regression and survival trees using a formula interface (`Y ~ X`) instead of a non-formula interface (`y=Y, x=X`) like the `ipredbagg()` function from the same package. The trees in the `bagging()` function are computed using the implementation in the `rpart` package.  The `nbagg` parameter specifies the number of bootstrap replications. The `gbm()` function fits generalized boosted regression models. The `distribution` parameter which is dependent on the response variable is set to Gaussian since the response is not of Bernoulli (2 classes), Multinomial (more than 2 classes), or Survival (right censored) types.  The `cubist()` function from the `Cubist` package  fits a rule-based M5 model with additional corrections based on nearest neighbors in the training set. The `committees` parameter specifies how many boosting interactions should be used in the ensemble. Again, the variable importance calculations for all the models are then output is a data frame for comparison. To create the data frame models without the `V11` predictor need to be padded with a `V11` predictor that has a variable importance value of `NA`.
+The `bagging()` function from the `ipred` package conducts bagging for classification, regression and survival trees using a formula interface (`Y ~ X`) instead of a non-formula interface (`y=Y, x=X`) like the `ipredbagg()` function from the same package. The trees in the `bagging()` function are computed using the implementation in the `rpart` package.  The `nbagg` parameter specifies the number of bootstrap replications. The `gbm()` function fits generalized boosted regression models. The `distribution` parameter, which is dependent on the response variable, is set to Gaussian since the response is not of Bernoulli (2 classes), Multinomial (more than 2 classes), or Survival (right censored) types.  The `cubist()` function from the `Cubist` package  fits a rule-based M5 model with additional corrections based on nearest neighbors in the training set. The `committees` parameter specifies how many boosting interactions should be used in the ensemble. The Random Forest implementations `randomForest()` and `cforest()` are more flexible and reliable for computing Bootstrap Aggregated trees than the `bagging()` function and although they should generally be used instead of the `bagging()` function, the `bagging()` function is being used in this exercise for demonstration reasons. Again, the variable importance calculations for all the models are then output in a data frame for comparison. To create the data frame, models without the `V11` predictor need to be padded with a `V11` predictor that has a variable importance value of `NA`.
 
 #### Results
 
@@ -217,16 +217,15 @@ colnames(varimp5) <- "Sim_CUBE"; colnames(varimp6) <- "Cor_CUBE"
 padding1 <- data.frame(Sim_BAG=NA, row.names="V11")
 padding2 <- data.frame(Sim_SGB=NA, row.names="V11")
 padding3 <- data.frame(Sim_CUBE=NA, row.names="V11")
-data.frame(rbind(varimp1, padding1), varimp2, 
-  rbind(varimp3, padding2), varimp4,
-  rbind(varimp5, padding3), varimp6)
+data.frame(rbind(varimp1, padding1),  
+  rbind(varimp3, padding2),
+  rbind(varimp5, padding3), 
+  varimp2, varimp4, varimp6)
 ```
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-The random forest implementations randomForest and cforest are more flexible and reliable for computing bootstrap-aggregated trees than the `bagging()` function and should be used instead.
+Adding the predictor `V11` that is highly correlated with the most informative predictor `V1` has differing effects on the variable importance score of `V1` as well as the importance scores of all the other informative and uninformative variables under Bootstrap Aggregation (BAG), Stochastic Gradient Boosting (SGB), and Rule-Based Cubist (CUBE) models. The BAG method performs worse than the Random Forest (RF) model. Including the highly correlated variable makes the BAG model interpret the correlated variable `V11` as unimportant, but one of the uninformative variables (`V6`) as the most important. The SGB method performs poorly as well with one uninformative variables (`V10`) being listed as important and two informative variables (`V2`, `V5`) being listed as unimportant. The CUBE model fairs better than the other models by not marking any informative variables as unimportant, but it also lists an uninformative variables (`V10`) as the most important variable. This exercise highlights a weakness in tree-based models. When variables are highly correlated, tree-based models have a tendency to select more predictors than are actually needed with the choice between highly correlated predictors being nearly random.
 
 ## Exercise 8.2
 
@@ -972,6 +971,8 @@ https://rpubs.com/josezuniga/376348
 http://appliedpredictivemodeling.com/
 
 https://github.com/topepo/APM_Exercises
+
+https://www.ncbi.nlm.nih.gov/pubmed/18620558
 
 https://cran.r-project.org/web/packages/gbm/gbm.pdf
 
