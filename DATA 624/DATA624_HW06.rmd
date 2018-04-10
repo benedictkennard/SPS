@@ -1,0 +1,268 @@
+---
+title: "Partial Least Squares Regression"
+author: "Jose Zuniga"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Note**: Model descriptions are from *Applied Predictive Modeling* by Max Kuhn and Kjell Johnson. Solutions are modifications of those posted by Max Kuhn on his public [GitHub](https://github.com/topepo/APM_Exercises) page. Function descriptions are from the [RDocumentation](https://www.rdocumentation.org) website. 
+
+## Exercise 6.3
+
+A chemical manufacturing process for a pharmaceutical product [is] discussed [below]. 
+
+> This data set contains information about a chemical manufacturing process, in which the goal is to understand the relationship between the process and the resulting final product yield. Raw material in this process is put through a sequence of 27 steps to make the final pharmaceutical product. The starting material is generated from a biological unit and has a range of quality and characteristics. The objective in this project was to develop a model to predict percent yield of the manufacturing process. The data set consisted of 177 samples of biological material for which 57 characteristics were measured. Of the 57 characteristics, there were 12 measurements of the biological starting material and 45 measurements of the manufacturing process. The process variables included measurements such as temperature, drying time, washing time, and concentrations of by-products at various steps. Some of the process measurements can be controlled, while others are observed. Predictors are continuous, count, categorical; some are correlated, and some contain missing values. Samples are not independent because sets of samples come from the same batch of biological starting material.
+>
+>  + Dimensions: 177 Samples, 57 Predictors.
+  + Response: Continuous, Balanced/symmetric.
+  + Predictors: Continuous, Count, Categorical, Correlated/associated, Different scales, Missing values.
+
+In this problem, the objective is to understand the relationship between biological measurements of the raw materials (predictors), measurements of the manufacturing process (predictors), and the response of product yield. Biological predictors cannot be changed but can be used to assess the quality of the raw material before processing. On the other hand, manufacturing process predictors can be changed in the manufacturing process. Improving product yield by 1% will boost revenue by approximately one hundred thousand dollars per batch:
+
+```{r message=FALSE, warning=FALSE}
+if (!require("pls")) install.packages("pls")
+if (!require("fma")) install.packages("fma")
+if (!require("VIM")) install.packages("VIM")
+if (!require("RANN")) install.packages("RANN")
+if (!require("mice")) install.packages("mice")
+if (!require("caret")) install.packages("caret")
+if (!require("AppliedPredictiveModeling")) install.packages("AppliedPredictiveModeling")
+library(pls)
+library(fma)
+library(VIM)
+library(RANN)
+library(mice)
+library(caret)
+library(AppliedPredictiveModeling)
+```
+
+### Exercise 6.3.a
+
+Start R and use these commands to load the data:
+
+```{r fig.align='center', cache=TRUE}
+data(package = "AppliedPredictiveModeling")$results[, "Item"]
+data(ChemicalManufacturingProcess)
+```
+
+[Create a] matrix `processPredictors` [that] contains the 57 predictors (12 describing the input biological material and 45 describing the process predictors) for the 176 manufacturing runs. [Create the vector] `yield` [that] contains the percent yield for each run.
+
+#### Approach
+
+The `ChemicalManufacturingProcess` dataset is loaded then separated into a matrix containing the predictors and a vector with the target variable. Next predictors with degenerate distributions are identified.  Degenerate distributions are those where the predictor variable has a single unique value (zero variance) or a handful of unique values that occur with very low frequencies (near-zero variance). The `nearZeroVar()` function from the `caret` library examines the uniqueness of data and returns a table indicating whether each variable has zero or near-zero variance. Any degenerate distributions are then plotted with a smoothed color density representation of a scatterplot using the `smoothScatter()` function. This is followed by the identification and plotting of highly correlated variables using the `findCorrelation()` function and a *Scatterplot Matrix*. The Scatterplot Matrix is a grid with a scatterplot for each pair of predictors. The diagonal of the matrix indicates which variable spans across the row and column. The last operation on the predictors is checking if a transformation is appropriate by applying the `BoxCoxTrans()` function to each predictor. For the response variable, a density plot with an overlapping normal distribution curve are plotted for comparison.
+
+#### Results
+
+```{r fig.align='center', cache=TRUE}
+typeof(ChemicalManufacturingProcess)
+CMP <- as.matrix(ChemicalManufacturingProcess)
+rm(ChemicalManufacturingProcess) # list not needed
+predictors <- subset(CMP, select=-Yield)
+nzv <- nearZeroVar(predictors)
+smoothScatter(predictors[, nzv])
+table(predictors[, nzv])
+corr <- findCorrelation(cor(predictors, use='complete.obs'))
+pairs(predictors[, corr])
+cols <- setdiff(1:ncol(predictors), c(nzv, corr))
+df = data.frame(Predictor=character(0), Lamda=numeric(0), stringsAsFactors=F)
+for (i in cols) {
+  pred <- colnames(predictors)[i]
+  nonulls <- na.omit(predictors[,i])
+  lambda <- BoxCoxTrans(nonulls)$lambda
+  k <- ifelse(i==1, 1, k+1)
+  df[k,] <- c(pred, round(lambda, 1))
+}
+df
+yield <- subset(CMP, select=Yield)
+plot(density(yield), main="Density")
+polygon(density(yield), col="steelblue")
+curve(dnorm(x, mean=mean(yield), sd=sd(yield)), col="red", lwd=2, add=TRUE)
+```
+
+#### Interpretation
+
+One predictor did have a degenerate distribution with near-zero variance. It contained only a handful of unique values that occur with very low frequencies. Specifically, only the values 100 and 100.83 with the latter appearing only three times. There were several highly correlated predictors with correlations exceeding the $r=0.9$ cutoff (default). The *Scatterplot Matrix* shows each pair of highly correlated predictors and their relationships. The `BoxCoxTrans()` function indicates that about half of the remaining 47 variables would benefit from a power transformation. Plotting the target variable against a Gaussian distribution with the same mean and standard deviation shows that the target variable is very close to normal.
+
+### Exercise 6.3.b
+
+A small percentage of cells in the predictor set contain missing values. Use an imputation function to fill in these missing values (e.g., see [here](https://rpubs.com/josezuniga/358605)).
+
+#### Approach
+
+The `aggr` function in the `VIM` package plots and calculates the amount of missing values in each variable. The `mice()` function in the `mice` package conducts Multivariate Imputation by Chained Equations (MICE) on multivariate datasets with missing values. The function has over imputation 20 methods that can be applied to the data. The one used with these data is the predictive mean matching method which is currently the most popular in online forums. After the imputations are made, a complete dataset is created using the `complete()` function. The `aggr` function from the `VIM` package is then reran for comparison.
+
+#### Results
+
+```{r fig.align='center', cache=TRUE}
+data(ChemicalManufacturingProcess)
+CMP <- as.matrix(ChemicalManufacturingProcess)
+rm(ChemicalManufacturingProcess) # list not needed
+aggr(CMP, prop = c(T, T), bars=T, numbers=T)
+MICE <- mice(CMP, method="pmm", printFlag=F, seed=624)
+aggr(complete(MICE), prop = c(T, T), bars=T, numbers=T)
+```
+
+#### Interpretation
+
+The visualizations produced by the `aggr` function in the `VIM` package show a bar chart with the proportion of missing data per variable as well as a grid with the proportion of missing data for variable combinations. The bar chart shows some predictor variables with values missing. The grid shows the combination of all predictors have 88% of data not missing. The remainder of the grid shows missing data for variable combinations with each row highlighting the missing values for the group of variables detailed in the x-axis. Most predictors with missing data have under 5% of their values missing. Imputation is done with Multivariate Imputation by Chained Equations (MICE). MICE assumes values are missing at random and is implement by imputing missing data for all variables with a simple method, removing the imputations for one variable, imputing the removed data using regression, repeating the remove-regress imputation for every other imputed variable, then continuing the remove-regress imputation in a loop over the whole dataset $m$ times. The simple imputation method used in here is Predictive Mean Matching (PMM) which "imputes missing values by means of the nearest-neighbor donor with distance based on the expected values of the missing variables conditional on the observed covariates." After imputing with the `mice()` function, no missing values remain in the data. 
+
+### Exercise 6.3.c
+
+Split the data into a training and a test set, pre-process the data, and tune a model of your choice from this chapter. What is the optimal value of the performance metric?
+
+#### Approach
+
+Pre-processing in this section is done entirely with functions from the `caret` package. The `createDataPartition()` function helps create a series of test and training partitions. The `p` parameter sets the percentage of data that goes to training. Declaring `list=FALSE` returns a matrix. The `preProcess()` function is used complete several pre-processing steps at once. The `method` parameter outlines the preprocessing steps. Possible values are "BoxCox", "YeoJohnson", "expoTrans", "center", "scale", "range", "knnImpute", "bagImpute", "medianImpute", "pca", "ica", "spatialSign", "corr", "zv", "nzv", and "conditionalX". The 'BoxCox' method is a simple, computationally efficient, and effective method for estimating power transformations.  The `center` method subtracts the mean of the predictor's data from the predictor values while `scale` method divides values by the standard deviation of the predictor. The `nzv` method identifies numeric predictor columns having very few unique values by applying `nearZeroVar()` and then excludes any "near zero-variance" predictors. The `corr` method seeks to filter out highly correlated predictors. A k-nearest neighbor imputation with `knnImpute` is carried out by finding the k closest samples (Euclidian distance) in the training set. Using `bagImpute` fits a bagged tree model for each predictor and has much higher computational cost. Using `medianImpute` is fast, but may be inaccurate. The operations are applied in this order: zero-variance filter, near-zero variance filter, correlation filter, Box-Cox/Yeo-Johnson/exponential transformation, centering, scaling, range, imputation, PCA, ICA then spatial sign. The `predict()` function  applies the results to a set of data.  The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. 
+
+#### Results
+
+```{r fig.align='center', cache=TRUE, warning=FALSE}
+set.seed(624)
+data(ChemicalManufacturingProcess)
+CMP <- as.matrix(ChemicalManufacturingProcess)
+rm(ChemicalManufacturingProcess) # list not needed
+rows_train <- createDataPartition(CMP[, 1], p=0.75, list=F)
+CMP_train_X <- CMP[rows_train, -1]
+CMP_train_Y <- CMP[rows_train, 1]
+nearZeroVar(CMP_train_X, names = T)
+findCorrelation(cor(CMP_train_X, use="complete.obs"), names=T)
+preMethods <- c("nzv", "corr", "YeoJohnson", "center", "scale", "knnImpute")
+ctrl <- trainControl(method = "boot", number = 25)
+(tune <- train(x=CMP_train_X, y=CMP_train_Y, 
+  method="pls", preProcess= preMethods, tuneLength=15, trControl=ctrl))
+plot(tune)
+```
+
+#### Interpretation
+
+As noted in [Exercise 6.3.a](#exercise-6.3.a), there is one near zero variance  predictor and several highly correlated predictors. The near-zero variance predictor with the degenerate distribution contained only a handful of unique values that occur with very low frequencies. Specifically, only the values 100 and 100.83 with the latter appearing only three times. There are several highly correlated predictors with correlations exceeding the $r=0.9$ cutoff (default). When transforming, Box-Cox power transformations work for only strictly positive numbers, $\mathbb{R}^+$. Although all the variables are non-negative, many include zero. Therefore the `YeoJohnson` method which allows a few negative values is used. The full pre-processing also performed centering and scaling.  The regression model chosen is in accordance with Kuhn (2013) who states that: 
+
+>Partial Least Squares (PLS) models is essentially a supervised version of Principal Component Analysis (PCA). PCA is unsupervised in that it does not consider any aspects of the response when it selects its components. Instead, it simply chases the variability present throughout the predictor space. If that variability happens to be related to the response variability, then Principal Component Regression (PCR) has a good chance to identify a predictive relationship. If, however, the variability in the predictor space is not related to the variability of the response, then PCR can have difficulty identifying a predictive relationship when one might actually exist. Because of this inherent problem with PCR, it is recommended that PLS be used when there are correlated predictors and a linear regression-type solution is desired.
+
+To select the number components, the model is tuned using the `train()` function. First, the `trainControl()` function is set to control the computational nuances of the `train()` function. Next, the `train()` function is applied to set up a grid of tuning parameters, fits each model, and calculate a resampling based performance measure. The tuning process indicates that for a `pls` model with the aforementioned preprocessing, a Partial Least Squares Regression (PLSR) model with three components leads to the optimal value in the RMSE performance metric.
+
+### Exercise 6.3.d
+
+Predict the response for the test set. What is the value of the performance metric and how does this compare with the resampled performance metric on the training set?
+
+#### Approach
+
+Pre-processing in this section is done entirely with functions from the `caret` package. The `createDataPartition()` function helps create a series of test and training partitions. The `p` parameter sets the percentage of data that goes to training. Declaring `list=FALSE` returns a matrix. The `preProcess()` function is used complete several pre-processing steps at once. The `method` parameter outlines the preprocessing steps. Possible values are "BoxCox", "YeoJohnson", "expoTrans", "center", "scale", "range", "knnImpute", "bagImpute", "medianImpute", "pca", "ica", "spatialSign", "corr", "zv", "nzv", and "conditionalX". The 'BoxCox' method is a simple, computationally efficient, and effective method for estimating power transformations.  The `center` method subtracts the mean of the predictor's data from the predictor values while `scale` method divides values by the standard deviation of the predictor. The `nzv` method identifies numeric predictor columns having very few unique values by applying `nearZeroVar()` and then excludes any "near zero-variance" predictors. The `corr` method seeks to filter out highly correlated predictors. A k-nearest neighbor imputation with `knnImpute` is carried out by finding the k closest samples (Euclidian distance) in the training set. Using `bagImpute` fits a bagged tree model for each predictor and has much higher computational cost. Using `medianImpute` is fast, but may be inaccurate. The operations are applied in this order: zero-variance filter, near-zero variance filter, correlation filter, Box-Cox/Yeo-Johnson/exponential transformation, centering, scaling, range, imputation, PCA, ICA then spatial sign. The ` plsr()` function  fits a Partial Least Squares Regression (PLSR)  model with the number of components specified in the `ncomp` argument. The `defaultSummary()` function calculates the performance of the model across resamples.
+
+#### Results
+
+```{r fig.align='center', cache=TRUE, warning=FALSE}
+set.seed(624)
+data(ChemicalManufacturingProcess)
+CMP <- as.matrix(ChemicalManufacturingProcess)
+rm(ChemicalManufacturingProcess) # list not needed
+rows_train <- createDataPartition(CMP[, 1], p=0.75, list=F)
+CMP_train_X <- CMP[rows_train, -1]
+CMP_train_Y <- CMP[rows_train, 1]
+CMP_test_X <- CMP[-rows_train, -1]
+CMP_test_Y <- CMP[-rows_train, 1]
+preMethods <- c("nzv", "corr", "YeoJohnson", "center", "scale", "knnImpute")
+preprocessed <- preProcess(CMP_train_X, verbose=T, method = preMethods)
+CMP_train_X_pp <- predict(preprocessed, CMP_train_X, ncomp = 1:3)
+CMP_test_X_pp <- predict(preprocessed, CMP_test_X, ncomp = 1:3)
+fit <- plsr(CMP_train_Y ~ CMP_train_X_pp)
+# The plsr function returns a 3D array. Must flatten to a vector.
+predictions <- as.vector(predict(fit, CMP_test_X_pp, ncomp = 3))
+obs_vs_pred <- data.frame(obs = CMP_test_Y, pred = predictions)
+defaultSummary(obs_vs_pred)
+```
+
+#### Interpretation
+
+As noted in [Exercise 6.3.a](#exercise-6.3.a), there is one near zero variance  predictor and several highly correlated predictors. The near-zero variance predictor with the degenerate distribution contained only a handful of unique values that occur with very low frequencies. Specifically, only the values 100 and 100.83 with the latter appearing only three times. There are several highly correlated predictors with correlations exceeding the $r=0.9$ cutoff (default). When transforming, Box-Cox power transformations work for only strictly positive numbers, $\mathbb{R}^+$. Although all the variables are non-negative, many include zero. Therefore the `YeoJohnson` method which allows a few negative values is used. The full pre-processing also performed centering and scaling. In [Exercise 6.3.c](#exercise-6.3.c), it was determined that Partial Least Squares Regression (PLSR) model with three components leads to the optimal value in the RMSE performance metric. The value of the RMSE performance metric for this three-component PLSR model is 2.0537798 compared to 1.343566 for the resampled RMSE performance metric on the training set. The resampled training set has eight alternatives that perform better than this, but performance metrics from the resampled training set are highly optimistic because they are based on resampling.
+
+### Exercise 6.3.e
+
+Which predictors are most important in the model you have trained? Do either the biological or process predictors dominate the list?
+
+#### Approach
+
+Pre-processing in this section is done entirely with functions from the `caret` package. The `createDataPartition()` function helps create a series of test and training partitions. The `p` parameter sets the percentage of data that goes to training. Declaring `list=FALSE` returns a matrix. The `preProcess()` function is used complete several pre-processing steps at once. The `method` parameter outlines the preprocessing steps. Possible values are "BoxCox", "YeoJohnson", "expoTrans", "center", "scale", "range", "knnImpute", "bagImpute", "medianImpute", "pca", "ica", "spatialSign", "corr", "zv", "nzv", and "conditionalX". The 'BoxCox' method is a simple, computationally efficient, and effective method for estimating power transformations.  The `center` method subtracts the mean of the predictor's data from the predictor values while `scale` method divides values by the standard deviation of the predictor. The `nzv` method identifies numeric predictor columns having very few unique values by applying `nearZeroVar()` and then excludes any "near zero-variance" predictors. The `corr` method seeks to filter out highly correlated predictors. A k-nearest neighbor imputation with `knnImpute` is carried out by finding the k closest samples (Euclidian distance) in the training set. Using `bagImpute` fits a bagged tree model for each predictor and has much higher computational cost. Using `medianImpute` is fast, but may be inaccurate. The operations are applied in this order: zero-variance filter, near-zero variance filter, correlation filter, Box-Cox/Yeo-Johnson/exponential transformation, centering, scaling, range, imputation, PCA, ICA then spatial sign. The `predict()` function  applies the results to a set of data.  The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `varImp()` function calculates the variable importance for a given model.The `dotPlot()` function create a dotplot of variable importance values.
+
+#### Results
+
+```{r fig.align='center', cache=TRUE, warning=FALSE}
+data(ChemicalManufacturingProcess)
+CMP <- as.matrix(ChemicalManufacturingProcess)
+rm(ChemicalManufacturingProcess) # list not needed
+set.seed(624)
+rows_train <- createDataPartition(CMP[, 1], p=0.75, list=F)
+CMP_train_X <- CMP[rows_train, -1]
+CMP_train_Y <- CMP[rows_train, 1]
+set.seed(624)
+preMethods <- c("nzv", "corr", "YeoJohnson", "center", "scale", "knnImpute")
+ctrl <- trainControl(method = "boot", number = 25)
+tune <- train(x=CMP_train_X, y=CMP_train_Y, method="pls", 
+  preProcess= preMethods, tuneLength=15, trControl=ctrl)
+(varimp <- varImp(tune))
+dotPlot(varimp, top=15)
+```
+
+#### Interpretation
+
+As noted in [Exercise 6.3.a](#exercise-6.3.a), there is one near zero variance  predictor and several highly correlated predictors. The near-zero variance predictor with the degenerate distribution contained only a handful of unique values that occur with very low frequencies. Specifically, only the values 100 and 100.83 with the latter appearing only three times. There are several highly correlated predictors with correlations exceeding the $r=0.9$ cutoff (default). When transforming, Box-Cox power transformations work for only strictly positive numbers, $\mathbb{R}^+$. Although all the variables are non-negative, many include zero. Therefore the `YeoJohnson` method which allows a few negative values is used. The full pre-processing also performed centering and scaling. In [Exercise 6.3.c](#exercise-6.3.c), it was determined that Partial Least Squares Regression (PLSR) model with three components leads to the optimal value in the RMSE performance metric. The larger the normalized weight and amount of response variation explained by the component, the more important predictor is in the PLS model.The `varImp()` function output and its corresponding `dotPlot()` show the most important predictors are the manufacturing process predictors which dominate the list.
+
+### Exercise 6.3.f
+
+Explore the relationships between each of the top predictors and the response. How could this information be helpful in improving yield in future runs of the manufacturing process?
+
+#### Approach
+
+Pre-processing in this section is done entirely with functions from the `caret` package. The `createDataPartition()` function helps create a series of test and training partitions. The `p` parameter sets the percentage of data that goes to training. Declaring `list=FALSE` returns a matrix. The `preProcess()` function is used complete several pre-processing steps at once. The `method` parameter outlines the preprocessing steps. Possible values are "BoxCox", "YeoJohnson", "expoTrans", "center", "scale", "range", "knnImpute", "bagImpute", "medianImpute", "pca", "ica", "spatialSign", "corr", "zv", "nzv", and "conditionalX". The 'BoxCox' method is a simple, computationally efficient, and effective method for estimating power transformations.  The `center` method subtracts the mean of the predictor's data from the predictor values while `scale` method divides values by the standard deviation of the predictor. The `nzv` method identifies numeric predictor columns having very few unique values by applying `nearZeroVar()` and then excludes any "near zero-variance" predictors. The `corr` method seeks to filter out highly correlated predictors. A k-nearest neighbor imputation with `knnImpute` is carried out by finding the k closest samples (Euclidian distance) in the training set. Using `bagImpute` fits a bagged tree model for each predictor and has much higher computational cost. Using `medianImpute` is fast, but may be inaccurate. The operations are applied in this order: zero-variance filter, near-zero variance filter, correlation filter, Box-Cox/Yeo-Johnson/exponential transformation, centering, scaling, range, imputation, PCA, ICA then spatial sign. The `predict()` function  applies the results to a set of data.  The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `varImp()` function calculates the variable importance for a given model. Examining and understanding the correlations between the top predictors and the response variable can help improve the yield in future runs of the manufacturing process.
+
+#### Results
+
+```{r fig.align='center', cache=TRUE, warning=FALSE}
+data(ChemicalManufacturingProcess)
+CMP <- as.matrix(ChemicalManufacturingProcess)
+rm(ChemicalManufacturingProcess) # list not needed
+set.seed(624)
+rows_train <- createDataPartition(CMP[, 1], p=0.75, list=F)
+CMP_train_X <- CMP[rows_train, -1]
+CMP_train_Y <- CMP[rows_train, 1]
+set.seed(624)
+preMethods <- c("nzv", "corr", "YeoJohnson", "center", "scale", "knnImpute")
+ctrl <- trainControl(method = "boot", number = 25)
+tune <- train(x=CMP_train_X, y=CMP_train_Y, method="pls", 
+  preProcess= preMethods, tuneLength=15, trControl=ctrl)
+varImp(tune)
+important <- c('ManufacturingProcess32',
+               'ManufacturingProcess36',
+               'ManufacturingProcess13',
+               'ManufacturingProcess33',
+               'ManufacturingProcess09')
+cor(CMP_train_X[, important], CMP_train_Y, use="complete.obs")
+```
+
+#### Interpretation
+
+As noted in [Exercise 6.3.a](#exercise-6.3.a), there is one near zero variance  predictor and several highly correlated predictors. The near-zero variance predictor with the degenerate distribution contained only a handful of unique values that occur with very low frequencies. Specifically, only the values 100 and 100.83 with the latter appearing only three times. There are several highly correlated predictors with correlations exceeding the $r=0.9$ cutoff (default). When transforming, Box-Cox power transformations work for only strictly positive numbers, $\mathbb{R}^+$. Although all the variables are non-negative, many include zero. Therefore the `YeoJohnson` method which allows a few negative values is used. The full pre-processing also performed centering and scaling. In [Exercise 6.3.c](#exercise-6.3.c), it was determined that Partial Least Squares Regression (PLSR) model with three components leads to the optimal value in the RMSE performance metric. The larger the normalized weight and amount of response variation explained by the component, the more important predictor is in the PLS model. In [Exercise 6.3.e](#exercise-6.3.e), it was determined that the manufacturing process predictors are the most important predictors. The top five predictors show moderate correlation with the response variable. Some are negatively correlated and others are positively correlated. Understanding the strength and direction of these relationships will help with improving the yield in future runs of the manufacturing process by delineating the expected impact of tweaks to the processes.
+
+# References
+
+https://rpubs.com/josezuniga/358601
+
+https://rpubs.com/josezuniga/358606
+
+https://rpubs.com/josezuniga/358605
+
+http://appliedpredictivemodeling.com/
+
+https://topepo.github.io/caret/pre-processing.html
+
+https://cran.r-project.org/web/packages/caret/caret.pdf
+
+http://appliedpredictivemodeling.com/blog/2014/11/12/solutions-on-github 
+
+http://ftp.uni-bayreuth.de/math/statlib/R/CRAN/doc/vignettes/caret/caretVarImp.pdf
