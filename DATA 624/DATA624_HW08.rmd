@@ -233,7 +233,7 @@ Use a simulation to show tree bias with different granularities.
 
 #### Approach
 
-Single Regression Trees suffer from selection bias. Predictors with a higher number of distinct values (lower variance) are favored over more granular (higher variance) predictors. The danger occurs when a data set consists of a mix of informative and noise variables, and the noise variables have many more splits than the informative variables. There is therefore a high probability that the noise variables will be chosen to split the top nodes of the tree. Pruning will produce either a tree with misleading structure or no tree at all. Also, as the number of missing values increases, the selection of predictors becomes more biased. This phenomenon is best exemplified by creating a high variance predictor that is correlated to the response variable and a second predictor with less variance that is not related to the response variable. Specifically, a predictor `X1` with 100 one values and 100 two values is created. Then a response variable `Y` is created that is equal to `X1` plus a pseudo-random Gaussian variable with $\mu=0, \sigma=2$. A completely unrelated pseudo-random Gaussian variable `X2` with $\mu=0, \sigma=4$ is then created. These variables are then placed in a data frame and then modeled using the `rpart()` function which makes splits based on the CART methodology. The `varImp()` function then calculates the variable importance for the model.
+Single Regression Trees suffer from selection bias. Predictors with a higher number of distinct values (lower variance) are favored over more granular (higher variance) predictors. The danger occurs when a data set consists of a mix of informative and noise variables, and the noise variables have many more splits than the informative variables. There is therefore a high probability that the noise variables will be chosen to split the top nodes of the tree. Pruning will produce either a tree with misleading structure or no tree at all. Also, as the number of missing values increases, the selection of predictors becomes more biased. This phenomenon is best exemplified by creating a high variance predictor that is correlated to the response variable and a second predictor with less variance that is not related to the response variable. Specifically, a predictor `X1` with 100 one values and 100 two values is created. Then a response variable `Y` is created that is equal to `X1` plus a pseudo-random Gaussian variable with $\mu=0, \sigma=2$. A completely unrelated higher variance pseudo-random Gaussian variable `X2` with $\mu=0, \sigma=4$ is then created. These variables are then placed in a data frame and modeled using the `rpart()` function which makes splits based on the CART methodology. The `varImp()` function then calculates the variable importance for the model.
 
 #### Results
 
@@ -253,7 +253,7 @@ varImp(fit)
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The predictor `X1` which is related to `Y` is found to be less important than the higher variance `X2` predictor which is completely unrelated to `Y`. The selection bias pitfall of Single Regression Trees is highlighted well in this example. The importance of the unrelated `X2` predictor is not just greater, it is substantially greater. The calculated importance value of the unelated `X2` predictor is over five times larger than that of the related `X1` predictor.
 
 ## Exercise 8.3
 
