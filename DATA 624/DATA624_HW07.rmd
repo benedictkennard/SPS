@@ -103,6 +103,8 @@ The MARS models outperform the KNN models tuned in the question setup. This is t
 
 Exercise [6.3](http://rpubs.com/josezuniga/366918) describes data for a chemical manufacturing process. Use the same data imputation, data splitting, and pre-processing steps as before and train several nonlinear regression models.
 
+> This data set contains information about a chemical manufacturing process... Raw material in this process is put through a sequence of 27 steps to generate the final pharmaceutical product. The starting material is generated from a biological unit and has a range of quality and characteristics... The data set consisted of 177 samples of biological material for which 57 characteristics were measured. Of the 57 characteristics, there were 12 measurements of the biological starting material, and 45 measurements of the manufacturing process. The process variables included measurements such as temperature, drying time, washing time, and concentrations of by-products at various steps. Some of the process measurements can be controlled, while others are observed. Samples are not independent because sets of samples come from the same batch of biological starting material.
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 CMP <- get(data(ChemicalManufacturingProcess))
 rm(ChemicalManufacturingProcess) # list not needed
@@ -255,7 +257,7 @@ The `dotPlot()` function create a dotplot of variable importance values. The `va
 dotPlot(varImp(tune5), top=15)
 imp <- data.frame(varImp(tune5)$importance, varImp(tune1)$importance)
 colnames(imp) <- c("KNN","PLS")
-imp[order(imp$KNN,decreasing = T), ]
+head(imp[order(imp$KNN,decreasing = T), ], 15)
 ```
 
 #### Interpretation
@@ -287,11 +289,7 @@ cor(CMP_train_X[, important], CMP_train$Yield, method="kendall")
 
 #### Interpretation
 
-The top four predictors show low to moderate correlation with the response variable. Some are negatively correlated and others are positively correlated. According the [description]( https://www.rdocumentation.org/packages/AppliedPredictiveModeling/versions/1.1-6/topics/ChemicalManufacturingProcess) of the data:
-
-> This data set contains information about a chemical manufacturing process... Raw material in this process is put through a sequence of 27 steps to generate the final pharmaceutical product. The starting material is generated from a biological unit and has a range of quality and characteristics... The data set consisted of 177 samples of biological material for which 57 characteristics were measured. Of the 57 characteristics, there were 12 measurements of the biological starting material, and 45 measurements of the manufacturing process. The process variables included measurements such as temperature, drying time, washing time, and concentrations of by-products at various steps. Some of the process measurements can be controlled, while others are observed. Samples are not independent because sets of samples come from the same batch of biological starting material.
-
-The intuition that is potentially revealed about the predictors and their relationship with yield is how each predictor plays a small part in the yield. This would explain the need for a 27-step process. It also highlights the importance of selecting the appropriate biological material for the pharmaceutical product.
+The top four predictors show low to moderate correlation with the response variable. Some are negatively correlated and others are positively correlated. The intuition that is potentially revealed about the predictors and their relationship with yield is how each predictor plays a small part in the yield. This would explain the need for a 27-step process. It also highlights the importance of selecting the appropriate biological material for the pharmaceutical product.
 
 # References
 
