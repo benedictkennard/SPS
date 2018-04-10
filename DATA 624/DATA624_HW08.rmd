@@ -303,7 +303,7 @@ Why does the model on the right focus its importance on just the first few of pr
 
 #### Approach
 
-The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `tuneGrid` parameter of the `train()` function is fed a data frame with values in columns named after the parameters being tuned. The hyperparameters declared in the tuning grid to be evaluated for the `gbm` (SGD) model are given in the question setup. Models with various variable interaction depths (`interaction.depth`), fitted trees (`n.trees`), learning rates (`shrinkage`), and a minimum of 10 observations in the trees terminal nodes (`n.minobsinnode`) are compared. Then the best interaction depth and number of iterations (fitted trees) are then tested on two SGB models. The first SGB models uses a 0.1 learning rate and selects 0.1 of the training set observations (`bag.fraction`) to propose the next tree in the expansion. The second SGB models uses a 0.9 learning rate and selects 0.9 of the training set observations (`bag.fraction`) to propose the next tree in the expansion.
+The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `tuneGrid` parameter of the `train()` function is fed a data frame with values in columns named after the parameters being tuned. The hyperparameters declared in the tuning grid to be evaluated for the `gbm` (SGD) model are given in the question setup. Models with various variable interaction depths (`interaction.depth`), fitted trees (`n.trees`), learning rates (`shrinkage`), and a minimum of 10 observations in the trees terminal nodes (`n.minobsinnode`) are compared. Then the best interaction depth and number of iterations (fitted trees) from the tuning are examined more closely with their own SGB model. The first SGB model uses a 0.1 learning rate and selects 0.1 of the training set observations (`bag.fraction`) to propose the next tree in the expansion. The second SGB model uses a 0.9 learning rate and selects 0.9 of the training set observations (`bag.fraction`) to propose the next tree in the expansion.
 
 #### Results
 
@@ -318,7 +318,7 @@ head(df, 15)
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+This question is somewhat hard to answer. According to the author, model greediness (choosing the optimal weak learner at each stage) which decreases the number of predictors, increases proportional to the learning rate. Therefore, the lower learning rate of 0.1 in the left model results in fewer predictors than the model on the right which has a 0.9 learning rate. This number of predictors is also proportional to the stochastic nature of the model such that increased randomness sets the stage for an increased number of predictors. Therefore, the lower bagging fraction of 0.1 in the left model results in fewer predictors than the more deterministic model on the right which selects 0.9 of the training set observations to propose the next tree in the expansion.
 
 ### Exercise 8.3.b
 
@@ -337,7 +337,7 @@ data.frame(model="SGB_0.9", tune3$bestTune, RMSE=min(tune3$results$RMSE), row.na
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Greedy models are less likely to optimal global model and are prone to over-fitting. Stochastic models reduce prediction variance.  Therefore, the less greedy and more random model on the left with a 0.1 learning rate that selects 0.1 of the training set observations to propose the next tree in the expansion would be more predictive of other samples. The RMSE metric for the respective models supports this conclusion.
 
 ### Exercise 8.3.c
 
@@ -351,11 +351,16 @@ The first SGB models uses a 0.1 learning rate and selects 0.1 of the training se
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 plot(tune1)
+varimp1 <- varImp(tune1)
+varimp2 <- varImp(tune2)
+colnames(varimp1) <- "SGB_0.1"
+colnames(varimp2) <- "SGB_0.9"
+data.frame(arimp1, varimp2)
 ```
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The positive impact of interaction depth on RMSE is proportional to the learning rate and number of trees. Models with a lower learning rate see greater improvements from interaction depth than models with a higher learning rate. A higher learning rate in these data results in improvements up to the 300 tree mark. Tree depth and learning rates impact the number of predictors which impacts the model greediness which impacts the predictive ability of the model which impacts the RMSE; all proportionally. Therefore, by transitivity, an increase in interaction depth will increase the number of predictors and RMSE. Variable importance will be spread across more predictors and the RMSE-Iterations graph will have a higher intercept that increases the slope.
 
 ## Exercise 8.4
 
