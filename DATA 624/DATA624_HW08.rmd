@@ -101,7 +101,6 @@ Methods for fitting the random forest model and the variable importance score ca
 #### Results
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-dotPlot(varimp1, top=15)
 varimp1
 ```
 
@@ -151,7 +150,7 @@ Use the `cforest` function in the party package to fit a random forest model usi
 
 #### Approach
 
-The `cforest()` implementation of the random forest (and bagging) algorithm differs from `randomForest()` with respect to the base learners used and the aggregation scheme applied. Conditional inference trees are fitted to each of the `ntree` (default 500 or defined via `cforest_control()`) bootstrap samples of the learning sample. The only hyperparameter set in `cforest_control()` is `mtry` which dictates the number of randomly preselected variables. This hyperparameter is set to $P-1$, where $P$ is the number of predictors instead of the `cforest()` default of five (in `randomForest()` the default varies with the number of input variables). After a  `cforest()` model is fit, there are two functions that can calculate the importance of the variables. The `varimp()` function with a lowercase **i** from the `party` package calculates the standard and conditional variable importance for `cforest()` following the permutation principle of the "mean decrease in accuracy" importance in `randomForest()`. The `varImp()` function with an uppercase **I** from the `caret` package is a generic method for calculating variable importance for objects produced by `train()` and other specific methods such as `cforest()`. For the sake of consistency, the `varImp()` function with an uppercase **I** is used. Again, the variable importance calculations for all the models are then output is a data frame for comparison. To create the data frame models without the `V11` predictor need to be padded with a `V11` predictor that has a variable importance value of `NA`.
+The `cforest()` implementation of the random forest (and bagging) algorithm differs from `randomForest()` with respect to the base learners used and the aggregation scheme applied. Conditional inference trees are fitted to each of the `ntree` (default 500 or defined via `cforest_control()` bootstrap samples of the learning sample. The only hyperparameter set in `cforest_control()` is `mtry` which dictates the number of randomly preselected variables. This hyperparameter is set to $P-1$, where $P$ is the number of predictors instead of the `cforest()` default of five (in `randomForest()` the default varies with the number of input variables). After a  `cforest()` model is fit, there are two functions that can calculate the importance of the variables. The `varimp()` function with a lowercase **i** from the `party` package calculates the standard and conditional variable importance for `cforest()` following the permutation principle of the "mean decrease in accuracy" importance in `randomForest()`. The `varImp()` function with an uppercase **I** from the `caret` package is a generic method for calculating variable importance for objects produced by `train()` and other specific methods such as `cforest()`. For the sake of consistency, the `varImp()` function with an uppercase **I** is used. Again, the variable importance calculations for all the models are then output is a data frame for comparison. To create the data frame models without the `V11` predictor need to be padded with a `V11` predictor that has a variable importance value of `NA`.
 
 #### Results
 
@@ -197,8 +196,8 @@ fit4 <- bagging(y ~ ., duplicated, nbagg = 50)
 ```
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
-fit5 <- gbm(y ~ ., simulated, distribution = "gaussian")
-fit6 <- gbm(y ~ ., duplicated, distribution = "gaussian")
+fit5 <- gbm(y ~ ., simulated, n.trees = 100, distribution = "gaussian")
+fit6 <- gbm(y ~ ., duplicated, n.trees = 100, distribution = "gaussian")
 ```
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
@@ -208,8 +207,8 @@ fit8 <- cubist(x=duplicated[,-11], y=duplicated[,11], committees = 100)
 ```{r warning=F, message=F, fig.align='center', cache=T}
 varimp1 <- varImp(fit3)
 varimp2 <- varImp(fit4)
-varimp3 <- varImp(fit5)
-varimp4 <- varImp(fit6)
+varimp3 <- varImp(fit5, numTrees = 100)
+varimp4 <- varImp(fit6, numTrees = 100)
 varimp5 <- varImp(fit7)
 varimp6 <- varImp(fit8)
 colnames(varimp1) <- "Sim_BAG"; colnames(varimp2) <- "Cor_BAG"
@@ -235,7 +234,7 @@ Use a simulation to show tree bias with different granularities.
 
 #### Approach
 
-Single Regression Trees suffer from selection bias. Predictors with a higher number of distinct values (lower variance) are favored over more granular (higher variance) predictors. The danger occurs when a data set consists of a mix of informative and noise variables, and the noise variables have many more splits than the informative variables. There is therefore a high probability that the noise variables will be chosen to split the top nodes of the tree. Pruning will produce either a tree with misleading structure or no tree at all. Also, as the number of missing values increases, the selection of predictors becomes more biased. This phenomenon is best exemplified by creating a high variance predictor that is correlated to the response variable and a second predictor with less variance that is not related to the response variable. Specifically, a predictor `X1` with 100 one values and 100 two values is created. Then a response variable `Y` is created that is equal to `X1` plus a pseudo-random Gaussian variable with $\mu=0, \sigma=2$. A completely unrelated pseudo-random Gaussian variable `X2` with $\mu=0, \sigma=4$ is then created. These variables are then placed in a data frame and then modeled using the `rpart()` function which makes splits based on the CART methodology.  The `varImp()` function then calculates the variable importance for the model.
+Single Regression Trees suffer from selection bias. Predictors with a higher number of distinct values (lower variance) are favored over more granular (higher variance) predictors. The danger occurs when a data set consists of a mix of informative and noise variables, and the noise variables have many more splits than the informative variables. There is therefore a high probability that the noise variables will be chosen to split the top nodes of the tree. Pruning will produce either a tree with misleading structure or no tree at all. Also, as the number of missing values increases, the selection of predictors becomes more biased. This phenomenon is best exemplified by creating a high variance predictor that is correlated to the response variable and a second predictor with less variance that is not related to the response variable. Specifically, a predictor `X1` with 100 one values and 100 two values is created. Then a response variable `Y` is created that is equal to `X1` plus a pseudo-random Gaussian variable with $\mu=0, \sigma=2$. A completely unrelated pseudo-random Gaussian variable `X2` with $\mu=0, \sigma=4$ is then created. These variables are then placed in a data frame and then modeled using the `rpart()` function which makes splits based on the CART methodology. The `varImp()` function then calculates the variable importance for the model.
 
 #### Results
 
@@ -305,11 +304,12 @@ Why does the model on the right focus its importance on just the first few of pr
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `tuneGrid` parameter of the `train()` function is fed a data frame with values in columns named after the parameters being tuned. The hyperparameters declared in the tuning grid to be evaluated for the `gbm` (SGD) model are given in the question setup. Models with various variable interaction depths (`interaction.depth`), fitted trees (`n.trees`), learning rates (`shrinkage`), and a minimum of 10 observations in the trees terminal nodes (`n.minobsinnode`) are compared. Then the best interaction depth and number of iterations (fitted trees) are then tested on two SGB models. The first SGB models uses a 0.1 learning rate and selects 0.1 of the training set observations (`bag.fraction`) to propose the next tree in the expansion. The second SGB models uses a 0.9 learning rate and selects 0.9 of the training set observations (`bag.fraction`) to propose the next tree in the expansion.
 
 #### Results
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
+tune1$bestTune
 varimp1 <- varImp(tune1)$importance
 varimp2 <- varImp(tune2)$importance
 df <- data.frame(sort(varimp1$Overall, T), sort(varimp2$Overall, T))
@@ -327,7 +327,7 @@ Which model do you think would be more predictive of other samples?
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The first SGB models uses a 0.1 learning rate and selects 0.1 of the training set observations (`bag.fraction`) to propose the next tree in the expansion. The second SGB models uses a 0.9 learning rate and selects 0.9 of the training set observations (`bag.fraction`) to propose the next tree in the expansion. The bagging fraction introduces randomness to the model that improves the predictive ability of the model.
 
 #### Results
 
@@ -346,7 +346,7 @@ How would increasing interaction depth affect the slope of predictor importance 
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The first SGB models uses a 0.1 learning rate and selects 0.1 of the training set observations (`bag.fraction`) to propose the next tree in the expansion. The second SGB models uses a 0.9 learning rate and selects 0.9 of the training set observations (`bag.fraction`) to propose the next tree in the expansion.  The learning rate shrinks the RMSE by constraining the tree depth with a penalty.
 
 #### Results
 
@@ -376,7 +376,7 @@ A simple regression tree.
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The training and test sets are predefined by the `solubility` data. Selecting the molecular weight subset involves a simple application of the base R `subset()` function on the dataset selecting the `MolWeight` field. The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. CART can be implemented in the `train()` function using the `rpart` and the `rpart2` methods. The `rpart` method tunes the model over the complexity parameter (right-sized tree based on RMSE). The `rpart2` method tunes the model over the maximum depth (of the tree).
 
 #### Results
 
@@ -396,7 +396,7 @@ A random forest model.
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The training and test sets are predefined by the `solubility` data. Selecting the molecular weight subset involves a simple application of the base R `subset()` function on the dataset selecting the `MolWeight` field. The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `rf` method in the `train()` function implements Random Forest classification and regression using the `randomForest` package.
 
 #### Results
 
@@ -416,7 +416,7 @@ Different Cubist models with a single rule or multiple committees (each with and
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The training and test sets are predefined by the `solubility` data. Selecting the molecular weight subset involves a simple application of the base R `subset()` function on the dataset selecting the `MolWeight` field. The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `tuneGrid` parameter of the `train()` function is fed a data frame with values in columns named after the parameters being tuned. The `cubist` method in the `train()` function implements a rule-based M5 model with additional corrections based on nearest neighbors in the training set using the `Cubist` package.  The hyperparameters declared in the tuning grid to be evaluated are the `committees` parameter which specifies how many boosting interactions should be used in the ensemble, and the `neighbors` parameter which specifies the number of instances to use to correct the rule-based prediction.
 
 #### Results
 
@@ -455,7 +455,7 @@ Plot the predictor data versus the solubility results for the test set. Overlay 
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The `predict()` function applies a fitted model to data consisting of predictor variables. A function is created to plot the predictor test data versus the solubility test results then overlay the predictions of the six models. The `postResample()` function takes two vectors as its inputs and computes the RMSE, $R^2$, and MAE performance metrics.
 
 #### Results
 
@@ -513,7 +513,7 @@ tune1 <- train(x = TEC_train_X, y = TEC_train_Y, method="pls",
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The `tecatur` data partitioning, controls, and PLS model are given in the question setup. The `createDataPartition()` function helps create a series of test and training partitions. The `p` parameter sets the percentage of data that goes to training. Declaring `list=FALSE` returns a matrix.  The `trainControl()` function controls the computational nuances of  the `train()` function. The `repeatedcv` resampling method and `number` parameters are specific the type of $k$-fold cross-validation to be implemented. The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `tuneGrid` parameter of the `train()` function is fed a data frame with values in columns named after the parameters being tuned.  CART is implemented in the `train()` function using the `rpart` method which tunes the model over the complexity parameter (right-sized tree based on RMSE). BAG is implemented in the `train()` function using the `treebag` method which conducts bagging for classification, regression and survival trees using the implementation in the `rpart` package. RF is implemented in the `train()` function using the `rf` method which implements Random Forest classification and regression using the `randomForest` package.  SGB is implemented in the `train()` function using the `gbm` method fits generalized boosted regression models. The hyperparameters declared in the tuning grid to be evaluated are various variable interaction depths (`interaction.depth`), fitted trees (`n.trees`), learning rates (`shrinkage`), and a minimum of 10 observations in the trees terminal nodes (`n.minobsinnode`). CUBE is implemented in the `train()` function using the `cubist` method which fits a rule-based M5 model with additional corrections based on nearest neighbors in the training set. The hyperparameters declared in the tuning grid to be evaluated are the `committees` parameter which specifies how many boosting interactions should be used in the ensemble, and the `neighbors` parameter which specifies the number of instances to use to correct the rule-based prediction. A function is created to help display the resampling performance metrics as a data frame. The `bwplot()` function plots a series of vertical box-and-whisker plots for the resampling performance metrics.
 
 #### Results
 
@@ -603,7 +603,7 @@ Which tree-based model gives the optimal resampling and test set performance?
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The `permeability` data partitioning, transformation, controls, ENET model, and SVM model are given in the question setup. The `createDataPartition()` function helps create a series of test and training partitions. The `p` parameter sets the percentage of data that goes to training. Declaring `list=FALSE` returns a matrix.  The `trainControl()` function controls the computational nuances of  the `train()` function. The `LGOCV` resampling method and `number` parameters specific the type of leave-group-out cross-validation to be implemented. The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `tuneGrid` parameter of the `train()` function is fed a data frame with values in columns named after the parameters being tuned.  CART is implemented in the `train()` function using the `rpart2` method which tunes the model over the maximum depth (of the tree). RF is implemented in the `train()` function using the `rf` method which implements Random Forest classification and regression using the `randomForest` package.  SGB is implemented in the `train()` function using the `gbm` method fits generalized boosted regression models. The hyperparameters declared in the tuning grid to be evaluated are various variable interaction depths (`interaction.depth`), fitted trees (`n.trees`), learning rates (`shrinkage`), and a minimum of 10 observations in the trees terminal nodes (`n.minobsinnode`). A function is created to help display the resampling performance metrics as a data frame. The `bwplot()` function plots a series of vertical box-and-whisker plots for the resampling performance metrics. The `predict()` function applies a fitted model to data consisting of predictor variables. A data frame with the test set performance metrics is then displayed.
 
 #### Results
 
@@ -667,7 +667,7 @@ Do any of these models outperform the covariance or non-covariance based regress
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+A function is created to help display the resampling performance metrics as a data frame. The `bwplot()` function plots a series of vertical box-and-whisker plots for the resampling performance metrics. 
 
 #### Results
 
@@ -694,7 +694,7 @@ Of all the models you have developed thus far, which, if any, would you recommen
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The `train()` function, once computed and stored to a variable, contains several attributes which help evaluate model performance.
 
 #### Results
 
@@ -742,7 +742,7 @@ tune2 <- train(x = CMP_train_X, y = CMP_train$Yield,
 
 #### Classification and Regression Tree (CART)
 
-To tune an CART tree over the complexity parameter, the method option in the train function should be set to `rpart`. To tune over maximum depth, the method option should be set to `rpart2`.
+CART is implemented in the `train()` function using the `rpart2` method which tunes the model over the maximum depth (of the tree). 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
@@ -754,7 +754,7 @@ tune3 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "rpart2",
 
 #### Conditional Inference Tree (CIT)
 
-The number of randomly selected predictors to choose from at each split is set by `mtry`. since random forests is computationally intensive, tune `mtry` with around five values that are somewhat evenly spaced across the range from 2 to $P$, where $P$ is the number of predictors.
+CIT is implemented in the `train()` function using the `ctree2` method where the number of randomly selected predictors to choose from at each split is set by `mtry`. Since Random Forests is computationally intensive, `mtry` is tuned with around five values that are somewhat evenly spaced across the range from 2 to $P$, where $P$ is the number of predictors.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
@@ -766,7 +766,7 @@ tune4 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "ctree2",
 
 #### Regression Model Tree (M5)
 
-Specify the minimum number of samples needed to further splits with $M$.
+M5 is implemented in the `train()` function using the `M5` method from the `RWeka` package. The `prune`, `smooth`, and `rules` hyperparameters evaluate models with and without those features.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
@@ -779,8 +779,10 @@ tune5 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "M5",
 
 #### Bootstrap Aggregation (BAG)
 
+BAG is implemented in the `train()` function using the `bag` method which conducts bagging for classification and regression using the implementation in the `caret` package. The `bagControl()` function controls the computational nuances of this `train()` function method. The hyperparameters declared in the tuning grid are fit, predict and aggregate which all take a function that provides a framework for bagging classification or regression models. The function used for the bagging predictions is the tree-based function `ctreeBag`.
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
-n <- ncol(CMP_train_X)
+n <- ncol(CMP_train_X) 
 seq_len(abs(n))[n %% seq_len(abs(n)) == 0L]
 set.seed(624)
 bag6 <- bagControl(fit=ctreeBag$fit, predict=ctreeBag$pred, aggregate=ctreeBag$aggregate)
@@ -792,6 +794,8 @@ tune6 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "bag", B = 25,
 
 #### Random Forest (RF)
 
+RF is implemented in the `train()` function using the `rf` method which implements Random Forest classification and regression using the `randomForest` package. 
+
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
 ctrl7 <- trainControl(method = "boot", number = 25)
@@ -801,6 +805,8 @@ tune7 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "rf",
 ```
 
 #### Stochastic Gradient Boosting (SGB)
+
+SGB is implemented in the `train()` function using the `gbm` method fits generalized boosted regression models. The hyperparameters declared in the tuning grid to be evaluated are various variable interaction depths (`interaction.depth`), fitted trees (`n.trees`), learning rates (`shrinkage`), and a minimum of 10 observations in the trees terminal nodes (`n.minobsinnode`). 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
@@ -812,6 +818,8 @@ tune8 <- train(x = CMP_train_X, y = CMP_train$Yield, method = "gbm",
 ```
 
 #### Rule-Based Cubist (CUBE)
+
+CUBE is implemented in the `train()` function using the `cubist` method which fits a rule-based M5 model with additional corrections based on nearest neighbors in the training set. The hyperparameters declared in the tuning grid to be evaluated are the `committees` parameter which specifies how many boosting interactions should be used in the ensemble, and the `neighbors` parameter which specifies the number of instances to use to correct the rule-based prediction. 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 set.seed(624)
@@ -827,7 +835,7 @@ Which tree-based regression model gives the optimal resampling and test set perf
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The `ChemicalManufacturingProcess` data partitioning, preprocessing, controls, PLS model, and KNN model are given in the question setup. The `train()` function, once computed and stored to a variable, contains several attributes which help evaluate model performance. A function is created to help display the resampling performance metrics as a data frame. A slight issue arises during forecasting due to a value of $-\infty$ remaining in the pre-processed dataset. This infinite value hinders forecasting with the Neural Network and $K$-Nearest Neighbor models but does not affect the Multivariate Adaptive Regression Splines and Support Vector Machine models. For the sake of completeness in model comparison, the value of $-\infty$ is replaced with the minimum finite value of the variable to which the infinite value belongs. The `predict()` function applies a fitted model to data consisting of predictor variables. The `postResample()` function takes two vectors as its inputs and computes the RMSE, $R^2$, and MAE performance metrics. A data frame with the test set performance metrics is then displayed.
 
 #### Results
 
@@ -919,7 +927,7 @@ Which predictors are most important in the optimal tree-based regression model? 
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The `dotPlot()` function create a dotplot of variable importance values. The `varImp()` function calculates the variable importance for a given model.
 
 #### Results
 
@@ -945,19 +953,12 @@ Plot the optimal single tree with the distribution of yield in the terminal node
 
 #### Approach
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+This `plot()` method for single tree objects is an extensible framework for the visualization of binary regression trees.
 
 #### Results
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-important <- c('ManufacturingProcess32',
-              'BiologicalMaterial03',
-              'BiologicalMaterial06',
-              'ManufacturingProcess09',
-              'ManufacturingProcess25',
-              'ManufacturingProcess29')
-featurePlot(CMP_train_X[, important], CMP_train$Yield)
-cor(CMP_train_X[, important], CMP_train$Yield, method="kendall")
+plot(tune4$finalModel)
 ```
 
 #### Interpretation
@@ -995,3 +996,5 @@ https://github.com/topepo/caret/blob/master/RegressionTests/Code/cforest.R
 https://www.rdocumentation.org/packages/party/versions/1.2-4/topics/varimp
 
 https://www.rdocumentation.org/packages/caret/versions/6.0-78/topics/varImp
+
+https://cran.r-project.org/web/packages/HSAUR2/vignettes/Ch_recursive_partitioning.pdf
