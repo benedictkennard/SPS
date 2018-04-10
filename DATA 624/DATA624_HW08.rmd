@@ -380,7 +380,7 @@ A simple regression tree.
 
 #### Approach
 
-The training and test sets are predefined by the `solubility` data. Selecting the molecular weight subset involves a simple application of the base R `subset()` function on the dataset selecting the `MolWeight` field. The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. CART can be implemented in the `train()` function using the `rpart` and the `rpart2` methods. The `rpart` method tunes the model over the complexity parameter (right-sized tree based on RMSE). The `rpart2` method tunes the model over the maximum depth (of the tree).
+The training and test sets are predefined by the `solubility` data. Selecting the molecular weight subset involves a simple application of the base R `subset()` function on the dataset where the `MolWeight` field is selected. The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. CART can be implemented in the `train()` function using the `rpart` and the `rpart2` methods. The `rpart` method tunes the model over the complexity parameter (right-sized tree based on RMSE). The `rpart2` method tunes the model over the maximum depth (of the tree).
 
 #### Results
 
@@ -392,7 +392,7 @@ min(tune1$results$RMSE)
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The CART model applied to the Molecular Weight predictor in the `solubility` dataset results in a 1.663586 RMSE.
 
 ### Exercise 8.4.b
 
@@ -412,7 +412,7 @@ min(tune2$results$RMSE)
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The RF model applied to the Molecular Weight predictor in the `solubility` dataset results in a 1.562868 RMSE.
 
 ### Exercise 8.4.c
 
@@ -451,7 +451,7 @@ min(tune6$results$RMSE)
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The CUBE models applied to the Molecular Weight predictor in the `solubility` dataset result in a RMSE ranging between [1.528700, 1.602018]
 
 ### Exercise 8.4.d
 
@@ -491,7 +491,7 @@ data.frame(row.names = models, rbind(
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Overlaying the model predictions on the test set is very useful in highlighting the differences in the models. The CART model predicts values within two categories that does not fit the data very well. The RF model fits the data much better but its predictions are the most heteroskedastic of all the fitted models. The CUBE models appear perform the best but there are differences between them. Although the number of committees which specifies how many boosting interactions should be used in the ensemble has little to no effect in the CUBE model predictions, the number of neighbors which specifies the number of instances to use to correct the rule-based prediction has a significant impact. Declaring zero neighbors makes the CUBE model predictions homoskedastic to a fault. Multiple neighbors adds variance to the prediction which improves the fit. Interestingly enough, the RMSE, $R^2$ and MAE performance metrics indicate that the RF model with the most heteroskedasticity is the best fit for these data.
 
 ## Exercise 8.5
 
