@@ -42,7 +42,7 @@ library(AppliedPredictiveModeling)
 
 ## Classification and Regression Tree (CART)
 
-**Single Decision Tree**. Tree-based models generate a set of conditions that are highly interpretable and are easy to implement. They can effectively handle many types of predictors (sparse, skewed, continuous, categorical, etc.) without the need to pre-process them (imputation, feature selection, etc.). In addition, these models do not require the user to specify the form of the predictors relationship to the response like, for example, a linear regression model requires. There are many techniques for constructing regression trees. One of the oldest and most utilized is the Classification and Regression Tree (**CART**) methodology also known as recursive partitioning. For regression, the model begins with the entire data set and searches every distinct value of every predictor to find the predictor and split value that partitions the data into two groups such that the overall sums of squares error are minimized. Then within each of [the] groups, this method searches for the predictor and split value that best reduces SSE until the number of samples in the splits falls below some threshold. The fully grown tree is then pruned back to a potentially smaller depth [to mitigate over-fitting]. If a predictor is never used in a split, the prediction equation is independent of those data.
+**Single Decision Tree**. Tree-based models generate a set of conditions that are highly interpretable and are easy to implement. They can effectively handle many types of predictors (sparse, skewed, continuous, categorical, etc.) without the need to pre-process them (imputation, feature selection, etc.). In addition, these models do not require the user to specify the form of the predictors relationship to the response like, for example, a linear regression model requires. There are many techniques for constructing regression trees. One of the oldest and most utilized is the Classification and Regression Tree (**CART**) methodology also known as recursive partitioning. For regression, the model begins with the entire data set and searches every distinct value of every predictor to find the predictor and split value that partitions the data into two groups such that the overall sums of squares error are minimized. Then within each of [the] groups, this method searches for the predictor and split value that best reduces SSE until the number of samples in the splits falls below some threshold. The fully-grown tree is then pruned back to a potentially smaller depth [to mitigate over-fitting]. If a predictor is never used in a split, the prediction equation is independent of those data.
 
 ## Conditional Inference Tree (CIT)
 
@@ -177,7 +177,7 @@ data.frame(rbind(varimp1, padding1), rbind(varimp3, padding2), varimp2, varimp4)
 
 #### Interpretation
 
-Conditional variable importance scores are supposed to reflect “the true impact of each predictor variable more reliably than” the standard variable importance score calculation method. This however, does not seem to be the case here.  For the Conditional Inference Trees (CIT), the conditional importance (CI) scores follow the same ranking pattern, with respect to the informative variables for both the simulated and highly correlated data, as the standard importance (SI) scores. For the informative predictors the pattern is nearly with same as well. Inclusively, the drop in importance of the informative variables is greater when using the conditional importance (CI) scores.
+Conditional variable importance scores are supposed to reflect “the true impact of each predictor variable more reliably than” the standard variable importance score calculation method. This however, does not seem to be the case here.  For the Conditional Inference Trees (CIT), the conditional importance (CI) scores follow the same ranking pattern, with respect to the informative variables for both the simulated and highly correlated data, as the standard importance (SI) scores. For the informative predictors the pattern is nearly with same as well. Inclusively, the decrease in importance of the informative variables is greater when using the conditional importance (CI) scores.
 
 ### Exercise 8.1.d
 
@@ -225,7 +225,7 @@ data.frame(rbind(varimp1, padding1),
 
 #### Interpretation
 
-Adding the predictor `V11` that is highly correlated with the most informative predictor `V1` has differing effects on the variable importance score of `V1` as well as the importance scores of all the other informative and uninformative variables under Bootstrap Aggregation (BAG), Stochastic Gradient Boosting (SGB), and Rule-Based Cubist (CUBE) models. The BAG method performs worse than the Random Forest (RF) model. Including the highly correlated variable makes the BAG model interpret the correlated variable `V11` as unimportant, but one of the uninformative variables (`V6`) as the most important. The SGB method performs poorly as well with one uninformative variables (`V10`) being listed as important and two informative variables (`V2`, `V5`) being listed as unimportant. The CUBE model fairs better than the other models by not marking any informative variables as unimportant, but it also lists an uninformative variables (`V10`) as the most important variable. This exercise highlights a weakness in tree-based models. When variables are highly correlated, tree-based models have a tendency to select more predictors than are actually needed with the choice between highly correlated predictors being nearly random.
+Adding the predictor `V11` that is highly correlated with the most informative predictor `V1` has differing effects on the variable importance score of `V1` as well as the importance scores of all the other informative and uninformative variables under Bootstrap Aggregation (BAG), Stochastic Gradient Boosting (SGB), and Rule-Based Cubist (CUBE) models. The BAG method performs worse than the Random Forest (RF) model. Including the highly correlated variable makes the BAG model interpret the correlated variable `V11` as unimportant, but one of the uninformative variables (`V6`) as the most important. The SGB method performs poorly as well with one uninformative variables (`V10`) being listed as important and two informative variables (`V2`, `V5`) being listed as unimportant. The CUBE model fairs better than the other models by not marking any informative variables as unimportant, but it also lists an uninformative variable (`V10`) as the most important variable. This exercise highlights a weakness in tree-based models. When variables are highly correlated, tree-based models have a tendency to select more predictors than are actually needed with the choice between highly correlated predictors being nearly random.
 
 ## Exercise 8.2
 
@@ -351,16 +351,11 @@ The first SGB models uses a 0.1 learning rate and selects 0.1 of the training se
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 plot(tune1)
-varimp1 <- varImp(tune1)
-varimp2 <- varImp(tune2)
-colnames(varimp1) <- "SGB_0.1"
-colnames(varimp2) <- "SGB_0.9"
-data.frame(arimp1, varimp2)
 ```
 
 #### Interpretation
 
-The positive impact of interaction depth on RMSE is proportional to the learning rate and number of trees. Models with a lower learning rate see greater improvements from interaction depth than models with a higher learning rate. A higher learning rate in these data results in improvements up to the 300 tree mark. Tree depth and learning rates impact the number of predictors which impacts the model greediness which impacts the predictive ability of the model which impacts the RMSE; all proportionally. Therefore, by transitivity, an increase in interaction depth will increase the number of predictors and RMSE. Variable importance will be spread across more predictors and the RMSE-Iterations graph will have a higher intercept that increases the slope.
+The positive impact of interaction depth on RMSE is proportional to the learning rate and number of trees. Models with a lower learning rate see greater improvements from interaction depth than models with a higher learning rate. A higher learning rate in these data results in improvements up to the 300-tree mark. Tree depth and learning rates impact the number of predictors which impacts the model greediness which impacts the predictive ability of the model which impacts the RMSE; all proportionally. Therefore, by transitivity, an increase in interaction depth will increase the number of predictors and RMSE. Variable importance will be spread across more predictors and the RMSE-Iterations graph will have a higher intercept that increases the slope.
 
 ## Exercise 8.4
 
@@ -478,7 +473,6 @@ for (i in 1:6) {
   plot(X, Y, xaxt="n", yaxt="n", xlab="", ylab="", main=models[i])
   par(new=T); 
   plot(X, fcast[,i], xaxt="n", yaxt="n", xlab="", ylab="", col="blue")
-  
 }
 data.frame(row.names = models, rbind(
   postResample(pred = fcast1, obs = SOL_test_Y), 
@@ -552,7 +546,7 @@ tune6 <- train(x = TEC_train_X, y = TEC_train_Y, method = "cubist",
 
 ##### Training Set Resampling
 
-```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+```{r warning=F, message=F, fig.align='center', cache=T}
 metrics <- function(tune) {
   RMSE = min(tune$results$RMSE)
   Rsquared = max(tune$results$Rsquared)
@@ -567,7 +561,7 @@ bwplot(resamples(fits))
 
 #### Interpretation
 
-After fitting a CART, BAG, RF, SGB, and CUBE model to the `tecator` data which were previously found to be best suited for fitting with a linear PLS model, it appears that a CUBE model may also provide a suitable fit for the  `tecator` data. The CUBE and PLS models outperform the other tree-based models in every resampling performance metric. The RMSE and $R^2$ resampling performance metrics of the PLS model however, outperforms the CUBE model. The CUBE model only outperforms the PLS model in the MAE resampling performance metric. The linear PLS model still appears to provide the best fit for the `tecator` data although the CUBE model comes in at a close second. In an earlier exercise it was found that predictor correlations do have an impact CUBE models so removing highly correlated variables using `findCorrelation(cor(.))` may yield improvements that can make a CUBE model a better fit for the `tecator` data that a PLS model.
+After fitting a CART, BAG, RF, SGB, and CUBE model to the `tecator` data which were previously found to be best suited for fitting with a linear PLS model, it appears that a CUBE model may also provide a suitable fit for the `tecator` data. The CUBE and PLS models outperform the other tree-based models in every resampling performance metric. The RMSE and $R^2$ resampling performance metrics of the PLS model however, outperforms the CUBE model. The CUBE model only outperforms the PLS model in the MAE resampling performance metric. The linear PLS model still appears to provide the best fit for the `tecator` data although the CUBE model comes in at a close second. In an earlier exercise it was found that predictor correlations do have an impact CUBE models so removing highly correlated variables using `findCorrelation(cor(.))` may yield improvements that can make a CUBE model a better fit for the `tecator` data that a PLS model.
 
 ## Exercise 8.6
 
@@ -632,7 +626,7 @@ tune5 <- train(x = PER_train_X, y = log10(PER_train_Y),
 
 ##### Training Set Resampling
 
-```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+```{r warning=F, message=F, fig.align='center', cache=T}
 metrics <- function(tune) {
   RMSE = min(tune$results$RMSE)
   Rsquared = max(tune$results$Rsquared)
@@ -658,7 +652,7 @@ data.frame(rbind(postResample(pred = fcast3, obs = PER_test_Y),
 
 #### Interpretation
 
-After fitting tree-based CART, RF, and SGB models to the ` permeability` data which were previously found to be best suited for fitting with an ENT or SVM model, it appears that the SGB model provides the most suitable fit for the  `permeability` data. The SGB model outperforms the other tree-based models in every resampling performance metric. The RF model outperforms the other tree-based models on the test set, but these test set metrics are less important to predictive ability than the resampling performance metrics.
+After fitting tree-based CART, RF, and SGB models to the ` permeability` data which were previously found to be best suited for fitting with an ENT or SVM model, it appears that the SGB model provides the most suitable fit for the `permeability` data. The SGB model outperforms the other tree-based models in every resampling performance metric. The RF model outperforms the other tree-based models on the test set, but these test set metrics are less important to predictive ability than the resampling performance metrics.
 
 ### Exercise 8.6.b
 
@@ -696,7 +690,7 @@ data.frame(rbind(postResample(pred = fcast1, obs = PER_test_Y),
 
 #### Interpretation
 
-After fitting tree-based CART, RF, and SGB models to the ` permeability` data which were previously found to be best suited for fitting with an ENT or SVM model, it appears that the SGB model provides the most suitable fit for the  `permeability` data. The SGB model outperforms the other tree-based models in every resampling performance metric. The RF model outperforms the ENT model on the test set, but these test set metrics are less important to predictive ability than the resampling performance metrics.
+After fitting tree-based CART, RF, and SGB models to the ` permeability` data which were previously found to be best suited for fitting with a linear ENT or nonlinear SVM model, it appears that the SGB model provides the most suitable fit for the `permeability` data. The ENET model outperforms the other tree-based models in every resampling performance metric. The RF model outperforms the ENET model on the test set, but these test set metrics are less important to predictive ability than the resampling performance metrics.
 
 ### Exercise 8.6.c
 
@@ -721,7 +715,7 @@ plot(tune3)
 
 #### Interpretation
 
-Using the resampling performance metrics as a guide to choosing the recommendation of a replacement for the permeability laboratory experiment, it would probably be best to opt for the ENT model. This model performs better than the SVM and tree-based models. If however, a more interpretable model is necessary for business users, the CART model would be a good choice. Its resampling performance is relatively close to that of the ENET model and it is more interpretable to business users.
+Using the resampling performance metrics as a guide in choosing the recommendation of a replacement for the permeability laboratory experiment, it would probably be best to opt for the ENT model. This model performs better than the SVM and tree-based models. If, however, a more interpretable model is necessary for business users, the CART model would be a good choice. Its resampling performance is relatively close to that of the ENET model and it is more interpretable to business users.
 
 ## Exercise 8.7
 
@@ -892,7 +886,7 @@ plot(tune9)
 
 ##### Training Set Resampling
 
-```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+```{r warning=F, message=F, fig.align='center', cache=T}
 metrics <- function(tune) {
   RMSE = min(tune$results$RMSE)
   Rsquared = max(tune$results$Rsquared)
@@ -934,7 +928,7 @@ data.frame(rbind(postResample(pred = fcast1, obs = CMP_test$Yield),
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+After fitting tree-based CART, CIT, M5, BAG, RF, SGB and CUBE models to the `ChemicalManufacturingProcess` data which were previously found to be best suited for fitting with a linear PLS or nonlinear KNN model, it appears that the CUBE model provides the most suitable fit for the `ChemicalManufacturingProcess` data. The CUBE model with 100 committees and 1 neighbor outperforms the other models in every resampling performance metric. Several models outperform the CUBE model on the test set with the SGB performing the best, but these test set metrics are less important to predictive ability than the resampling performance metrics.
 
 ### Exercise 8.7.b
 
@@ -955,12 +949,12 @@ colnames(varimp1) <- "CUBE"
 colnames(varimp2) <- "PLS"
 colnames(varimp3) <- "KNN"
 imp <- data.frame(varimp1, varimp2, varimp3)
-head(imp[order(imp$CUBE, decreasing = T), ], 15)
+head(imp[order(imp$CUBE, decreasing = T), ], 10)
 ```
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The CUBE model which was found to be the optimal tree-based regression model, the KNN model which [was found](https://rpubs.com/josezuniga/376348) to be the optimal nonlinear regression model, and the PLS model which [was found](https://rpubs.com/josezuniga/366918) to be the optimal linear regression model all agree that the most important predictor is the `ManufacturingProcess32` process variable. All models also agree that `BiologicalProcess32` is a very important biological process, but the CUBE model ranks it equal in importance to the `BiologicalMaterial03` biological process. The PLS and KNN models clear distinguish `BiologicalProcess32` as the most important biological process and `BiologicalMaterial03` as the second most important biological process. Another interesting difference in the CUBE model is that only five predictors are listed as important, one of which (`ManufacturingProcess25`) is not even in the top ten of the PLS or the KNN models. 
 
 ### Exercise 8.7.c
 
@@ -968,17 +962,18 @@ Plot the optimal single tree with the distribution of yield in the terminal node
 
 #### Approach
 
-This `plot()` method for single tree objects is an extensible framework for the visualization of binary regression trees.
+Decision trees for single tree models can be easily plotted using the base R `plot()` function with the `finalModel` attribute of the tuned model. Plotting decision trees from CIT models presents no issues, but plotting decision trees from CART models sometimes results in blank nodes. Wrapping the `finalModel` attribute of the tuned CART model in the `as.party()` function from the `partykit` library resolves these CART model decision tree plotting issues. To avoid overlapping text that renders the tree illegible, the font size is reduced in using the `gp=gpar()` parameter.
 
 #### Results
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 plot(tune4$finalModel)
+plot(as.party(tune3$finalModel), gp=gpar(fontsize = 8))
 ```
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The optimal single tree model based on RMSE, $R^2$, and MAE resampling performance metrics is the CIT model. This decision tree produced for the CIT model shows a single split for `ManufacturingProcess32` at the 0.111 value. Values lower than 0.111 are associated with lower yields as represented by the boxplots. Values over 0.111 are associated with higher yields. This view of the tree does help in understanding the relationship between `ManufacturingProcess32` and the yield, but very little due to the single split. The CART model tree is plotted for comparison. This tree has several branches and details the same information about `ManufacturingProcess32`, albeit at a different cutoff value of 0.2, but also provides a much greater understanding of the relationship between the biological and process predictors and the yield due to the additional branches.
 
 # References
 
@@ -1015,3 +1010,5 @@ https://www.rdocumentation.org/packages/party/versions/1.2-4/topics/varimp
 https://www.rdocumentation.org/packages/caret/versions/6.0-78/topics/varImp
 
 https://cran.r-project.org/web/packages/HSAUR2/vignettes/Ch_recursive_partitioning.pdf
+
+https://stackoverflow.com/questions/13751962/how-to-plot-a-large-ctree-to-avoid-overlapping-nodes
