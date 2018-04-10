@@ -517,7 +517,7 @@ tune1 <- train(x = TEC_train_X, y = TEC_train_Y, method="pls",
 
 #### Approach
 
-The `tecator` data partitioning, controls, and PLS model are given in the question setup. The `createDataPartition()` function helps create a series of test and training partitions. The `p` parameter sets the percentage of data that goes to training. Declaring `list=FALSE` returns a matrix.  The `trainControl()` function controls the computational nuances of  the `train()` function. The `repeatedcv` resampling method and `number` parameters are specific the type of $k$-fold cross-validation to be implemented. The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `tuneGrid` parameter of the `train()` function is fed a data frame with values in columns named after the parameters being tuned.  CART is implemented in the `train()` function using the `rpart` method which tunes the model over the complexity parameter (right-sized tree based on RMSE). BAG is implemented in the `train()` function using the `treebag` method which conducts bagging for classification, regression and survival trees using the implementation in the `rpart` package. RF is implemented in the `train()` function using the `rf` method which implements Random Forest classification and regression using the `randomForest` package.  SGB is implemented in the `train()` function using the `gbm` method fits generalized boosted regression models. The hyperparameters declared in the tuning grid to be evaluated are various variable interaction depths (`interaction.depth`), fitted trees (`n.trees`), learning rates (`shrinkage`), and a minimum of 10 observations in the trees terminal nodes (`n.minobsinnode`). CUBE is implemented in the `train()` function using the `cubist` method which fits a rule-based M5 model with additional corrections based on nearest neighbors in the training set. The hyperparameters declared in the tuning grid to be evaluated are the `committees` parameter which specifies how many boosting interactions should be used in the ensemble, and the `neighbors` parameter which specifies the number of instances to use to correct the rule-based prediction. A function is created to help display the resampling performance metrics as a data frame. The `bwplot()` function plots a series of vertical box-and-whisker plots for the resampling performance metrics.
+The `tecator` data partitioning, controls, and Partial Least Squares (PLS) model are given in the question setup. The `createDataPartition()` function helps create a series of test and training partitions. The `p` parameter sets the percentage of data that goes to training. Declaring `list=FALSE` returns a matrix.  The `trainControl()` function controls the computational nuances of  the `train()` function. The `repeatedcv` resampling method and `number` parameters are specific the type of $k$-fold cross-validation to be implemented. The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `tuneGrid` parameter of the `train()` function is fed a data frame with values in columns named after the parameters being tuned.  CART is implemented in the `train()` function using the `rpart` method which tunes the model over the complexity parameter (right-sized tree based on RMSE). BAG is implemented in the `train()` function using the `treebag` method which conducts bagging for classification, regression and survival trees using the implementation in the `rpart` package. RF is implemented in the `train()` function using the `rf` method which implements Random Forest classification and regression using the `randomForest` package.  SGB is implemented in the `train()` function using the `gbm` method fits generalized boosted regression models. The hyperparameters declared in the tuning grid to be evaluated are various variable interaction depths (`interaction.depth`), fitted trees (`n.trees`), learning rates (`shrinkage`), and a minimum of 10 observations in the trees terminal nodes (`n.minobsinnode`). CUBE is implemented in the `train()` function using the `cubist` method which fits a rule-based M5 model with additional corrections based on nearest neighbors in the training set. The hyperparameters declared in the tuning grid to be evaluated are the `committees` parameter which specifies how many boosting interactions should be used in the ensemble, and the `neighbors` parameter which specifies the number of instances to use to correct the rule-based prediction. A function is created to help display the resampling performance metrics as a data frame. The `bwplot()` function plots a series of vertical box-and-whisker plots for the resampling performance metrics.
 
 #### Results
 
@@ -567,11 +567,11 @@ bwplot(resamples(fits))
 
 #### Interpretation
 
-After fitting a CART, BAG, RF, SGB, and CUBE models to the `tecator` data which were previously found to be best suited for fitting with a linear PLS model, it appears that a CUBE model may also provide a suitable fit for the  `tecator` data. The CUBE and PLS models outperform the other tree-based models in every resampling performance metric. The RMSE and $R^2$ resampling performance metrics of the PLS model however, outperforms the CUBE model. The CUBE model only outperforms the PLS model in the MAE resampling performance metric. The linear PLS model still appears to provide the best fit for the `tecator` data although the CUBE model comes in at a close second. In an earlier exercise it was found that predictor correlations do have an impact CUBE models so removing highly correlated variables using `findCorrelation(cor(.))` may yield improvements that can make a CUBE model a better fit for the `tecator` data that a PLS model.
+After fitting a CART, BAG, RF, SGB, and CUBE model to the `tecator` data which were previously found to be best suited for fitting with a linear PLS model, it appears that a CUBE model may also provide a suitable fit for the  `tecator` data. The CUBE and PLS models outperform the other tree-based models in every resampling performance metric. The RMSE and $R^2$ resampling performance metrics of the PLS model however, outperforms the CUBE model. The CUBE model only outperforms the PLS model in the MAE resampling performance metric. The linear PLS model still appears to provide the best fit for the `tecator` data although the CUBE model comes in at a close second. In an earlier exercise it was found that predictor correlations do have an impact CUBE models so removing highly correlated variables using `findCorrelation(cor(.))` may yield improvements that can make a CUBE model a better fit for the `tecator` data that a PLS model.
 
 ## Exercise 8.6
 
-Return to the permeability problem described [below]. Train several tree-based models and evaluate the resampling and test set performance:
+Return to the permeability problem described [below]. Train several tree-based models and evaluate the resampling and test set performance.
 
 > Permeability is the measure of a molecule's ability to cross a membrane. Compounds that appear to be effective for a particular disease in research screening experiments but appear to be poorly permeable may need to be altered in order to improve permeability and thus the compound's ability to reach the desired target. Permeability assays such as PAMPA and Caco-2 have been developed to help measure compounds' permeability. These screens are effective at quantifying a compound's permeability, but the assay is expensive labor intensive. Given a sufficient number of compounds that have been screened, we could develop a predictive model for permeability in an attempt to potentially reduce the need for the assay. In this project there were 165 unique compounds; 1,107 molecular fingerprints were determined for each. A molecular fingerprint is a binary sequence of numbers that represents the presence or absence of a specific molecular substructure. The response is highly skewed, the predictors are sparse, and many predictors are strongly associated. Developing a model to predict permeability could save significant resources for a pharmaceutical company, while at the same time more rapidly identifying molecules that have a sufficient permeability to become a drug.
 
@@ -607,7 +607,7 @@ Which tree-based model gives the optimal resampling and test set performance?
 
 #### Approach
 
-The `permeability` data partitioning, transformation, controls, ENET model, and SVM model are given in the question setup. The `createDataPartition()` function helps create a series of test and training partitions. The `p` parameter sets the percentage of data that goes to training. Declaring `list=FALSE` returns a matrix.  The `trainControl()` function controls the computational nuances of  the `train()` function. The `LGOCV` resampling method and `number` parameters specific the type of leave-group-out cross-validation to be implemented. The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `tuneGrid` parameter of the `train()` function is fed a data frame with values in columns named after the parameters being tuned.  CART is implemented in the `train()` function using the `rpart2` method which tunes the model over the maximum depth (of the tree). RF is implemented in the `train()` function using the `rf` method which implements Random Forest classification and regression using the `randomForest` package.  SGB is implemented in the `train()` function using the `gbm` method fits generalized boosted regression models. The hyperparameters declared in the tuning grid to be evaluated are various variable interaction depths (`interaction.depth`), fitted trees (`n.trees`), learning rates (`shrinkage`), and a minimum of 10 observations in the trees terminal nodes (`n.minobsinnode`). A function is created to help display the resampling performance metrics as a data frame. The `bwplot()` function plots a series of vertical box-and-whisker plots for the resampling performance metrics. The `predict()` function applies a fitted model to data consisting of predictor variables. A data frame with the test set performance metrics is then displayed.
+The `permeability` data partitioning, transformation, controls, Elastic Net Regression (ENET) model, and Support Vector Machines (SVM) model are given in the question setup. The `createDataPartition()` function helps create a series of test and training partitions. The `p` parameter sets the percentage of data that goes to training. Declaring `list=FALSE` returns a matrix.  The `trainControl()` function controls the computational nuances of  the `train()` function. The `LGOCV` resampling method and `number` parameters specific the type of leave-group-out cross-validation to be implemented. The `train()` function sets up a grid of tuning parameters for a number of classification and regression routines, fits each model, and calculates a resampling based performance measure. The `tuneGrid` parameter of the `train()` function is fed a data frame with values in columns named after the parameters being tuned.  CART is implemented in the `train()` function using the `rpart2` method which tunes the model over the maximum depth (of the tree). RF is implemented in the `train()` function using the `rf` method which implements Random Forest classification and regression using the `randomForest` package.  SGB is implemented in the `train()` function using the `gbm` method fits generalized boosted regression models. The hyperparameters declared in the tuning grid to be evaluated are various variable interaction depths (`interaction.depth`), fitted trees (`n.trees`), learning rates (`shrinkage`), and a minimum of 10 observations in the trees terminal nodes (`n.minobsinnode`). A function is created to help display the resampling performance metrics as a data frame. The `bwplot()` function plots a series of vertical box-and-whisker plots for the resampling performance metrics. The `predict()` function applies a fitted model to data consisting of predictor variables. A data frame with the test set performance metrics is then displayed.
 
 #### Results
 
@@ -638,16 +638,49 @@ metrics <- function(tune) {
   Rsquared = max(tune$results$Rsquared)
   MAE = min(tune$results$MAE)
   return(cbind(RMSE, Rsquared, MAE)) }
-data.frame(rbind(metrics(tune1), metrics(tune2), 
-  metrics(tune3), metrics(tune4), metrics(tune5)),
-  row.names = c("ENET","SVM","CART","RF","SGB"))
-fits <- list(ENET=tune1, SVM=tune2, CART=tune3, RF=tune4, SGB=tune5)
+data.frame(rbind(metrics(tune3), metrics(tune4),
+  metrics(tune5)), row.names = c("CART","RF","SGB"))
+fits <- list(CART=tune3, RF=tune4, SGB=tune5)
 bwplot(resamples(fits))
 ```
 
 ##### Validation on Test Set 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
+fcast3 <- predict(tune3, newdata = PER_test_X)
+fcast4 <- predict(tune4, newdata = PER_test_X)
+fcast5 <- predict(tune5, newdata = PER_test_X)
+data.frame(rbind(postResample(pred = fcast3, obs = PER_test_Y),
+  postResample(pred = fcast4, obs = PER_test_Y),
+  postResample(pred = fcast5, obs = PER_test_Y)), 
+  row.names = c("CART","RF","SGB"))
+```
+
+#### Interpretation
+
+After fitting tree-based CART, RF, and SGB models to the ` permeability` data which were previously found to be best suited for fitting with an ENT or SVM model, it appears that the SGB model provides the most suitable fit for the  `permeability` data. The SGB model outperforms the other tree-based models in every resampling performance metric. The RF model outperforms the other tree-based models on the test set, but these test set metrics are less important to predictive ability than the resampling performance metrics.
+
+### Exercise 8.6.b
+
+Do any of these models outperform the covariance or non-covariance based regression models you have previously developed for these data? What criteria did you use to compare models' performance?
+
+#### Approach
+
+A function is created to help display the resampling performance metrics as a data frame. The `bwplot()` function plots a series of vertical box-and-whisker plots for the resampling performance metrics. A data frame with the test set performance metrics is also displayed.
+
+#### Results
+
+```{r warning=F, message=F, fig.align='center', cache=T}
+metrics <- function(tune) {
+  RMSE = min(tune$results$RMSE)
+  Rsquared = max(tune$results$Rsquared)
+  MAE = min(tune$results$MAE)
+  return(cbind(RMSE, Rsquared, MAE)) }
+data.frame(rbind(metrics(tune1), metrics(tune2), 
+  metrics(tune3), metrics(tune4), metrics(tune5)),
+  row.names = c("ENET","SVM","CART","RF","SGB"))
+fits <- list(ENET=tune1, SVM=tune2, CART=tune3, RF=tune4, SGB=tune5)
+bwplot(resamples(fits))
 fcast1 <- predict(tune1, newdata = PER_test_X)
 fcast2 <- predict(tune2, newdata = PER_test_X)
 fcast3 <- predict(tune3, newdata = PER_test_X)
@@ -663,34 +696,7 @@ data.frame(rbind(postResample(pred = fcast1, obs = PER_test_Y),
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-### Exercise 8.6.b
-
-Do any of these models outperform the covariance or non-covariance based regression models you have previously developed for these data? What criteria did you use to compare models' performance?
-
-#### Approach
-
-A function is created to help display the resampling performance metrics as a data frame. The `bwplot()` function plots a series of vertical box-and-whisker plots for the resampling performance metrics. 
-
-#### Results
-
-```{r warning=F, message=F, fig.align='center', cache=T}
-metrics <- function(tune) {
-  RMSE = min(tune$results$RMSE)
-  Rsquared = max(tune$results$Rsquared)
-  MAE = min(tune$results$MAE)
-  return(cbind(RMSE, Rsquared, MAE)) }
-data.frame(rbind(metrics(tune1), metrics(tune2), 
-  metrics(tune3), metrics(tune4), metrics(tune5)),
-  row.names = c("ENET","SVM","CART","RF","SGB"))
-fits <- list(ENET=tune1, SVM=tune2, CART=tune3, RF=tune4, SGB=tune5)
-bwplot(resamples(fits))
-```
-
-#### Interpretation
-
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+After fitting tree-based CART, RF, and SGB models to the ` permeability` data which were previously found to be best suited for fitting with an ENT or SVM model, it appears that the SGB model provides the most suitable fit for the  `permeability` data. The SGB model outperforms the other tree-based models in every resampling performance metric. The RF model outperforms the ENT model on the test set, but these test set metrics are less important to predictive ability than the resampling performance metrics.
 
 ### Exercise 8.6.c
 
@@ -703,6 +709,11 @@ The `train()` function, once computed and stored to a variable, contains several
 #### Results
 
 ```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
+tune1$modelInfo$label
+data.frame(model="ENET", tune1$bestTune, RMSE=min(tune1$results$RMSE), row.names="")
+plot(tune1)
+```
+```{r warning=F, message=F, fig.align='center', cache=T, results = 'hold'}
 tune3$modelInfo$label
 data.frame(model="CART", tune3$bestTune, RMSE=min(tune3$results$RMSE), row.names="")
 plot(tune3)
@@ -710,7 +721,7 @@ plot(tune3)
 
 #### Interpretation
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Using the resampling performance metrics as a guide to choosing the recommendation of a replacement for the permeability laboratory experiment, it would probably be best to opt for the ENT model. This model performs better than the SVM and tree-based models. If however, a more interpretable model is necessary for business users, the CART model would be a good choice. Its resampling performance is relatively close to that of the ENET model and it is more interpretable to business users.
 
 ## Exercise 8.7
 
