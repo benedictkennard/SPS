@@ -177,7 +177,7 @@ data.frame(rbind(varimp1, padding1), rbind(varimp3, padding2), varimp2, varimp4)
 
 #### Interpretation
 
-Conditional variable importance scores are supposed to reflect “the true impact of each predictor variable more reliably than” the standard variable importance score calculation method. This however, does not seem to be the case here.  For the Conditional Inference Trees (CIT), the conditional importance (CI) scores follow the same ranking pattern, with respect to the informative variables for both the simulated and highly correlated data, as the standard importance (SI) scores. For the informative predictors the pattern is nearly with same as well. Inclusively, the decrease in importance of the informative variables is greater when using the conditional importance (CI) scores.
+Conditional variable importance scores are supposed to reflect “the true impact of each predictor variable more reliably than” the standard variable importance score calculation method. This however, does not seem to be the case here.  For the Conditional Inference Trees (CIT), the conditional importance (CI) scores follow the same ranking pattern as the standard importance (SI) scores for the informative variables of the simulated and highly correlated data. For the uninformative predictors the pattern is nearly with same as well. Inclusively, the decrease in importance of the informative variables when a highly correlated variable is included is greater when using the conditional importance (CI) scores.
 
 ### Exercise 8.1.d
 
