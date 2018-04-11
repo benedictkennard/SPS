@@ -177,7 +177,7 @@ data.frame(rbind(varimp1, padding1), rbind(varimp3, padding2), varimp2, varimp4)
 
 #### Interpretation
 
-Conditional variable importance scores are supposed to reflect “the true impact of each predictor variable more reliably than” the standard variable importance score calculation method. This however, does not seem to be the case here.  For the Conditional Inference Trees (CIT), the conditional importance (CI) scores follow the same ranking pattern as the standard importance (SI) scores for the informative variables of the simulated and highly correlated data. For the uninformative predictors the pattern is nearly with same as well. Inclusively, the decrease in importance of the informative variables when a highly correlated variable is included is greater when using the conditional importance (CI) scores.
+Conditional variable importance scores are supposed to reflect “the true impact of each predictor variable more reliably than” the standard variable importance score calculation method. This however, does not seem to be the case here.  For the Conditional Inference Trees (CIT), the conditional importance (CI) scores of informative variables follow the same ranking pattern as the standard importance (SI) scores for the simulated and highly correlated data. The pattern is nearly with same for the uninformative predictors as well. Inclusively, the decrease in importance of the informative variables when a highly correlated variable is included is greater when using the conditional importance (CI) scores.
 
 ### Exercise 8.1.d
 
@@ -185,7 +185,7 @@ Repeat this process with different tree models, such as boosted trees and Cubist
 
 #### Approach
 
-The `bagging()` function from the `ipred` package conducts bagging for classification, regression and survival trees using a formula interface (`Y ~ X`) instead of a non-formula interface (`y=Y, x=X`) like the `ipredbagg()` function from the same package. The trees in the `bagging()` function are computed using the implementation in the `rpart` package.  The `nbagg` parameter specifies the number of bootstrap replications. The `gbm()` function fits generalized boosted regression models. The `distribution` parameter, which is dependent on the response variable, is set to Gaussian since the response is not of Bernoulli (2 classes), Multinomial (more than 2 classes), or Survival (right censored) types.  The `cubist()` function from the `Cubist` package  fits a rule-based M5 model with additional corrections based on nearest neighbors in the training set. The `committees` parameter specifies how many boosting interactions should be used in the ensemble. The Random Forest implementations `randomForest()` and `cforest()` are more flexible and reliable for computing Bootstrap Aggregated trees than the `bagging()` function and although they should generally be used instead of the `bagging()` function, the `bagging()` function is being used in this exercise for demonstration reasons. Again, the variable importance calculations for all the models are then output in a data frame for comparison. To create the data frame, models without the `V11` predictor need to be padded with a `V11` predictor that has a variable importance value of `NA`.
+Unlike the `ipredbagg()` function from the `ipred` package, the `bagging()` function from the same package conducts bagging for classification, regression and survival trees using a formula interface (`Y ~ X`) instead of a non-formula interface (`y=Y, x=X`). The trees in the `bagging()` function are computed using the implementation in the `rpart` package.  The `nbagg` parameter specifies the number of bootstrap replications. The `gbm()` function fits generalized boosted regression models. The `distribution` parameter, which is dependent on the response variable, is set to Gaussian since the response is not of Bernoulli (2 classes), Multinomial (more than 2 classes), or Survival (right censored) types.  The `cubist()` function from the `Cubist` package  fits a rule-based M5 model with additional corrections based on nearest neighbors in the training set. The `committees` parameter specifies how many boosting interactions should be used in the ensemble. The Random Forest implementations `randomForest()` and `cforest()` are more flexible and reliable for computing Bootstrap Aggregated trees than the `bagging()` function and although they should generally be used instead of the `bagging()` function, the `bagging()` function is being used in this exercise for demonstration reasons. Again, the variable importance calculations for all the models are then output in a data frame for comparison. To create the data frame, models without the `V11` predictor are padded with a `V11` predictor that has a variable importance value of `NA`.
 
 #### Results
 
@@ -225,7 +225,7 @@ data.frame(rbind(varimp1, padding1),
 
 #### Interpretation
 
-Adding the predictor `V11` that is highly correlated with the most informative predictor `V1` has differing effects on the variable importance score of `V1` as well as the importance scores of all the other informative and uninformative variables under Bootstrap Aggregation (BAG), Stochastic Gradient Boosting (SGB), and Rule-Based Cubist (CUBE) models. The BAG method performs worse than the Random Forest (RF) model. Including the highly correlated variable makes the BAG model interpret the correlated variable `V11` as unimportant, but one of the uninformative variables (`V6`) as the most important. The SGB method performs poorly as well with one uninformative variables (`V10`) being listed as important and two informative variables (`V2`, `V5`) being listed as unimportant. The CUBE model fairs better than the other models by not marking any informative variables as unimportant, but it also lists an uninformative variable (`V10`) as the most important variable. This exercise highlights a weakness in tree-based models. When variables are highly correlated, tree-based models have a tendency to select more predictors than are actually needed with the choice between highly correlated predictors being nearly random.
+Adding the predictor `V11` that is highly correlated with the most informative predictor `V1` has differing effects on the variable importance score of `V1` as well as the importance scores of all the other informative and uninformative variables. The Bootstrap Aggregation (BAG) method performs worse than the Conditional Inference Trees (CIT) from the previous exercise. Adding the highly correlated variable makes the BAG model interpret the correlated variable `V11` as unimportant, but one of the uninformative variables (`V6`) as the most important. The Stochastic Gradient Boosting (SGB) method performs poorly as well with one uninformative variables (`V10`) being listed as important and two informative variables (`V2`, `V5`) being listed as unimportant. The Rule-Based Cubist (CUBE) model fairs better than the other models by not marking any informative variables as unimportant, but it also lists an uninformative variable (`V10`) as the most important variable. This exercise highlights a weakness in tree-based models. When variables are highly correlated, tree-based models have a tendency to select more predictors than are actually needed with the choice between highly correlated predictors being nearly random.
 
 ## Exercise 8.2
 
@@ -253,7 +253,7 @@ varImp(fit)
 
 #### Interpretation
 
-The predictor `X1` which is related to `Y` is found to be less important than the higher variance `X2` predictor which is completely unrelated to `Y`. The selection bias pitfall of Single Regression Trees is highlighted well in this example. The importance of the unrelated `X2` predictor is not just greater, it is substantially greater. The calculated importance value of the unelated `X2` predictor is over five times larger than that of the related `X1` predictor.
+The lower variance predictor `X1` which is related to `Y` is found to be less important than the higher variance `X2` predictor which is completely unrelated to `Y`. The selection bias pitfall of Single Regression Trees is highlighted well in this example. The importance of the unrelated `X2` predictor is not just greater, it is substantially greater. The calculated importance value of the unelated `X2` predictor is over five times larger than that of the related `X1` predictor.
 
 ## Exercise 8.3
 
@@ -318,7 +318,7 @@ head(df, 15)
 
 #### Interpretation
 
-This question is somewhat hard to answer. According to the author, model greediness (choosing the optimal weak learner at each stage) which decreases the number of predictors, increases proportional to the learning rate. Therefore, the lower learning rate of 0.1 in the left model results in fewer predictors than the model on the right which has a 0.9 learning rate. This number of predictors is also proportional to the stochastic nature of the model such that increased randomness sets the stage for an increased number of predictors. Therefore, the lower bagging fraction of 0.1 in the left model results in fewer predictors than the more deterministic model on the right which selects 0.9 of the training set observations to propose the next tree in the expansion.
+This question is somewhat hard to answer. According to the author, model greediness (choosing the optimal weak learner at each stage) which decreases the number of predictors, increases proportional to the learning rate. Therefore, the lower learning rate of 0.1 in the left model results in fewer predictors than the model on the right which has a 0.9 learning rate. This number of predictors is also proportional to the stochastic nature of the model such that increased randomness results in an increase in the number of predictors. Therefore, the lower bagging fraction of 0.1 in the left model results in fewer predictors than the more deterministic model on the right which selects 0.9 of the training set observations to propose the next tree in the expansion.
 
 ### Exercise 8.3.b
 
@@ -337,7 +337,7 @@ data.frame(model="SGB_0.9", tune3$bestTune, RMSE=min(tune3$results$RMSE), row.na
 
 #### Interpretation
 
-Greedy models are less likely to optimal global model and are prone to over-fitting. Stochastic models reduce prediction variance.  Therefore, the less greedy and more random model on the left with a 0.1 learning rate that selects 0.1 of the training set observations to propose the next tree in the expansion would be more predictive of other samples. The RMSE metric for the respective models supports this conclusion.
+Greedy models are less likely to select the optimal global model and are prone to over-fitting. Stochastic models reduce prediction variance.  Therefore, the less greedy model on the left (with a 0.1 learning rate) that is also more random (due to only selecting 0.1 of the training set observations to propose the next tree in the expansion) would be more predictive of other samples. The RMSE metric for the respective models supports this conclusion.
 
 ### Exercise 8.3.c
 
@@ -355,7 +355,7 @@ plot(tune1)
 
 #### Interpretation
 
-The positive impact of interaction depth on RMSE is proportional to the learning rate and number of trees. Models with a lower learning rate see greater improvements from interaction depth than models with a higher learning rate. A higher learning rate in these data results in improvements up to the 300-tree mark. Tree depth and learning rates impact the number of predictors which impacts the model greediness which impacts the predictive ability of the model which impacts the RMSE; all proportionally. Therefore, by transitivity, an increase in interaction depth will increase the number of predictors and RMSE. Variable importance will be spread across more predictors and the RMSE-Iterations graph will have a higher intercept that increases the slope.
+The positive impact of interaction depth on RMSE is proportional to the learning rate and number of trees. A higher learning rate in these data results in improvements up to the 300-tree mark. Models with a lower learning rate see greater improvements from interaction depth than models with a higher learning rate. Tree depth and learning rates impact the number of predictors which impacts the model greediness which impacts the predictive ability of the model which impacts the RMSE; all proportionally. Therefore, by transitivity, an increase in interaction depth will increase the number of predictors and RMSE. Variable importance will be spread across more predictors and the RMSE-Iterations graph will have a higher intercept that increases the negative slope. 
 
 ## Exercise 8.4
 
@@ -387,7 +387,7 @@ min(tune1$results$RMSE)
 
 #### Interpretation
 
-The CART model applied to the Molecular Weight predictor in the `solubility` dataset results in a 1.663586 RMSE.
+Fitting a CART model between the Molecular Weight predictor and the `solubility` dataset target variable results in a 1.663586 RMSE.
 
 ### Exercise 8.4.b
 
@@ -407,7 +407,7 @@ min(tune2$results$RMSE)
 
 #### Interpretation
 
-The RF model applied to the Molecular Weight predictor in the `solubility` dataset results in a 1.562868 RMSE.
+Fitting a RF model between the Molecular Weight predictor and the `solubility` dataset target variable results in a 1.562868 RMSE.
 
 ### Exercise 8.4.c
 
@@ -446,7 +446,7 @@ min(tune6$results$RMSE)
 
 #### Interpretation
 
-The CUBE models applied to the Molecular Weight predictor in the `solubility` dataset result in a RMSE ranging between [1.528700, 1.602018]
+Fitting CUBE models between the Molecular Weight predictor and the `solubility` dataset target variable result in a RMSE ranging between [1.528700, 1.619041].
 
 ### Exercise 8.4.d
 
@@ -485,7 +485,7 @@ data.frame(row.names = models, rbind(
 
 #### Interpretation
 
-Overlaying the model predictions on the test set is very useful in highlighting the differences in the models. The CART model predicts values within two categories that does not fit the data very well. The RF model fits the data much better but its predictions are the most heteroskedastic of all the fitted models. The CUBE models appear perform the best but there are differences between them. Although the number of committees which specifies how many boosting interactions should be used in the ensemble has little to no effect in the CUBE model predictions, the number of neighbors which specifies the number of instances to use to correct the rule-based prediction has a significant impact. Declaring zero neighbors makes the CUBE model predictions homoskedastic to a fault. Multiple neighbors adds variance to the prediction which improves the fit. Interestingly enough, the RMSE, $R^2$ and MAE performance metrics indicate that the RF model with the most heteroskedasticity is the best fit for these data.
+Overlaying the model predictions on the test set is very useful in highlighting the differences in the models. The CART model predicts values within two categories that does not fit the data very well. The RF model fits the data much better but its predictions are the most heteroskedastic of all the fitted models. The CUBE models appear perform the best but there are differences between them. Although the number of committees (which specifies how many boosting interactions should be used in the ensemble) has little to no effect in the CUBE model predictions, the number of neighbors (which specifies the number of instances to use to correct the rule-based prediction) has a significant impact. Declaring zero neighbors makes the CUBE model predictions homoskedastic to a fault and returns a hockey-stick shaped prediction reminiscent of nonlinear [MARS](https://rpubs.com/josezuniga/376348) models. Declaring multiple neighbors adds variance to the prediction which improves the fit. Interestingly enough, the RMSE, $R^2$ and MAE performance metrics indicate that the RF model with the most heteroskedasticity is the best fit for these data.
 
 ## Exercise 8.5
 
