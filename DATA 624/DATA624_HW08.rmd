@@ -561,7 +561,7 @@ bwplot(resamples(fits))
 
 #### Interpretation
 
-After fitting a CART, BAG, RF, SGB, and CUBE model to the `tecator` data which were previously found to be best suited for fitting with a linear PLS model, it appears that a CUBE model may also provide a suitable fit for the `tecator` data. The CUBE and PLS models outperform the other tree-based models in every resampling performance metric. The RMSE and $R^2$ resampling performance metrics of the PLS model however, outperforms the CUBE model. The CUBE model only outperforms the PLS model in the MAE resampling performance metric. The linear PLS model still appears to provide the best fit for the `tecator` data although the CUBE model comes in at a close second. In an earlier exercise it was found that predictor correlations do have an impact CUBE models so removing highly correlated variables using `findCorrelation(cor(.))` may yield improvements that can make a CUBE model a better fit for the `tecator` data that a PLS model.
+After fitting a CART, BAG, RF, SGB, and CUBE model to the `tecator` data which were previously found to be best suited for fitting with a linear PLS model, it appears that a CUBE model is also well suited for modeling the `tecator` data. The CUBE and PLS models outperform the other tree-based models in every resampling performance metric. The RMSE and $R^2$ resampling performance metrics of the PLS model are superior to those of the CUBE model however. The CUBE model only outperforms the PLS model in the MAE resampling performance metric. Based on these performance metrics, the linear PLS model still appears to provide the best fit for the `tecator` data (although the CUBE model comes in at a close second). In [Exercise 8.2](#exercise-8.2) it was found that predictor correlations do have an impact CUBE models so removing highly correlated variables using `findCorrelation(cor(.))` may yield improvements that can make a CUBE model a better fit for the `tecator` data that a PLS model.
 
 ## Exercise 8.6
 
@@ -652,7 +652,7 @@ data.frame(rbind(postResample(pred = fcast3, obs = PER_test_Y),
 
 #### Interpretation
 
-After fitting tree-based CART, RF, and SGB models to the ` permeability` data which were previously found to be best suited for fitting with an ENT or SVM model, it appears that the SGB model provides the most suitable fit for the `permeability` data. The SGB model outperforms the other tree-based models in every resampling performance metric. The RF model outperforms the other tree-based models on the test set, but these test set metrics are less important to predictive ability than the resampling performance metrics.
+After fitting tree-based CART, RF, and SGB models to the ` permeability` data which were previously found to be best suited for fitting with a linear ENET or a nonlinear SVM model, it appears that most suitable tree-based model fit for the `permeability` data is an SGB model. The SGB model outperforms the other tree-based models in every resampling performance metric. The RF model does outperform the other tree-based models on the test set, but these test set metrics are less important to predictive ability than the resampling performance metrics.
 
 ### Exercise 8.6.b
 
@@ -690,7 +690,7 @@ data.frame(rbind(postResample(pred = fcast1, obs = PER_test_Y),
 
 #### Interpretation
 
-After fitting tree-based CART, RF, and SGB models to the ` permeability` data which were previously found to be best suited for fitting with a linear ENT or nonlinear SVM model, it appears that the SGB model provides the most suitable fit for the `permeability` data. The ENET model outperforms the other tree-based models in every resampling performance metric. The RF model outperforms the ENET model on the test set, but these test set metrics are less important to predictive ability than the resampling performance metrics.
+After fitting tree-based CART, RF, and SGB models to the ` permeability` data which were previously found to be best suited for fitting with a covariance (linear) ENET or non-covariance (nonlinear) SVM model, it appears that most suitable model for the `permeability` data is still the ENET model. The ENET model outperforms the SVM and tree-based models in every resampling performance metric. Other models outperform the ENET model on the test set, but these test set metrics are less important to predictive ability than the resampling performance metrics.
 
 ### Exercise 8.6.c
 
@@ -715,7 +715,7 @@ plot(tune3)
 
 #### Interpretation
 
-Using the resampling performance metrics as a guide in choosing the recommendation of a replacement for the permeability laboratory experiment, it would probably be best to opt for the ENT model. This model performs better than the SVM and tree-based models. If, however, a more interpretable model is necessary for business users, the CART model would be a good choice. Its resampling performance is relatively close to that of the ENET model and it is more interpretable to business users.
+Using the resampling performance metrics as a guide in choosing the recommendation of a replacement for the permeability laboratory experiment, it would advisable to opt for the ENET model since the ENET model performs better than the SVM and tree-based models. If, however, a more interpretable model is necessary, the CART model would be a good choice. Its resampling performance is relatively close to that of the ENET model and it is more interpretable by non-technical persons.
 
 ## Exercise 8.7
 
@@ -928,7 +928,7 @@ data.frame(rbind(postResample(pred = fcast1, obs = CMP_test$Yield),
 
 #### Interpretation
 
-After fitting tree-based CART, CIT, M5, BAG, RF, SGB and CUBE models to the `ChemicalManufacturingProcess` data which were previously found to be best suited for fitting with a linear PLS or nonlinear KNN model, it appears that the CUBE model provides the most suitable fit for the `ChemicalManufacturingProcess` data. The CUBE model with 100 committees and 1 neighbor outperforms the other models in every resampling performance metric. Several models outperform the CUBE model on the test set with the SGB performing the best, but these test set metrics are less important to predictive ability than the resampling performance metrics.
+After fitting tree-based CART, CIT, M5, BAG, RF, SGB and CUBE models to the `ChemicalManufacturingProcess` data which were previously found to be best suited for fitting with a linear PLS or nonlinear KNN model, it appears that most suitable model for the `ChemicalManufacturingProcess` data is a CUBE model. The CUBE model with 100 committees and 1 neighbor outperforms the other models in every resampling performance metric. Several models outperform the CUBE model on the test set with the SGB performing the best, but these test set metrics are less important to predictive ability than the resampling performance metrics.
 
 ### Exercise 8.7.b
 
@@ -954,7 +954,7 @@ head(imp[order(imp$CUBE, decreasing = T), ], 10)
 
 #### Interpretation
 
-The CUBE model which was found to be the optimal tree-based regression model, the KNN model which [was found](https://rpubs.com/josezuniga/376348) to be the optimal nonlinear regression model, and the PLS model which [was found](https://rpubs.com/josezuniga/366918) to be the optimal linear regression model all agree that the most important predictor is the `ManufacturingProcess32` process variable. All models also agree that `BiologicalProcess32` is a very important biological process, but the CUBE model ranks it equal in importance to the `BiologicalMaterial03` biological process. The PLS and KNN models clear distinguish `BiologicalProcess32` as the most important biological process and `BiologicalMaterial03` as the second most important biological process. Another interesting difference in the CUBE model is that only five predictors are listed as important, one of which (`ManufacturingProcess25`) is not even in the top ten of the PLS or the KNN models. 
+The CUBE model which was found to be the optimal tree-based regression model, the KNN model which [was found](https://rpubs.com/josezuniga/376348) to be the optimal nonlinear regression model, and the PLS model which [was found](https://rpubs.com/josezuniga/366918) to be the optimal linear regression model all agree that the most important predictor is the `ManufacturingProcess32` process variable. All models also agree that `BiologicalProcess32` is a very important biological process, but the CUBE model ranks it equal to the `BiologicalMaterial03` biological process. The PLS and KNN models clearly distinguish `BiologicalProcess32` as the most important biological process and `BiologicalMaterial03` as the second most important biological process. Another interesting difference in the variable importance of the CUBE model is that only five predictors are listed as important, one of which (`ManufacturingProcess25`) is not even in the top ten of the PLS or the KNN models.
 
 ### Exercise 8.7.c
 
@@ -973,11 +973,15 @@ plot(as.party(tune3$finalModel), gp=gpar(fontsize = 8))
 
 #### Interpretation
 
-The optimal single tree model based on RMSE, $R^2$, and MAE resampling performance metrics is the CIT model. This decision tree produced for the CIT model shows a single split for `ManufacturingProcess32` at the 0.111 value. Values lower than 0.111 are associated with lower yields as represented by the boxplots. Values over 0.111 are associated with higher yields. This view of the tree does help in understanding the relationship between `ManufacturingProcess32` and the yield, but very little due to the single split. The CART model tree is plotted for comparison. This tree has several branches and details the same information about `ManufacturingProcess32`, albeit at a different cutoff value of 0.2, but also provides a much greater understanding of the relationship between the biological and process predictors and the yield due to the additional branches.
+The optimal single tree model based on RMSE, $R^2$, and MAE resampling performance metrics is the CIT model. The decision tree produced for the CIT model shows a single split for `ManufacturingProcess32` at the 0.111 value. Values lower than 0.111 are associated with lower yields as represented by the boxplot distributions. Values over 0.111 are associated with higher yields as represented by the boxplot distributions. The visualization of the tree does help in understanding the relationship between `ManufacturingProcess32` and the yield, but not between any other predictor and the yield since there is only one split. The CART model tree is plotted for comparison. This tree has several branches and details the same information about `ManufacturingProcess32`, albeit at a different cutoff value of 0.2, but also provides a much greater understanding of the relationship between the biological and process predictors and the yield due to the additional branches.
 
 # References
 
+https://rpubs.com/josezuniga/366918
+
 https://rpubs.com/josezuniga/376348
+
+https://rpubs.com/josezuniga/377753
 
 http://appliedpredictivemodeling.com/
 
