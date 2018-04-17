@@ -1,18 +1,20 @@
 ---
-title: "Nation of Immigrants"
+title: |
+  | \LARGE{Nation of Immigrants}
+  | \vspace{0.1cm} \large{A Longitudinal Study of the Relationship of Immigration Laws with Changes in Demographics and GDP in the U.S.}
 author: "Jose Zuniga"
-date: "March 26, 2018"
+date: "May 14, 2018"
 output:
-  word_document:
+  pdf_document:
     toc: yes
     toc_depth: 4
-  pdf_document:
+  word_document:
     toc: yes
     toc_depth: 4
   html_document:
     df_print: paged
     toc: yes
-    toc_depth: 4
+    toc_depth: 2
   fontfamily: tnr
   fontsize: 12pt
   geometry: margin=1in
@@ -34,7 +36,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Abstract
 
-Immigrants come to the United States looking to benefit from opportunities available in the U.S. labor market that they are unable to find in their country of origin. It is ambition, and not demographics that impacts the U.S. economy. The presidential administration claims that immigration reforms will improve the economy through merit-based admissions and enforcement of existing laws. Political opponents claim the proposed policies have racial undertones and are meant to reduce the diversity of Immigrants. This paper conducts correlational research to describe the historic relationships between legislation on immigration, demographics, and the economy. Based on this empirical research, conclusions are then drawn on what is the likely outcome of the proposed immigration reforms.
+Immigrants come to the United States looking to benefit from opportunities available in the U.S. labor market that they are unable to find in their country of origin. The current presidential administration claims that immigration reforms focusing on merit-based admissions and enforcement of existing laws will improve the economy. Political opponents claim the proposed policies have racial undertones and are meant to reduce the diversity of Immigrants. This paper conducts correlational research to describe the historic relationships between legislation on immigration, demographics, and the economy. Based on this empirical research, conclusions are then drawn on what is the likely outcome of the proposed immigration reforms.
 
 # Introduction
 
@@ -52,7 +54,7 @@ The presidential administration claims that immigration reforms will improve the
 
 ## Theory and Hypothesis
 
-Immigrants come to the United States looking to benefit from opportunities available in the U.S. labor market that they are unable to find in their country of origin. It is ambition, and not demographics that impacts the U.S. economy. The positive impact that Immigrants have on various sectors of the U.S. economy will continue regardless of the demographics of the immigrant. The proposed immigration restrictions will not have a positive impact on the economy. The reforms will mostly serve to reduce diversity in the United States.
+In the current political climate, restrictions on immigration are politicized as means to protect the average American works from the influx of low-cost labor. It is true that Immigrants do come to the United States looking to benefit from opportunities available in the U.S. labor market that they are unable to find in their country of origin. It is also true that standard economic theories about competitive markets posit that immigration increases the supply of labor which in turn decreases the cost of labor (wages). This claim however, has not been supported by empirics. The impact of immigration on wages has been found to be either nonexistent or small; even when the influx was large and sudden (Kaufman, Hotchkiss 2006). This contradiction has led to explanations such as those claiming that immigrants are not perfect substitutes for native workers due to language. It has also led to counter studies where the data were dredged until the theorized negative impact was found. Although the impact of immigration on wages is debatable, economic theory is unambiguous about the positive relationship between immigration and economic growth (Kaufman, Hotchkiss 2006). The positive relationship that Immigrants share with various sectors of the U.S. economy holds regardless of the demographics of the immigrant. The is why the proposed immigration restrictions based on demographics are not likely to have a positive impact to the economy. From an empirical and historical perspective, the proposed restrictions on immigration appear to be motivated by desires to reduce the rate of racial and ethnic diversity in America. The results support this theory in showing a lack of meaningful correlation with changes in the legal flow of immigrants and economic growth over America’s history.
 
 ## Significance
 
@@ -60,7 +62,7 @@ The topic is important because of the significance of the United States' economy
 
 ## Originality
 
-There are descriptive studies on immigration laws, demographics in the United States, and the economy. Yet there are not any that look at the relationship between immigration laws, demographics, and the economy over throughout history. There are studies by the U.S. Census Bureau on historic demographics, but they do not address immigration law or the economy. The Migration Policy Institute[^6] has reports on immigration flows based on data from the U.S. Department of Homeland Security, but this information is also mostly demographic. A recent study was published in the Washington Post on the impact of the proposed immigration reforms on demographics and the economy, but it does not address anything prior to 2015. This research project looks at the relationship between immigration laws, demographics, and the economy. at a very granular level.
+There are descriptive studies on immigration laws, demographics in the United States, and the economy. Yet there are not as many that look at the relationship between immigration laws, demographics, and the economy throughout history. There are studies by the U.S. Census Bureau on historic demographics, but they do not address immigration law or the economy. The Migration Policy Institute[^6] has reports on immigration flows based on data from the U.S. Department of Homeland Security, but this information is also mostly demographic. A recent study was published in the Washington Post on the impact of the proposed immigration reforms on demographics and the economy, but it does not address anything prior to 2015. This research project looks at the relationship between immigration laws, demographics, and the economy. at a very granular level.
 
 # Research Materials
 
@@ -145,7 +147,7 @@ The U.S. Bureau of Economic Analysis has data on *Gross Output by Industry*[^43]
 
 The dataset[^45] constructed from an arduous  data gathering and cleaning process consists of Immigration Laws and Census data from 1790 to 2016, employment visa data from 1981 to 2016, enforcement data from 1925 to 2016, and GDP by Industry from 1987 to 2016. Correlational research method is being conducted on the dataset to describe relationships between immigration law, demographics, employment visas, and the economy. The significance of the relationships between variables is evaluated using formal statistical tests.
 
-```{r eval=F}
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 github <- "https://raw.githubusercontent.com/jzuniga123"
 file <- "/SPS/master/DATA%20698/DATA698_Project.csv"
 data698 <- read.csv(paste0(github, file), header=1)
@@ -161,7 +163,7 @@ data698 <- ts(data698[, -1], frequency=1,
 
 Historic immigration law numbers have an interesting pattern. The period between 1790 and 1931 saw an average of 3.03 pieces legislation per decade. The relative frequency of legislation did increase around the time of Mexican-American War in 1846, but the number of laws passed continued to remain relatively low. Then in 1932, in the midst the Great Depression, the number and frequency immigration laws started steadily increasing. Since 1932 there have been an average of 2.06 immigration laws being passed every year. Looking only at the period since 1997 shows an average of 3.65 immigration laws passed annually. The last 21 years have seen legislation on immigration being enacted at a frequency over 10 times greater than what was witnessed during the first 141 years of Federal legislative action on immigration. 
 
-```{r warning=F, message=F, eval=F}
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 Laws <- data698[, 1]
 mean(window(Laws, end = 1931))
 mean(window(Laws, start = 1932))
@@ -182,7 +184,7 @@ Notable periods of increased legislative activity that were outliers in their er
   + **2002**: Ten laws passed in the wake of the September 11, 2001 terrorists attacks.
   + **2008**: Six laws passed during an election year, all prior to elections.
 
-```{r warning=F, message=F, fig.align='center', eval=F}
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 library(fma)
 mov_avg <- ma(Laws, order=10)
 plot(Laws)
@@ -196,7 +198,7 @@ abline(h=c(0.75, 1.5, 2.5), col=c(3:5))
 
 The purely numerical data from the decennial Census on race and Hispanic origin has two interesting features. As is usual with most social phenomena, the distributions appear mostly exponential. The two exceptions are the White race which can be described as linear since around 1870 and the Native American race which has a positive parabolic shape with a minimum at the year 1900. Note that for aggregate analysis purposes, the free and enslaved Black population that the Census counts separately until 1860, is being counted together. When the Census data on race and Hispanic origin are viewed as a percentage of total population however, some striking details emerge. Hispanics, Asians, Pacific Islanders, and Other races grow exponentially as a percentage of total population over time. Native Americans have decreased exponentially as a percentage of total population over time, from 14.2% in 1790 to 0.7% in 2016. The Black percentage of the population has decreased overall but in a cubic manner with a minimum of 9.5% in 1930 and two local maximas of 17.7% in 1810 and 11% in 1990. The White percentage of the population has a negative parabolic shape with a maximum of 89% in 1920 and an all time low of 61.7% in 2016.
 
-```{r warning=F, message=F, fig.align='center', eval=F}
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 library(zoo)
 Census <- data698[, 2:17]
 RAHO <- Census[, 2:8]
@@ -213,7 +215,7 @@ na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
 
 The decennial numbers on the Native and Foreign-born population also follow what can be described as an exponential pattern. There is a decline in the Foreign-born population from 1940 to 1970, but by 1980 the number returns to its prior levels and continues on its prior trajectory. The proportion of Native and Foreign-born persons in the population are mirror images of each other. The median proportion of Foreign-born persons in the United States since 1790 has been 12.4%. In 1850 and 1970 the percentage of Foreign-born persons in the United States reaches lows of 9.5% and 4.8%, respectively. The proportion of Foreign-born persons in the United States has peaks in 1870, 1890, and 1910 at 14.3%, 14.8%, and 14.7%; respectively. In 2016 the percentage of Foreign-born sits at 13.5%. 
 
-```{r warning=F, message=F, fig.align='center', eval=F}
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 NAFB <- Census[, 9:10]
 Population <- rowSums(NAFB)
 Proportions <- NAFB / Population
@@ -227,7 +229,7 @@ na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
 
 The decennial numbers on country of origin for Foreign-born are a little more interesting. Persons from Africa, Asia, Oceania, and Latin America arrive at an exponential rate. Arrivals from Europe and North America however, show exponential growth until around 1930, and then steady declining thereafter. The proportion of Foreign-born persons in the United States by country of origin shows exponential increases from Asia, Oceania, and Latin America just like the pure numbers. The large increases start around 1860 for Oceania, and 1970 for Latin America and Asia. Foreign-born persons from Africa follow a less natural pattern due the slavery. The percentage of Foreign-born persons from Africa was high from 1790 to 1820, but relatively low thereafter. Looking at Foreign-born persons from Africa in the post-slavery era shows a more natural exponential pattern with a large increase starting in 1980. The proportion of Foreign-born persons from Europe remained above 80% until 1950 when a permanent and rapid decline started leading to its current low of 10.9% in 2016. The proportion of Foreign-born persons from North America has a very strange and unnatural pattern hovering around 8.9% until 1970 when a rapid decline started leading to its current low of 1.8% in 2016. 
 
-```{r warning=F, message=F, fig.align='center', eval=F}
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 FBCO <- Census[, 11:16]
 Population <- rowSums(FBCO)
 Proportions <- FBCO / Population
@@ -243,7 +245,7 @@ na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
 
 The numeric data on Immigrant Visas since 1820 is best described as chaotic. It has wild swings up and down starting with an upward trend from 1820 to about 1910, then a drastic decline until about 1945, then another trend upward with a similar trajectory as before until 2016. The graph also shows a huge spike around 1990. Employment related Immigrant visas over the last 30 years are much simpler. The number of Immigrant visas related to employment held steady from 1981 to 1991, was chaotic from 1992 to 2007, and then steady ever since. There were large decreases around 1999 and 2004, and large increases around 1993, 2001, and 2006. Total immigrant visas follow a similar pattern with the exception of the huge spike around 1990 mentioned earlier. Nonimmigrant visas have a less interesting pattern. Employment related visas have a steadily increasing trend with only a slight amount of variability. All Nonimmigrant visas also have an increasing trend, but with less variability. Nonimmigrant visas make up between 89% to 95% off all visas for the last 30 years. 
 
-```{r fig.align='center', eval=F}
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 plot(data698[, 19], ylab="Imm_All", main="Immigrant Visas")
 Visas <- data698[, 18:21]
 plot(window(Visas, start = 1981))
@@ -253,7 +255,7 @@ plot(window(Visas, start = 1981))
 
 Enforcement data has some interesting patterns. Removals remained at a constant rate until 1996 when they increased substantially. Apprehensions and Returns follow almost identical patterns. There was a large increase in enforcement in the ten-year period between 1945 and 1955 with its peak being reached in 1954. The increase started again in 1965 and has remained elevated since with peaks in 1986, 1996, and 2000. Around the time Removals started steadily increasing, Apprehensions and Returns started steadily decreasing. The three enforcement actions combined follow the pattern of the latter two enforcement actions which make up the bulk of the actions. 
 
-```{r fig.align='center', eval=F}
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 Enforce <- data698[, 23:25]
 plot(window(Enforce, start = 1925))
 ```
@@ -262,7 +264,7 @@ plot(window(Enforce, start = 1925))
 
 GDP by industry over the past 30 years has increased nearly uniformly across industries. The exceptions are Agriculture Mining, Utilities and Construction which appear to be more susceptible to business cycles. When examining the industries in aggregate as a proportion of the economy, their shares appear to remain relatively constant over the last 30 years. The Manufacturing, FIRE (Finance, Insurance, Real Estate), Service, and Education sectors make up the bulk of GDP; in that order. Over time there has been a slight decrease in the proportion of the economy captured by the Manufacturing sector and slight increases in the FIRE and Service sectors
 
-```{r fig.align='center', eval=F}
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 Economy <- data698[, 27:42]
 plot(window(Economy[,1:8], start = 1987))
 plot(window(Economy[,9:16], start = 1987))
@@ -302,7 +304,7 @@ $$y=y_{ 1 }+\left( x-x_{ 1 } \right) \left( \frac { y_{ 2 }-y_{ 1 } }{ x_{ 2 }-x
 
 First the Kendall correlation between new, one-year old, two-year old, and three-year old immigration legislation and social factors is examined. When it comes to Race and Hispanic Origin, legislation has correlations between $\tau=0.51$ and $\tau=0.56$ for Hispanic origin and nearly every race. The exception is Native Americans which has a correlation that hoovers around $\tau=0.26$. For the Native and Foreign-born population, the correlations are also moderate. Native have a correlation that hoovers around $\tau=0.52$. Foreign-born correlation that hoovers around $\tau=0.44$. The correlations on Foreign-born Country of Origin are higher for Asia, Oceania, and Latin America which have correlations between $\tau=0.51$ and $\tau=0.53$. The correlation for Africa is around $\tau=0.4$. The correlations for Europe and North America are between $\tau=0.19$ and $\tau=0.26$ with the lower correlations figures being from Europe. All of these correlations are significant at $\alpha=0.05$.
 
-```{r warning=F, message=F, eval=F}
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 library(psych)
 Legislation <- window(cbind(Law_New=Laws, Law_1yr=lag(Laws, k=-1),
   Law_2yr=lag(Laws, k=-2), Law_3yr=lag(Laws, k=-3)), end=2016)
@@ -315,7 +317,7 @@ corr.test(na.approx(FBCO), Legislation, use="complete.obs", method="kendall")
 
 The Kendall correlation between new, one-year old, two-year old, and three-year old immigration legislation and economic factors is examined next. The largest correlations with immigration legislation and visas can be found after two years. Although these correlations are larger, they are not very high. The correlations are between $\tau=0.21$ and $\tau=0.31$. Enforcement actions have low correlations that are fairly constant across lags. They range between $\tau=0.19$ and $\tau=0.24$. The largest correlations with immigration legislation and GDP by Industry can be found after three years. Just like before, although these correlations are larger, they are not very high. Excluding the highest and lowest correlations, these correlations range between $\tau=0.29$ and $\tau=0.33$. The highest correlation is with Utilities at $\tau=0.39$ and the lowest is with Agriculture at $\tau=0.25$. None of these correlations are significant at $\alpha=0.05$.
 
-```{r warning=F, message=F, eval=F}
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(Visas, Legislation, use="complete.obs", method="kendall")
 corr.test(Enforce, Legislation, use="complete.obs", method="kendall")
 corr.test(Economy, Legislation, use="complete.obs", method="kendall")
@@ -325,7 +327,7 @@ corr.test(Economy, Legislation, use="complete.obs", method="kendall")
 
 As previously mentioned, Kendall correlations between legislation and the economy are low and statistically insignificant. This is not true for many other factors. Correlations between Race and Hispanic Origin and every industry in the Economy are high and statistically significant at $\alpha=0.05$ for every single race and Hispanics. The same is true for the Native and Foreign-born population and every industry; high and statistically significant at $\alpha=0.05$. Country of origin does not show the same level of equality however. At an $\alpha=0.05$ Asia, Africa, Oceania, and Latin America have high and statistically significant correlations with every industry, but Europe and North America have statistically insignificant correlations with every industry. There is also a dichotomy between Immigrant and Nonimmigrant visas. At an $\alpha=0.05$, Nonimmigrant visas have statistically significant correlations with every industry, but Immigrant visas have statistically insignificant correlations with every industry. Enforcement actions also have mixed results. Apprehensions and Returns have statistically insignificant correlations with every industry, but Removals have statistically significant correlations with every industry at $\alpha=0.05$. As stated earlier, Removals are compulsory actions based on a court order.
 
-```{r warning=F, message=F, eval=F}
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(Economy, na.approx(RAHO), use="complete.obs", method="kendall")
 corr.test(Economy, na.approx(NAFB), use="complete.obs", method="kendall")
 corr.test(Economy, na.approx(FBCO), use="complete.obs", method="kendall")
@@ -341,7 +343,7 @@ The correlations with industries in the economy contradicts several stereotypes.
 
 # Conclusion
 
-The presidential administration claims that immigration reforms will improve the economy through merit-based admissions and enforcement of existing laws. Political opponents claim the proposed policies have racial undertones and are meant to reduce the diversity of immigrants. Historically, legislation on immigration has had a statistically insignificant correlation with the economy. The statistically significant correlations that immigration laws legislation have had are with demographics. Although intent cannot be inferred, this research shows that it is statistically more likely that opponents of the administration are correct in their predicted outcomes. The proposed immigration reforms will have effect demographics and not on the economy.
+Historically, legislation on immigration has had a statistically insignificant correlation with the economy. The statistically significant correlations that immigration laws legislation have had are with demographics. Although intent cannot be inferred, this research shows that it is statistically more likely that opponents of the administration are correct in their predicted outcomes. The proposed immigration reforms may affect demographics, but not the economy.
 
 [^1]: https://www.migrationpolicy.org/research/timeline-1790
 [^2]: https://www.archives.gov/files/research/naturalization/420-major-immigration-laws.pdf
