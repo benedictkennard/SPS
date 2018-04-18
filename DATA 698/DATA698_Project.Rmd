@@ -187,7 +187,7 @@ Notable periods of increased legislative activity that were outliers in their er
 ```{r warning=F, message=F, fig.align='center', cache=TRUE}
 library(fma)
 mov_avg <- ma(Laws, order=10)
-plot(Laws)
+plot(Laws, main="Legislation on Immigration (Totals)")
 lines(mov_avg, col=2)
 abline(h=c(0.75, 1.5, 2.5), col=c(3:5))
 ```
@@ -206,8 +206,8 @@ RAHO[, 2] <- RAHO[, 2] + RAHO[, 3]
 RAHO <- RAHO[, -3]
 Population <- rowSums(RAHO)
 Proportions <- RAHO / Population
-plot(na.approx(RAHO), type="l", main="Race and Hispanic Origin")
-plot(na.approx(Proportions), type="l", main="Race and Hispanic Origin")
+plot(na.approx(RAHO), type="l", main="Race and Hispanic Origin (Totals)")
+plot(na.approx(Proportions), type="l", main="Race and Hispanic Origin (Proportions)")
 na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
 ```
 
@@ -219,8 +219,8 @@ The decennial numbers on the Native and Foreign-born population also follow what
 NAFB <- Census[, 9:10]
 Population <- rowSums(NAFB)
 Proportions <- NAFB / Population
-plot(na.approx(NAFB), type="l", main="Native and Foreign-born")
-plot(na.approx(Proportions), type="l", main="Native and Foreign-born")
+plot(na.approx(NAFB), type="l", main="Native and Foreign-born (Totals)")
+plot(na.approx(Proportions), type="l", main="Native and Foreign-born (Proportions)")
 median(Proportions[,2], na.rm=T)
 na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
 ```
@@ -233,8 +233,8 @@ The decennial numbers on country of origin for Foreign-born are a little more in
 FBCO <- Census[, 11:16]
 Population <- rowSums(FBCO)
 Proportions <- FBCO / Population
-plot(na.approx(FBCO), type="l", main="Native and Foreign-born")
-plot(na.approx(Proportions), type="l", main="Native and Foreign-born")
+plot(na.approx(FBCO), type="l", main="Native and Foreign-born (Totals)")
+plot(na.approx(Proportions), type="l", main="Native and Foreign-born (Proportions)")
 median(Proportions[,6], na.rm=T)
 na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
 ```
@@ -246,9 +246,9 @@ na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
 The numeric data on Immigrant Visas since 1820 is best described as chaotic. It has wild swings up and down starting with an upward trend from 1820 to about 1910, then a drastic decline until about 1945, then another trend upward with a similar trajectory as before until 2016. The graph also shows a huge spike around 1990. Employment related Immigrant visas over the last 30 years are much simpler. The number of Immigrant visas related to employment held steady from 1981 to 1991, was chaotic from 1992 to 2007, and then steady ever since. There were large decreases around 1999 and 2004, and large increases around 1993, 2001, and 2006. Total immigrant visas follow a similar pattern with the exception of the huge spike around 1990 mentioned earlier. Nonimmigrant visas have a less interesting pattern. Employment related visas have a steadily increasing trend with only a slight amount of variability. All Nonimmigrant visas also have an increasing trend, but with less variability. Nonimmigrant visas make up between 89% to 95% off all visas for the last 30 years. 
 
 ```{r warning=F, message=F, fig.align='center', cache=TRUE}
-plot(data698[, 19], ylab="Imm_All", main="Immigrant Visas")
+plot(data698[, 19], ylab="Imm_All", main="Immigrant Visas (Total)")
 Visas <- data698[, 18:21]
-plot(window(Visas, start = 1981))
+plot(window(Visas, start = 1981), main="Visas by Type (Total)")
 ```
 
 #### Enforcement
@@ -257,7 +257,7 @@ Enforcement data has some interesting patterns. Removals remained at a constant 
 
 ```{r warning=F, message=F, fig.align='center', cache=TRUE}
 Enforce <- data698[, 23:25]
-plot(window(Enforce, start = 1925))
+plot(window(Enforce, start = 1925), main="Enforcement by Type (Total)")
 ```
 
 ### GDP by Industry
@@ -266,12 +266,12 @@ GDP by industry over the past 30 years has increased nearly uniformly across ind
 
 ```{r warning=F, message=F, fig.align='center', cache=TRUE}
 Economy <- data698[, 27:42]
-plot(window(Economy[,1:8], start = 1987))
-plot(window(Economy[,9:16], start = 1987))
+plot(window(Economy[,1:8], start = 1987), main="GDP by Sector (Totals)")
+plot(window(Economy[,9:16], start = 1987), main="GDP by Sector (Totals)")
 GDP <- rowSums(Economy)
 Proportions <- Economy / GDP
-plot(window(Proportions[,1:8], start = 1987))
-plot(window(Proportions[,9:16], start = 1987))
+plot(window(Proportions[,1:8], start = 1987), main="GDP by Sector (Proportions)")
+plot(window(Proportions[,9:16], start = 1987), main="GDP by Sector (Proportions)")
 ```
 
 ## Data Relationships
@@ -354,7 +354,7 @@ Historically, legislation on immigration has had a statistically insignificant c
  [^7]: https://www.migrationpolicy.org/ 
 [^8]: https://www.census.gov/newsroom/pdf/cspan_fb_slides.pdf
 [^9]: https://www.archives.gov/publications/prologue/2002/summer/immigration-law-1.html
-[^10]: [https://www.washingtonpost.com/news/wonk/wp/2018/02/06/trump-immigration-plan](https://www.washingtonpost.com/news/wonk/wp/2018/02/06/trump-immigration-plan-could-keep-whites-in-u-s-majority-for-up-to-five-more-years/?utm_term=.2de44787d217)
+[^10]: [https://www.washingtonpost.com/news/wonk/wp/2018/02/06/immigration-plan](https://www.washingtonpost.com/news/wonk/wp/2018/02/06/trump-immigration-plan-could-keep-whites-in-u-s-majority-for-up-to-five-more-years/?utm_term=.2de44787d217)
 [^11]: [https://help.cbp.gov/app/answers/detail/a_id/72](https://help.cbp.gov/app/answers/detail/a_id/72/~/what-is-the-difference-between-an-immigrant-visa-vs.-nonimmigrant-visa-%3F)
 [^12]: https://factfinder.census.gov/faces/nav/jsf/pages/searchresults.xhtml
 [^13]: https://www.census.gov/prod/www/decennial.html
