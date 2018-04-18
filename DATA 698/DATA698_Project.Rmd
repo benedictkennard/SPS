@@ -140,7 +140,7 @@ Laws <- data698[, 1]
 na.omit(Laws)
 ```
 
-The U.S. Citizenship and Immigration Services division also maintains data on immigration application forms by type (Naturalization, Employment, Family, Humanitarian, Other) and approval status from 2012 to 2017. Data on I-129 applications used for employment are available since 2009. Combining all years of available data from the U.S. Citizenship and Immigration Services results in an unremarkable dataset.[^37] The most useful data[^38] on immigration relevant to this research are the statistics produced by the U.S. Department of Homeland Security in their annual yearbooks. The data on Immigrant visas form their *Persons Obtaining Lawful Permanent Resident Status by Type and Major Class Of Admission*[^39] tables spans 1986 to 2016. The data on *Nonimmigrant visas from their Nonimmigrant Admissions by Class of Admission*[^40] tables spans 1981 to 2016 with aggregate data on Immigrant visas since 1820. There are also data on *Aliens Apprehended*[^41] from 1925 to 2016, as well as on *Aliens Removed or Returned*[^42] from 1892 To 2016. Apprehensions are foreigner arrests, Removals are compulsory based on a court order, Returns are not based on court orders. From these data, a subset of the below Immigrant and Nonimmigrant employment visas has been carved out for additional analysis:
+The U.S. Citizenship and Immigration Services division also maintains data on immigration application forms by type (Naturalization, Employment, Family, Humanitarian, Other) and approval status from 2012 to 2017. Data on I-129 applications used for employment are available since 2009. Combining all years of available data from the U.S. Citizenship and Immigration Services results in an unremarkable dataset.[^37] The most useful data[^38] on immigration relevant to this research are the statistics produced by the U.S. Department of Homeland Security in their annual yearbooks. The data on Immigrant visas form their *Persons Obtaining Lawful Permanent Resident Status by Type and Major Class Of Admission*[^39] tables spans 1986 to 2016. The data on *Nonimmigrant visas from their Nonimmigrant Admissions by Class of Admission*[^40] tables spans 1981 to 2016 with aggregate data on Immigrant visas since 1820. There are also data on *Aliens Apprehended*[^41] from 1925 to 2016, as well as on *Aliens Removed or Returned*[^42] from 1892 To 2016. Apprehensions are foreigner arrests, Removals are compulsory based on a court order, Returns represent immigrants stopped (without a court order) from entering at the borders. From these data, a subset of the below Immigrant and Nonimmigrant employment visas has been carved out for additional analysis:
 
   + **CW1/CW2**: CNMI-only transitional workers and family.
   + **E1, E2, E2C**: Treaty traders or investors and family.
@@ -374,7 +374,7 @@ $$\tau = \frac{n_c - n_d}{\frac{1}{2}n(n-1)} \tag{Kendall}$$
 
 ### Policy Lag
 
-There is a lag between the enactment of a law and its full implementation. Changes in laws require bureaucratic changes which are slow by design. Immigration applications are processed on an ongoing basis. Changes to immigration laws must be managed around applications that are already in progress. When looking at the relationship between legislation and other variables, it is therefore important to also look at the lagged relationships.
+There is a lag between the enactment of a law and its full implementation. Changes in laws necessitate the adjustment of institutional processes which are mired by the rules and procedures guiding the bureaucracies implementing the laws. It is worth noting that bureaucracies have been maligned with the negative connation behind red tape, but that the bureaucratic adherence to rules is a feature—and not a bug-- that hedges against chaos. The point is that there is no value judgment being made here. It is simply true that Immigration applications are processed on an ongoing basis while laws change and agencies readjust. Applications in progress must be managed around changing immigration laws. When looking at the relationship between legislation and other variables, it is therefore important to also look at the lagged relationships.
 
 ### Imputation
 
@@ -386,38 +386,80 @@ $$y=y_{ 1 }+\left( x-x_{ 1 } \right) \left( \frac { y_{ 2 }-y_{ 1 } }{ x_{ 2 }-x
 
 ## Legislative Correlations
 
-### Social Factors
-
-First the Kendall correlation between new, one-year old, two-year old, and three-year old immigration legislation and social factors is examined. When it comes to Race and Hispanic Origin, legislation has correlations between $\tau=0.51$ and $\tau=0.56$ for Hispanic origin and nearly every race. The exception is Native Americans which has a correlation that hoovers around $\tau=0.26$. For the Native and Foreign-born population, the correlations are also moderate. Native have a correlation that hoovers around $\tau=0.52$. Foreign-born correlation that hoovers around $\tau=0.44$. The correlations on Foreign-born Country of Origin are higher for Asia, Oceania, and Latin America which have correlations between $\tau=0.51$ and $\tau=0.53$. The correlation for Africa is around $\tau=0.4$. The correlations for Europe and North America are between $\tau=0.19$ and $\tau=0.26$ with the lower correlations figures being from Europe. All of these correlations are significant at $\alpha=0.05$.
-
 ```{r warning=F, message=F, fig.align='center', cache=TRUE}
-library(psych)
 Legislation <- window(cbind(Law_New=Laws, Law_1yr=lag(Laws, k=-1),
   Law_2yr=lag(Laws, k=-2), Law_3yr=lag(Laws, k=-3)), end=2016)
+```
+
+### Social Factors
+
+First the Kendall correlation between new, one-year old, two-year old, and three-year old immigration legislation and social factors is examined. When it comes to Race and Hispanic Origin, legislation has correlations between $\tau=0.51$ and $\tau=0.56$ for Hispanic origin and nearly every race. The exception is Native Americans which has a correlation that hoovers around $\tau=0.26$. All of these correlations are significant at $\alpha=0.05$.
+
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(na.approx(RAHO), Legislation, use="complete.obs", method="kendall")
+```
+
+For the Native and Foreign-born population, the correlations with immigration law are also moderate. Native have a correlation that hoovers around $\tau=0.52$. Foreign-born have a correlation that hoovers around $\tau=0.44$. All of these correlations are significant at $\alpha=0.05$.
+
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(na.approx(NAFB), Legislation, use="complete.obs", method="kendall")
+```
+
+The correlations or Europe and North America with immigration law are between $\tau=0.19$ and $\tau=0.26$ with the lower correlations figures being from Europe. All of these correlations are significant at $\alpha=0.05$.
+
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(na.approx(FBCO), Legislation, use="complete.obs", method="kendall")
 ```
 
 ### Economic Factors
 
-The Kendall correlation between new, one-year old, two-year old, and three-year old immigration legislation and economic factors is examined next. The largest correlations with immigration legislation and visas can be found after two years. Although these correlations are larger, they are not very high. The correlations are between $\tau=0.21$ and $\tau=0.31$. Enforcement actions have low correlations that are fairly constant across lags. They range between $\tau=0.19$ and $\tau=0.24$. The largest correlations with immigration legislation and GDP by Industry can be found after three years. Just like before, although these correlations are larger, they are not very high. Excluding the highest and lowest correlations, these correlations range between $\tau=0.29$ and $\tau=0.33$. The highest correlation is with Utilities at $\tau=0.39$ and the lowest is with Agriculture at $\tau=0.25$. None of these correlations are significant at $\alpha=0.05$.
+The Kendall correlation between new, one-year old, two-year old, and three-year old immigration legislation and economic factors is examined next. The largest correlations with immigration legislation and visas can be found after two years. Although these correlations are larger, they are not very high. The correlations are between $\tau=0.21$ and $\tau=0.31$. None of these correlations are significant at $\alpha=0.05$.
 
 ```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(Visas, Legislation, use="complete.obs", method="kendall")
+```
+
+Enforcement actions have low correlations with immigration law that are fairly constant across lags. They range between $\tau=0.19$ and $\tau=0.24$. None of these correlations are significant at $\alpha=0.05$.
+
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(Enforce, Legislation, use="complete.obs", method="kendall")
+```
+
+The largest correlations with immigration legislation and GDP by Industry can be found after three years. Just like before, although these correlations are larger, they are not very high. Excluding the highest and lowest correlations, these correlations range between $\tau=0.29$ and $\tau=0.33$. The highest correlation is with Utilities at $\tau=0.39$ and the lowest is with Agriculture at $\tau=0.25$. None of these correlations are significant at $\alpha=0.05$.
+
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(Economy, Legislation, use="complete.obs", method="kendall")
 ```
 
 ## Economic Correlations
 
-As previously mentioned, Kendall correlations between legislation and the economy are low and statistically insignificant. This is not true for many other factors. Correlations between Race and Hispanic Origin and every industry in the Economy are high and statistically significant at $\alpha=0.05$ for every single race and Hispanics. The same is true for the Native and Foreign-born population and every industry; high and statistically significant at $\alpha=0.05$. Country of origin does not show the same level of equality however. At an $\alpha=0.05$ Asia, Africa, Oceania, and Latin America have high and statistically significant correlations with every industry, but Europe and North America have statistically insignificant correlations with every industry. There is also a dichotomy between Immigrant and Nonimmigrant visas. At an $\alpha=0.05$, Nonimmigrant visas have statistically significant correlations with every industry, but Immigrant visas have statistically insignificant correlations with every industry. Enforcement actions also have mixed results. Apprehensions and Returns have statistically insignificant correlations with every industry, but Removals have statistically significant correlations with every industry at $\alpha=0.05$. As stated earlier, Removals are compulsory actions based on a court order.
+As previously mentioned, Kendall correlations between legislation and the economy are low and statistically insignificant. This is not true for many other factors. Correlations between Race and Hispanic Origin and every industry in the Economy are high and statistically significant at $\alpha=0.05$ for every single race and Hispanics. 
 
 ```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(Economy, na.approx(RAHO), use="complete.obs", method="kendall")
+```
+
+The same is true for the Native and Foreign-born population and every industry. Correlations are high and statistically significant at $\alpha=0.05$. 
+
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(Economy, na.approx(NAFB), use="complete.obs", method="kendall")
+```
+
+Country of origin does not show the same level of equality however. At an $\alpha=0.05$ Asia, Africa, Oceania, and Latin America have high and statistically significant correlations with every industry, but Europe and North America have statistically insignificant correlations with every industry. 
+
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(Economy, na.approx(FBCO), use="complete.obs", method="kendall")
+```
+
+There is also a dichotomy between Immigrant and Nonimmigrant visas. At an $\alpha=0.05$, Nonimmigrant visas have statistically significant correlations with every industry, but Immigrant visas have statistically insignificant correlations with every industry. 
+
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(Economy, Visas, use="complete.obs", method="kendall")
+```
+
+Enforcement actions also have mixed results. Apprehensions and Returns have statistically insignificant correlations with every industry, but Removals have statistically significant correlations with every industry at $\alpha=0.05$. As stated earlier, Removals are compulsory actions based on a court order and Returns represent immigrants stopped (without a court order) from entering at the borders.
+
+```{r warning=F, message=F, fig.align='center', cache=TRUE}
 corr.test(Economy, Enforce, use="complete.obs", method="kendall")
 ```
 
