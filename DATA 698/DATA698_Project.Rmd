@@ -62,7 +62,7 @@ The topic is important because of the significance of the United States' economy
 
 ## Originality
 
-There are descriptive studies on immigration laws, demographics in the United States, and the economy. Yet there are not as many that look at the relationship between immigration laws, demographics, and the economy throughout history. Studies by the U.S. Census Bureau on historic demographics do not address immigration law or the economy. The Migration Policy Institute[^7] has reports on immigration flows based on data from the U.S. Department of Homeland Security, but this information is mostly demographic. A recent study was published in the Washington Post on the impact of the proposed immigration reforms on demographics and the economy, but it does not address anything prior to 2015. This research project looks at the relationship between immigration laws, demographics, and the economy at a very granular level.
+There are descriptive studies on immigration laws, demographics in the United States, and the economy. Yet there are not many that look at the relationship between immigration laws, demographics, and the economy throughout history. Studies by the U.S. Census Bureau on historic demographics do not address immigration law or the economy. The Migration Policy Institute[^7] has reports on immigration flows based on data from the U.S. Department of Homeland Security, but this information is mostly demographic. A recent study was published in the Washington Post on the impact of the proposed immigration reforms on demographics and the economy, but it does not address anything prior to 2015. This research project looks at the relationship between immigration laws, demographics, and the economy at a very granular level.
 
 # Research Materials
 
@@ -70,7 +70,7 @@ There are descriptive studies on immigration laws, demographics in the United St
 
 The U.S. Census Bureau has a demographic study examining the Foreign-born population by country from 1850 to 2010.[^8] Interesting revelations in this study are the steady decline in the Foreign-born population from 1910 to 1970 and then steady increase thereafter. In the last period examined, 2010, the Foreign-born population is still not as high as the period between 1860 and 1910. The study breaks down Natives and Foreign-born by State, Country or Origin, education level, preferred language, participation in the labor force, occupation, income, and age.
 
-An article published by The U.S. National Archives in 2002 takes an in depth look at demographics and immigration law. *Race, Nationality, and Reality* goes into great detail about how immigration policy has a long history of trying to exclude Immigrants based on race. Immigration and nationality were legislated separately in the early years of the United States. Early Immigration laws focused on keeping out the poor and sick. Early Nationality laws focused on granting "free white persons" who immigrated from Europe citizenship while excluding Blacks and untaxed Native Americans. Federal citizenship was not even seen as that important until after the Civil War. So, when immigration and naturalization were placed under the administration of one agency, the coordination and uniform application of different laws designed to restrict race (as defined by color) and geographic origin became a problem. Attempts to mitigate the confusion by focusing only on ethnicity exacerbated the problems. Citizenship was being granted and denied based on color, origin, or ethnicity depending on the case. Several pieces of legislation tried, but failed, to codify the "common understanding" of who was entitled to citizenship. Exceptions either for and against citizenship became commonplace. The lack of clarity and guidance was resulting in courts flooded with appeals. "There was no settled opinion on what constituted evidence of race [and] as long as nationality law contained racial requirements for naturalization and immigration law excluded those ineligible to naturalize," there was no way to stop the problem. Then, in 1952, immigration and naturalization laws were finally combined into a more cogent form with racial requirements completely removed.[^9] The article does a good job of showing a long history of racism underlying historic immigration policy.
+An article published by The U.S. National Archives in 2002 takes an in depth look at demographics and immigration law. *Race, Nationality, and Reality* goes into great detail about how immigration policy has a long history of trying to exclude Immigrants based on race. Immigration and nationality were legislated separately in the early years of the United States. Early Immigration laws focused on keeping out the poor and sick. Early Nationality laws focused on granting "free white persons" who immigrated from Europe citizenship while excluding Blacks and untaxed Native Americans. Federal citizenship was not even seen as that important until after the Civil War. So, when immigration and naturalization were placed under the administration of one agency, the coordination and uniform application of different laws designed to restrict race (as defined by color) and geographic origin became a problem. Attempts to mitigate the confusion by focusing only on ethnicity exacerbated the problems. Citizenship was being granted and denied based on color, origin, or ethnicity depending on the individual case. Several pieces of legislation tried, but failed, to codify the "common understanding" of who was entitled to citizenship. Exceptions either for and against citizenship became commonplace. The lack of clarity and guidance was resulting in courts flooded with appeals. "There was no settled opinion on what constituted evidence of race [and] as long as nationality law contained racial requirements for naturalization, and immigration law excluded those ineligible to naturalize," there was no way to stop the problem. Then, in 1952, immigration and naturalization laws were finally combined into a more cogent form with racial requirements completely removed.[^9] The article does a good job of showing a long history of racism underlying historic immigration policy.
 
 Another study published in the Washington Post last on February 26, 2018 looks at how the cuts to legal immigration proposed by the current presidential administration will impact demographics. The report states that the " immigration plan could keep whites in U.S. majority for up to five more years...[by] greatly slashing the number of Hispanic and black African Immigrants entering America." This study looks at the proposed immigration policies in combination with population projections, fertility figures, and visa backlog information. It concludes by postulating that the proposed reforms will decrease the size of the population, which will therefore decrease the size of the workforce, which will therefore decrease the size of the economy.[^10]
 
@@ -93,7 +93,7 @@ The dataset compiled from all these Census data is quite impressive, but it is n
   3.  The 1940 Hispanic population figure only included the "White population of Spanish mother tongue".
   4.  In 1940 and 1950, there is Foreign-born data missing "because data on the Foreign-born population by country of birth in census publications for these years are limited almost entirely to the White population." 
 
-  To address the discrepancy caused by (1), the number of slaves disembarking in the United States[^21] is used as a proxy for Foreign-born Africans entering the United States from 1790 to 1880. To address (2), the American Indian population figures are backfilled using the percent change[^22] of the American Indian population starting from the earliest period without discrepancies which is 1890. Native born and total population figures are also adjusted to refelect the revised American Indian population figures. To address (3), the value was removed since it was not representative of all Hispanics. Then, to complete the dataset, imputation is used. The missing data outlined in (4) for the Foreign-born in 1940 and 1950 is filled in using linear interpolation between 1930 and 1960. 
+  To address the discrepancy caused by (1), the number of slaves disembarking in the United States[^21] is used as a proxy for Foreign-born Africans entering the United States from 1790 to 1880. To address (2), the American Indian population figures are backfilled using the percent change[^22] of the American Indian population starting from the earliest period without discrepancies which is 1890. Native born and total population figures are also adjusted to reflect the revised American Indian population figures. To address (3), the value was removed since it was not representative of all Hispanics. Then, to complete the dataset, imputation is used. The missing data outlined in (4) for the Foreign-born in 1940 and 1950 is filled in using linear interpolation between 1930 and 1960. 
 
 $$y=y_{ 1 }+\left( x-x_{ 1 } \right) \left( \frac { y_{ 2 }-y_{ 1 } }{ x_{ 2 }-x_{ 1 } }  \right)$$
 
@@ -101,7 +101,7 @@ The remainder of the missing data is filled in using linear regression based on 
 
 $$\hat { y } ={ e }^{ \left( \beta _{ 0 }+\ln { \left( x_{ i } \right)  } \beta _{ 1 } \right)  }$$
 
-The exceptions to the imputation via interpolation and regression are the statistics on Foreign-born persons from Europe and North America. Linear regression is not suited for these nonlinear data. Instead, imputation for other regions are subtracted from the total Foreign-born population and distributed according to weights based on the historical averages for the two regions. The resulting dataset is a complete dataset[^23] from 1790 to 2016 on race, Hispanic origin, and nativity.
+The exceptions to the imputation via interpolation and regression are the statistics on Foreign-born persons from Europe and North America. Linear regression is not suited for these nonlinear data. Instead, imputation for other regions are subtracted from the total Foreign-born population and distributed according to weights based on the historical averages for the two regions. The resulting dataset is a complete dataset[^23] from 1790 to 2016 on race, Hispanic origin, nativity, and country of origin for Foreign-born.
 
 ```{r warning=F, message=F, fig.align='center', cache=T, echo=F}
 # This is for producing tables within the text before the analysis actually begins.
@@ -116,7 +116,7 @@ na.omit(data.frame(data698[, 3:17], row.names = data698$Year))
 
 ### U.S. Department of State
 
-Immigrant visas are issued to foreigners permanently relocating to the U.S. and Nonimmigrant visas are issued to foreigners relocating to the U.S. temporarily. Data regarding visas is available both from the U.S. Department of Homeland Security[^24] and the U.S. Department of State.[^25] The data[^26] from the U.S. Department of State shows every Nonimmigrant visa type[^27] by country from 1997 to 2017. This dataset has an extraordinary amount of detail, but only on Nonimmigrant visas issued by consular offices which is only a fraction of the Nonimmigrant visas. 
+Immigrant visas are issued to foreigners permanently relocating to the U.S. and Nonimmigrant visas are issued to foreigners relocating to the U.S. temporarily. Data regarding visas is available both from the U.S. Department of Homeland Security[^24] and the U.S. Department of State.[^25] The data[^26] from the U.S. Department of State shows every Nonimmigrant visa type[^27] by country from 1997 to 2017. This dataset has an extraordinary amount of detail, but only on Nonimmigrant visas issued by consular offices which is only a fraction of the Nonimmigrant visas. Therefore, these data are not suited for this analysis.
 
 ### U.S. Department of Labor
 
@@ -167,7 +167,7 @@ The U.S. Citizenship and Immigration Services division also maintains data on im
   + **R1/R2**: Workers in religious occupations and family.
   + **TN/TD**: NAFTA professional workers and family.
 
-The full join of these Immigrant and Nonimmigrant visa data are made uniform across their combined time domain by imputing missing years. Nonimmigrant data are imputed for 1982-1984, 1986-1988, and 1997 using linear interpolation between years where the data are present: [[1981, 1985], [1985, 1989], [1996, 1998]]. The missing Immigrant data from 1981 to 1985 is filled in by first imputing total visas issued using the historic average proportion of Nonimmigrant visas relative to total visas, then by subtracting Nonimmigrant visas by the derived number of total visas. The resulting dataset[^43] has complete cases on employment and total visas for both Immigrants and Nonimmigrants from 1981 to 2016. The dataset also includes Removals since 1892, Apprehensions since 1925, and Returns since 1927. No imputation was done on these three enforcement actions.
+The full join of these Immigrant and Nonimmigrant visa data are made uniform across their combined time domain by imputing missing years. Nonimmigrant data are imputed for 1982-1984, 1986-1988, and 1997 using linear interpolation between years where the data are present: [[1981, 1985], [1985, 1989], [1996, 1998]]. The missing Immigrant data from 1981 to 1985 is filled in by first imputing total visas issued using the historic average proportion of Nonimmigrant visas relative to total visas, then by subtracting Nonimmigrant visas by the derived number of total visas. The resulting dataset[^43] has complete cases on employment and total visas for both Immigrants and Nonimmigrants from 1981 to 2016. The dataset also includes Removals since 1892, Apprehensions since 1925, and Returns since 1927. No imputation was needed for these three enforcement actions since there are no missing data during the 1981 to 2016 period.
 
 ```{r warning=F, message=F, fig.align='center', cache=T, echo=F}
 # This is for producing tables within the text before the analysis actually begins.
@@ -188,6 +188,11 @@ na.omit(data.frame(data698[, 27:42], row.names = data698$Year))
 The dataset[^46] constructed from the arduous  data gathering and cleaning process described above consists of Immigration Laws and Census data from 1790 to 2016, employment visa data from 1981 to 2016, enforcement data from 1925 to 2016, and GDP by Industry from 1987 to 2016. Correlational research is being conducted on the dataset to describe relationships between immigration law, demographics, employment visas, and the economy. The significance of the relationships between variables is evaluated using formal statistical tests.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
+library(fma)
+library(zoo)
+library(psych)
+library(scales)
+library(ggplot2)
 github <- "https://raw.githubusercontent.com/jzuniga123"
 file <- "/SPS/master/DATA%20698/DATA698_Project.csv"
 data698 <- read.csv(paste0(github, file), header=1)
@@ -198,14 +203,6 @@ data698 <- ts(data698[, -1], frequency=1,
 ```
 
 ## Data Characteristics
-
-```{r warning=F, message=F, fig.align='center', cache=F}
-library(fma)
-library(zoo)
-library(psych)
-library(scales)
-library(ggplot2)
-```
 
 ### Legislation
 
@@ -219,6 +216,9 @@ Historic immigration law numbers have an interesting pattern. The period between
 mean(window(Laws, end = 1931))
 mean(window(Laws, start = 1932))
 mean(window(Laws, start = 1997))
+ggplot() + ggtitle("Legislation on Immigration (1790-2016)") + 
+  geom_line(aes(y = Laws, x = time(Laws)), stat="identity") +
+  xlab("Year") + theme(plot.title = element_text(hjust = 0.5))
 ```
 
 Notable periods of increased legislative activity that were outliers in their era are:
@@ -235,12 +235,6 @@ Notable periods of increased legislative activity that were outliers in their er
   + **2002**: Ten laws passed in the wake of the September 11, 2001 terrorists attacks.
   + **2008**: Six laws passed during an election year, all prior to elections.
 
-```{r warning=F, message=F, fig.align='center', cache=T}
-ggplot() + ggtitle("Legislation on Immigration (1790-2016)") + 
-  geom_line(aes(y = Laws, x = time(Laws)), stat="identity") +
-  xlab("Year") + theme(plot.title = element_text(hjust = 0.5))
-```
-
 ### Population
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
@@ -256,7 +250,7 @@ colnames(RAHO)[2] <- "Black"
 RAHO <- RAHO[, -3]
 ```
 
-The purely numerical data from the decennial Census on race and Hispanic origin has two interesting features. As is usual with most social phenomena, the distributions appear mostly exponential. The two exceptions are the White race which can be described as linear since around 1870 and the Native American race which has a positive parabolic shape with a minimum at the year 1900. For the purposes of aggregate analysis, the free and enslaved Black population that the Census counts separately until 1860 is being counted together. 
+The purely numerical data from the decennial Census on race and Hispanic origin has two interesting features. As is usual with most social phenomena, the distributions appear mostly exponential. The two exceptions are the White race which can be described as linear since about 1870 and the Native American race which has a positive parabolic shape with a minimum at the year 1900. For the purposes of aggregate analysis, the free and enslaved Black population that the Census counts separately until 1860 is being counted together. 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 numb_df <- data.frame(na.approx(RAHO), Year=time(RAHO))
@@ -273,7 +267,7 @@ ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
   scale_fill_grey(start = 0.2, end = 0.8)
 ```
 
-When the Census data on race and Hispanic origin are viewed as a percentage of total population however, some striking details emerge. Hispanics, Asians, Pacific Islanders, and Other races grow exponentially as a percentage of total population over time. Native Americans have decreased exponentially as a percentage of total population over time, from 14.2% in 1790 to 0.7% in 2016. The Black percentage of the population has decreased overall but in a cubic manner with a minimum of 9.5% in 1930 and two local maximas of 17.7% in 1810 and 11% in 1990. The White percentage of the population has a negative parabolic shape with a maximum of 89% in 1920 and an all time low of 61.7% in 2016.
+When the Census data on race and Hispanic origin are viewed as a percentage of total population however, some striking details emerge. Hispanics, Asians, Pacific Islanders, and Other races grow exponentially as a percentage of total population over time. Native Americans have decreased exponentially as a percentage of total population over time, from 14.2% in 1790 to 0.7% in 2016. The Black percentage of the population has decreased overall but in a cubic manner with a minimum of 9.5% in 1930 and two local maximas of 17.7% in 1810 and 11% in 1990. The White percentage of the population has a negative parabolic shape with a maximum of 89% in 1920 and an all time low of 61.7% in 2016. In aggregate, many of these individual characteristics seem less remarkable, but a demographic shift is clear.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 Population <- rowSums(RAHO)
@@ -290,7 +284,7 @@ ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_y_continuous(labels = scales::comma) + 
   scale_fill_grey(start = 0.2, end = 0.8)
-na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
+na.omit(data.frame(round(Proportions, 6)), row.names=as.numeric(time(Proportions)))
 ```
 
 #### Native and Foreign-born (NAFB)
@@ -299,7 +293,7 @@ na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
 NAFB <- Census[, 9:10]
 ```
 
-The decennial numbers on the Native and Foreign-born population also follow what can be described as an exponential pattern. There is a decline in the Foreign-born population from 1940 to 1970, but by 1980 the number returns to its prior levels and continues on its prior trajectory. 
+The decennial numbers on the Native and Foreign-born population also follow what can be described as an exponential pattern. There was a decline in the Foreign-born population from 1940 to 1970, but by 1980 the number returns to its prior levels and continues on its prior trajectory. When aggregated, the fluctuation in the Foreign-born population is much less noticeable.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 # plot(na.approx(NAFB), type="l", main="Native and Foreign-born (Totals)")
@@ -318,7 +312,7 @@ ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
   scale_fill_grey(start = 0.2, end = 0.8)
 ```
 
-The proportion of Native and Foreign-born persons in the population are mirror images of each other. The median proportion of Foreign-born persons in the United States since 1790 has been 12.4%. In 1850 and 1970 the percentage of Foreign-born persons in the United States reached local minmas of 9.5% and 4.8%, respectively. The proportion of Foreign-born persons in the United States has peaks in 1870, 1890, and 1910 at 14.3%, 14.8%, and 14.7%; respectively. In 2016 the percentage of Foreign-born sits at 13.5%. 
+The proportion of Native and Foreign-born persons in the population are mirror images of each other. The median proportion of Foreign-born persons in the United States since 1790 has been 12.4%. In 1850 and 1970 the percentage of Foreign-born persons in the United States reached local minmas of 9.5% and 4.8%, respectively. The proportion of Foreign-born persons in the United States has peaks in 1870, 1890, and 1910 at 14.3%, 14.8%, and 14.7%; respectively. In 2016 the percentage of Foreign-born sits at 13.5%. When viewed in aggregate, the decline in the percentage of Foreign-born persons in the United States in 1970 appears to be significant relative to its proportion over time.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 Population <- rowSums(NAFB)
@@ -335,7 +329,7 @@ ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_y_continuous(labels = scales::comma) + 
   scale_fill_grey(start = 0.2, end = 0.8)
-na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
+na.omit(data.frame(round(Proportions, 6)), row.names=as.numeric(time(Proportions)))
 ```
 
 #### Foreign-born Country of Origin (FBCO)
@@ -344,7 +338,7 @@ na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
 FBCO <- Census[, 11:16]
 ```
 
-The decennial numbers on country of origin for Foreign-born are a little more interesting. Persons from Africa, Asia, Oceania, and Latin America arrive at an exponential rate. Arrivals from Europe and North America however, show exponential growth until around 1930, and then steady declining thereafter. 
+The decennial numbers on country of origin for Foreign-born are a little more interesting. Persons from Africa, Asia, Oceania, and Latin America arrive at an exponential rate. Arrivals from Europe and North America however, show exponential growth until around 1930, and then steady declining thereafter. When aggregated, these data have a very interesting characteristic. There is a large hump in the number of Foreign-born Europeans that begins to deflate when race stopped being a factor in admissions around 1950.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 numb_df <- data.frame(na.approx(FBCO), Year=time(FBCO))
@@ -361,7 +355,7 @@ ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
   scale_fill_grey(start = 0.2, end = 0.8)
 ```
 
-The proportion of Foreign-born persons in the United States by country of origin shows exponential increases from Asia, Oceania, and Latin America just like the pure numbers. The large increases start around 1860 for Oceania, and 1970 for Latin America and Asia. Foreign-born persons from Africa follow a less natural pattern that coincides with slavery. The percentage of Foreign-born persons from Africa was high from 1790 to 1820, but relatively low thereafter. Looking at Foreign-born persons from Africa in the post-slavery era shows a more natural exponential pattern with a large increase starting in 1980. The proportion of Foreign-born persons from Europe remained above 80% until 1950 when a permanent and rapid decline started leading to its current low of 10.9% in 2016. The proportion of Foreign-born persons from North America has a very strange and unnatural pattern hovering around 8.9% until 1970 when a rapid decline started leading to its current low of 1.8% in 2016. The rapid decline of Europeans in 1950 and the rapid decline by North Americans starting 1970 are temporally proximate to the when race stopped being a factor in admissions around 1950. 
+The proportion of Foreign-born persons in the United States by country of origin shows exponential increases from Asia, Oceania, and Latin America just like the pure numbers. The large increases start around 1860 for Oceania, and 1970 for Latin America and Asia. Foreign-born persons from Africa follow a less natural pattern that coincides with slavery. The percentage of Foreign-born persons from Africa was high from 1790 to 1820, but relatively low thereafter. Looking at Foreign-born persons from Africa in the post-slavery era shows a more natural exponential pattern with a large increase starting in 1980. The proportion of Foreign-born persons from Europe remained above 80% until 1950 when a permanent and rapid decline started leading to its current low of 10.9% in 2016. The proportion of Foreign-born persons from North America has a very strange and unnatural pattern hovering around 8.9% until 1970 when a rapid decline started leading to its current low of 1.8% in 2016. The rapid decline of Europeans in 1950 and the rapid decline by North Americans starting 1970 are temporally proximate to the when race stopped being a factor in admissions around 1950. When aggregated, the fall from dominance by Foreign-born Europeans and the rise to dominance by Latin Americans and Asians over time is quite remarkable.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 Population <- rowSums(FBCO)
@@ -378,7 +372,7 @@ ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_y_continuous(labels = scales::comma) + 
   scale_fill_grey(start = 0.2, end = 0.8)
-na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
+na.omit(data.frame(round(Proportions, 6)), row.names=as.numeric(time(Proportions)))
 ```
 
 ### Immigration
@@ -389,7 +383,7 @@ na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
 Visas <- data698[, 18:21]
 ```
 
-The numeric data on Immigrant Visas since 1820 is best described as chaotic. It has wild swings up and down starting with an upward trend from 1820 to about 1910, followed by a drastic decline until about 1945, and then another trend upward with a similar trajectory until 2016. The graph also shows a huge spike around 1990. 
+The numeric data on Immigrant Visas since 1820 is best described as chaotic. It has wild swings up and down starting with an upward trend from 1820 to about 1910, followed by a drastic decline until about 1945, and then another trend upward with a similar trajectory until 2016. The graph also shows a huge spike around 1990. When aggregated, a clear upward trend is notable, but fluctuations seem relatively random.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 IV_All <- na.omit(Visas[, 2])
@@ -425,7 +419,7 @@ ggplot(plot_df, aes(x=Year, y=Approved, fill= Type)) + geom_area() +
 Enforce <- data698[, 22:24]
 ```
 
-Enforcement data has some interesting patterns. Removals remained at a constant rate until 1996 when they increased substantially. Apprehensions and Returns follow almost identical patterns. There was a large increase in enforcement in the ten-year period between 1945 and 1955 with its peak being reached in 1954. The increase started again in 1965 and has remained elevated ever since with peaks in 1986, 1996, and 2000. Around the time Removals started steadily increasing, Apprehensions and Returns started steadily decreasing. The three enforcement actions combined follow the pattern of the latter two enforcement actions which make up the bulk of the actions. 
+Enforcement data has some interesting patterns. Removals remained at a constant rate until 1996 when they increased substantially. Apprehensions and Returns follow almost identical patterns. There was a large increase in enforcement in the ten-year period between 1945 and 1955 with its peak being reached in 1954. The increase started again in 1965 and has remained elevated ever since with peaks in 1986, 1996, and 2000. Around the time Removals started steadily increasing, Apprehensions and Returns started steadily decreasing. When aggregated, the three enforcement actions follow the pattern of the latter two enforcement actions which make up the bulk of the actions. Another characteristic that emerges in these data when aggregated is the recent decline in Apprehensions and Returns and the recent increase in Removals.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 Enforce_Window <- window(Enforce, start = 1925)
@@ -449,7 +443,7 @@ ggplot(plot_df, aes(x=Year, y=Actions, fill= Mehod)) + geom_area() +
 Economy <- data698[, 26:41]
 ```
 
-GDP by industry over the past 30 years has increased nearly uniformly across industries. The exceptions are Agriculture Mining, Utilities and Construction which appear to be more susceptible to business cycles. 
+GDP by industry over the past 30 years has the same homoskedastic upward trend for nearly every industry. The exceptions are Agriculture Mining, Utilities and Construction which appear to be more susceptible to business cycles due to their heteroskedasticity. The homoscedastic upward trend dominates aggregated income with the exception of the period encompassing the Great Recession.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 Economy_Window <- window(Economy, start = 1987)
@@ -467,7 +461,7 @@ ggplot(plot_df, aes(x=Year, y=Income, fill= Sector)) + geom_area() +
   scale_fill_grey(start = 0.2, end = 0.8)
 ```
 
-When examining the industries in aggregate as a proportion of the economy, their shares appear to remain relatively constant over the last 30 years. The Manufacturing, FIRE (Finance, Insurance, Real Estate), Service, and Education sectors make up the bulk of GDP; in that order. Over time there has been a slight decrease in the proportion of the economy captured by the Manufacturing sector and slight increases in the FIRE and Service sectors
+When examining the industries in aggregate as a proportion of the economy, their shares fluctuate slightly but remain relatively constant over the last 30 years. Proportionally, the bulk of GDP by order of share is maintained by the Manufacturing, FIRE (Finance, Insurance, and Real Estate), Service, and Education sectors. Over time there has been a slight decrease in the proportion of the economy captured by the Manufacturing sector and slight increases in the FIRE and Service sectors.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 GDP <- rowSums(Economy_Window)
@@ -484,7 +478,7 @@ ggplot(plot_df, aes(x=Year, y=Income, fill= Sector)) + geom_area() +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_y_continuous(labels = scales::comma) + 
   scale_fill_grey(start = 0.2, end = 0.8)
-na.omit(data.frame(Year=as.numeric(time(Proportions)), round(Proportions, 6)))
+na.omit(data.frame(round(Proportions, 6)), row.names=as.numeric(time(Proportions)))
 ```
 
 ## Data Relationships
