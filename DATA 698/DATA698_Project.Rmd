@@ -171,7 +171,7 @@ The full join of these Immigrant and Nonimmigrant visa data are made uniform acr
 
 ```{r warning=F, message=F, fig.align='center', cache=T, echo=F}
 # This is for producing tables within the text before the analysis actually begins.
-na.omit(data.frame(data698[, 19:26], row.names = data698$Year))
+na.omit(data.frame(data698[, 19:25], row.names = data698$Year))
 ```
 
 ### U.S. Bureau of Economic Analysis
@@ -180,7 +180,7 @@ The U.S. Bureau of Economic Analysis has data on *Gross Output by Industry*[^44]
 
 ```{r warning=F, message=F, fig.align='center', cache=T, echo=F}
 # This is for producing tables within the text before the analysis actually begins.
-na.omit(data.frame(data698[, 28:42], row.names = data698$Year))
+na.omit(data.frame(data698[, 27:42], row.names = data698$Year))
 ```
 
 # Research Methods
@@ -199,7 +199,7 @@ data698 <- ts(data698[, -1], frequency=1,
 
 ## Data Characteristics
 
-```{r warning=F, message=F, fig.align='center', cache=T}
+```{r warning=F, message=F, fig.align='center', cache=F}
 library(fma)
 library(zoo)
 library(psych)
@@ -411,11 +411,11 @@ numb_df <- data.frame(Visa_Types, Year=time(Visa_Types))
 plot_df <- gather(numb_df, "Type", "Approved", 1:(ncol(numb_df)-1))
 ggplot(plot_df, aes(x=Year, y=Approved)) + geom_line() + 
   facet_wrap(~ Type, scales="free_y") + theme_bw() +
-  ggtitle("Race and Hispanic Origin (1790-2016)") + 
+  ggtitle("Immigrant and Nonimmigrant Visas by Type (1981-2016)") + 
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_y_continuous(labels = scales::comma)
 ggplot(plot_df, aes(x=Year, y=Approved, fill= Type)) + geom_area() +
-  ggtitle("Race and Hispanic Origin (1790-2016)") + xlab("Year") +
+  ggtitle("Immigrant and Nonimmigrant Visas by Type (1981-2016)") +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_y_continuous(labels = scales::comma) + 
   scale_fill_grey(start = 0.2, end = 0.8)
@@ -424,13 +424,14 @@ ggplot(plot_df, aes(x=Year, y=Approved, fill= Type)) + geom_area() +
 #### Enforcement
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-Enforce <- window(data698[, 23:25], start = 1925)
+Enforce <- data698[, 22:24]
 ```
 
 Enforcement data has some interesting patterns. Removals remained at a constant rate until 1996 when they increased substantially. Apprehensions and Returns follow almost identical patterns. There was a large increase in enforcement in the ten-year period between 1945 and 1955 with its peak being reached in 1954. The increase started again in 1965 and has remained elevated ever since with peaks in 1986, 1996, and 2000. Around the time Removals started steadily increasing, Apprehensions and Returns started steadily decreasing. The three enforcement actions combined follow the pattern of the latter two enforcement actions which make up the bulk of the actions. 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-numb_df <- data.frame(Enforce, Year=time(Enforce))
+Enforce_Window <- window(Enforce, start = 1925)
+numb_df <- data.frame(Enforce_Window, Year=time(Enforce_Window))
 plot_df <- gather(numb_df, "Mehod", "Actions", 1:(ncol(numb_df)-1))
 ggplot(plot_df, aes(x=Year, y=Actions)) + geom_line() + 
   facet_wrap(~ Mehod, scales="free_y") + theme_bw() +
@@ -447,13 +448,14 @@ ggplot(plot_df, aes(x=Year, y=Actions, fill= Mehod)) + geom_area() +
 ### GDP by Industry
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-Economy <- window(data698[, 27:42], start = 1987)
+Economy <- data698[, 26:41]
 ```
 
 GDP by industry over the past 30 years has increased nearly uniformly across industries. The exceptions are Agriculture Mining, Utilities and Construction which appear to be more susceptible to business cycles. 
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-numb_df <- data.frame(Economy, Year=time(Economy))
+Economy_Window <- window(Economy, start = 1987)
+numb_df <- data.frame(Economy_Window, Year=time(Economy_Window))
 plot_df <- gather(numb_df, "Sector", "Income", 1:(ncol(numb_df)-1))
 ggplot(plot_df, aes(x=Year, y=Income)) + geom_line() + 
   facet_wrap(~ Sector, scales="free_y") + theme_bw() +
@@ -461,7 +463,7 @@ ggplot(plot_df, aes(x=Year, y=Income)) + geom_line() +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_y_continuous(labels = scales::comma)
 ggplot(plot_df, aes(x=Year, y=Income, fill= Sector)) + geom_area() +
-  ggtitle("GDP by Sector (1987-2016)") + xlab("Year") +
+  ggtitle("GDP by Sector (1987-2016)") + 
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_y_continuous(labels = scales::comma) + 
   scale_fill_grey(start = 0.2, end = 0.8)
@@ -470,17 +472,17 @@ ggplot(plot_df, aes(x=Year, y=Income, fill= Sector)) + geom_area() +
 When examining the industries in aggregate as a proportion of the economy, their shares appear to remain relatively constant over the last 30 years. The Manufacturing, FIRE (Finance, Insurance, Real Estate), Service, and Education sectors make up the bulk of GDP; in that order. Over time there has been a slight decrease in the proportion of the economy captured by the Manufacturing sector and slight increases in the FIRE and Service sectors
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-GDP <- rowSums(Economy)
-Proportions <- Economy / GDP
+GDP <- rowSums(Economy_Window)
+Proportions <- Economy_Window / GDP
 prop_df <- data.frame(na.approx(Proportions), Year=time(Proportions))
 plot_df <- gather(prop_df, "Sector", "Income", 1:(ncol(prop_df)-1))
 ggplot(plot_df, aes(x=Year, y=Income)) + geom_line() + 
   facet_wrap(~ Sector, scales="free_y") + theme_bw() +
-  ggtitle("Race and Hispanic Origin Proportions (1790-2016)") + 
+  ggtitle("GDP by Sector Proportions (1987-2016)") + 
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_y_continuous(labels = scales::comma)
 ggplot(plot_df, aes(x=Year, y=Income, fill= Sector)) + geom_area() +
-  ggtitle("Race and Hispanic Origin Proportions (1790-2016)") + xlab("Year") +
+  ggtitle("GDP by Sector Proportions (1987-2016)") +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_y_continuous(labels = scales::comma) + 
   scale_fill_grey(start = 0.2, end = 0.8)
@@ -513,7 +515,7 @@ $$y=y_{ 1 }+\left( x-x_{ 1 } \right) \left( \frac { y_{ 2 }-y_{ 1 } }{ x_{ 2 }-x
 
 ## Legislative Correlations
 
-```{r warning=F, message=F, fig.align='center', cache=T}
+```{r warning=F, message=F, fig.align='center', cache=F}
 Legislation <- window(cbind(Law_New=Laws, Law_1yr=stats::lag(Laws, k=-1),
   Law_2yr=stats::lag(Laws, k=-2), Law_3yr=stats::lag(Laws, k=-3)), end=2016)
 ```
@@ -522,7 +524,7 @@ Legislation <- window(cbind(Law_New=Laws, Law_1yr=stats::lag(Laws, k=-1),
 
 First the Kendall correlation between new, one-year old, two-year old, and three-year old immigration legislation and social factors is examined. When it comes to Race and Hispanic Origin, legislation has correlations between $\tau=0.51$ and $\tau=0.56$ for Hispanic origin and nearly every race. The exception is Native Americans which has a correlation that hoovers around $\tau=0.26$. All of these correlations are significant at $\alpha=0.05$.
 
-```{r warning=F, message=F, fig.align='center', cache=T}
+```{r warning=F, message=F, fig.align='center', cache=F}
 corr.test(na.approx(RAHO), Legislation, use="complete.obs", method="kendall")$r
 corr.test(na.approx(RAHO), Legislation, use="complete.obs", method="kendall")$p < 0.05
 ```
@@ -530,14 +532,14 @@ corr.test(na.approx(RAHO), Legislation, use="complete.obs", method="kendall")$p 
 
 For the Native and Foreign-born population, the correlations with immigration law are also moderate. Native have a correlation that hoovers around $\tau=0.52$. Foreign-born have a correlation that hoovers around $\tau=0.44$. All of these correlations are significant at $\alpha=0.05$.
 
-```{r warning=F, message=F, fig.align='center', cache=T}
+```{r warning=F, message=F, fig.align='center', cache=F}
 corr.test(na.approx(NAFB), Legislation, use="complete.obs", method="kendall")$r
 corr.test(na.approx(NAFB), Legislation, use="complete.obs", method="kendall")$p < 0.05
 ```
 
 The correlations of Europe and North America with immigration law are between $\tau=0.19$ and $\tau=0.26$ with the lower correlations figures being from Europe. All of these correlations are significant at $\alpha=0.05$.
 
-```{r warning=F, message=F, fig.align='center', cache=T}
+```{r warning=F, message=F, fig.align='center', cache=F}
 corr.test(na.approx(FBCO), Legislation, use="complete.obs", method="kendall")$r
 corr.test(na.approx(FBCO), Legislation, use="complete.obs", method="kendall")$p < 0.05
 ```
@@ -546,21 +548,21 @@ corr.test(na.approx(FBCO), Legislation, use="complete.obs", method="kendall")$p 
 
 The Kendall correlation between new, one-year old, two-year old, and three-year old immigration legislation and economic factors is examined next. The largest correlations with immigration legislation and visas can be found after two years. Although these correlations are larger, they are not very high. The correlations are between $\tau=0.21$ and $\tau=0.31$. Only one of these correlations is significant at $\alpha=0.05$. The significant correlation found is between two-year lagged immigration laws and all Immigrant visas aggregated without regard to type. This could imply a relationship between temporary visas and legislations after two years, but it could also be a statistical anomaly. Within the context of statistical tests, at least one in twenty false positives are expected are a 95% confidence level.
 
-```{r warning=F, message=F, fig.align='center', cache=T}
+```{r warning=F, message=F, fig.align='center', cache=F}
 corr.test(Visas, Legislation, use="complete.obs", method="kendall")$r
 corr.test(Visas, Legislation, use="complete.obs", method="kendall")$p < 0.05
 ```
 
 Enforcement actions have low correlations with immigration law that are fairly constant across lags. They range between $\tau=0.19$ and $\tau=0.24$. None of these correlations are significant at $\alpha=0.05$.
 
-```{r warning=F, message=F, fig.align='center', cache=T}
+```{r warning=F, message=F, fig.align='center', cache=F}
 corr.test(Enforce, Legislation, use="complete.obs", method="kendall")$r
 corr.test(Enforce, Legislation, use="complete.obs", method="kendall")$p < 0.05
 ```
 
 The largest correlations with immigration legislation and GDP by Industry can be found after three years. Just like before, although these correlations are larger, they are not very high. Excluding the highest and lowest correlations, these correlations range between $\tau=0.29$ and $\tau=0.33$. The highest correlation is with Utilities at $\tau=0.39$ and the lowest is with Agriculture at $\tau=0.25$. None of these correlations are significant at $\alpha=0.05$.
 
-```{r warning=F, message=F, fig.align='center', cache=T}
+```{r warning=F, message=F, fig.align='center', cache=F}
 corr.test(Economy, Legislation, use="complete.obs", method="kendall")$r
 corr.test(Economy, Legislation, use="complete.obs", method="kendall")$p < 0.05
 ```
@@ -569,35 +571,35 @@ corr.test(Economy, Legislation, use="complete.obs", method="kendall")$p < 0.05
 
 As previously mentioned, Kendall correlations between legislation and the economy are low and statistically insignificant. This is not true for many other factors. Correlations between Race and Hispanic Origin and every industry in the Economy are high and statistically significant at $\alpha=0.05$ for every single race and Hispanics. 
 
-```{r warning=F, message=F, fig.align='center', cache=T}
+```{r warning=F, message=F, fig.align='center', cache=F}
 round(corr.test(Economy, na.approx(RAHO), use="complete.obs", method="kendall")$r, 5)
 corr.test(Economy, na.approx(RAHO), use="complete.obs", method="kendall")$p < 0.05
 ```
 
 The same is true for the Native and Foreign-born population and every industry. Correlations are high and statistically significant at $\alpha=0.05$. 
 
-```{r warning=F, message=F, fig.align='center', cache=T}
+```{r warning=F, message=F, fig.align='center', cache=F}
 corr.test(Economy, na.approx(NAFB), use="complete.obs", method="kendall")$r
 corr.test(Economy, na.approx(NAFB), use="complete.obs", method="kendall")$p < 0.05
 ```
 
 Country of origin does not show the same level of equality however. At an $\alpha=0.05$ Asia, Africa, Oceania, and Latin America have high and statistically significant correlations with every industry, but Europe and North America have statistically insignificant correlations with every industry. 
 
-```{r warning=F, message=F, fig.align='center', cache=T}
-corr.test(Economy, na.approx(FBCO), use="complete.obs", method="kendall")$r
+```{r warning=F, message=F, fig.align='center', cache=F}
+round(corr.test(Economy, na.approx(FBCO), use="complete.obs", method="kendall")$r, 5)
 corr.test(Economy, na.approx(FBCO), use="complete.obs", method="kendall")$p < 0.05
 ```
 
 There is also a dichotomy between Immigrant and Nonimmigrant visas. At an $\alpha=0.05$, Nonimmigrant visas have statistically significant correlations with every industry, but Immigrant visas have statistically insignificant correlations with every industry except for Utilities. Much like the outlier noted in the correlations between Immigrant Visas and Legislation, this could imply either a relationship or be a statistical anomaly because within the context of statistical tests, at least one in twenty false positives are expected are a 95% confidence level.
 
-```{r warning=F, message=F, fig.align='center', cache=T}
+```{r warning=F, message=F, fig.align='center', cache=F}
 corr.test(Economy, Visas, use="complete.obs", method="kendall")$r
 corr.test(Economy, Visas, use="complete.obs", method="kendall")$p < 0.05
 ```
 
 Enforcement actions also have mixed results. Apprehensions and Returns have statistically insignificant correlations with every industry, but Removals have statistically significant correlations with every industry at $\alpha=0.05$. As stated earlier, Removals are compulsory actions based on a court order and Returns represent immigrants stopped (without a court order) from entering at the borders.
 
-```{r warning=F, message=F, fig.align='center', cache=T}
+```{r warning=F, message=F, fig.align='center', cache=F}
 corr.test(Economy, Enforce, use="complete.obs", method="kendall")$r
 corr.test(Economy, Enforce, use="complete.obs", method="kendall")$p < 0.05
 ```
