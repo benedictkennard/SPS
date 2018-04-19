@@ -31,6 +31,20 @@ header-includes:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+<!-- 
+https://haozhu233.github.io/kableExtra/awesome_table_in_pdf.pdf
+https://rmarkdown.rstudio.com/lesson-7.html
+```{r echo = FALSE, results = 'asis'}
+library(knitr)
+kable(mtcars[1:5, ], caption = "A knitr kable.")
+```
+https://stackoverflow.com/questions/29697009/correlation-matrix-plot-with-ggplot2?rq=1
+chart.Correlation(my_data, histogram = F, pch = 19)
+https://www.rdocumentation.org/packages/GGally/versions/1.3.2/topics/ggpairs
+https://www.rdocumentation.org/packages/PerformanceAnalytics/versions/1.5.2/topics/chart.Correlation
+https://www.rdocumentation.org/packages/graphics/versions/3.4.3/topics/pairs
+https://stackoverflow.com/questions/21810675/ggallyggpairs-plot-without-gridlines-when-plotting-correlation-coefficient
+--> 
 
 \newpage
 
