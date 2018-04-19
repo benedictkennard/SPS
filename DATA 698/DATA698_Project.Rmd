@@ -236,11 +236,9 @@ Notable periods of increased legislative activity that were outliers in their er
   + **2008**: Six laws passed during an election year, all prior to elections.
 
 ```{r warning=F, message=F, fig.align='center', cache=T}
-mov_avg <- ma(Laws, order=10)
-ggplot() + ggtitle("Legislation on Immigration (1790-2016)") + xlab("Year") +
-  geom_line(aes(y = Laws, x = time(Laws)), stat="identity", color="steelblue") +
-  geom_line(aes(y = mov_avg, x = time(mov_avg)), stat="identity", color="red") +
-  theme(plot.title = element_text(hjust = 0.5))
+ggplot() + ggtitle("Legislation on Immigration (1790-2016)") + 
+  geom_line(aes(y = Laws, x = time(Laws)), stat="identity") +
+  xlab("Year") + theme(plot.title = element_text(hjust = 0.5))
 ```
 
 ### Population
@@ -396,9 +394,9 @@ The numeric data on Immigrant Visas since 1820 is best described as chaotic. It 
 ```{r warning=F, message=F, fig.align='center', cache=T}
 IV_All <- na.omit(Visas[, 2])
 numb_df <- data.frame(IV_All, Year=time(IV_All))
-ggplot() + ggtitle("Immigrant Visas (1820-2016)") + xlab("Year") + ylab("Amount") +
-  geom_line(aes(y = IV_All, x = time(IV_All)), stat="identity", color="steelblue") +
-  theme(plot.title = element_text(hjust = 0.5))
+ggplot() + ggtitle("Immigrant Visas (1820-2016)") + xlab("Year") + 
+  geom_line(aes(y = IV_All, x = time(IV_All)), stat="identity") +
+  ylab("Amount") + theme(plot.title = element_text(hjust = 0.5))
 ```
 
 Visa data since 1981 has been less chaotic. Employment related Immigrant visas over the last 30 years are not as noisy. The number of Immigrant visas related to employment held steady from 1981 to 1991, was chaotic from 1992 to 2007, and then steady ever since. There were large decreases around 1999 and 2004, and large increases around 1993, 2001, and 2006. Total immigrant visas follow a similar pattern with the exception of the huge spike around 1990 mentioned earlier. Nonimmigrant visas have a less interesting pattern. Employment related visas have a steadily increasing trend with only a slight amount of variability. All Nonimmigrant visas also have an increasing trend, but with less variability. Nonimmigrant visas have made up between 89% and 95% off all visas for the last 30 years.
