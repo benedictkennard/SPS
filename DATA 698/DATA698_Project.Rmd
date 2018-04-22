@@ -1,0 +1,890 @@
+---
+title: "Nation of Immigrants"
+subtitle: "A Longitudinal Study of the Relationship of Immigration Laws with Changes in Demographics and GDP in the U.S."
+author: "Jose Zuniga"
+date: "`r format(Sys.Date(), format='%B %d, %Y')`"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: 2
+  word_document:
+    toc: yes
+    toc_depth: 3
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+  fontfamily: tnr
+  fontsize: 12pt
+  geometry: margin=1in
+header-includes:
+- \usepackage{fancyhdr}
+- \usepackage{lipsum}
+- \pagestyle{fancy}
+- \fancyhf{}
+- \lhead{DATA 698.04}
+- \rhead{Jose Zuniga}
+- \rfoot{Page \thepage}
+---
+
+```{r setup, include=FALSE}
+library(tidyr)
+library(dplyr)
+library(fma)
+library(zoo)
+library(knitr)
+library(psych)
+library(scales)
+library(ggplot2)
+library(kableExtra)
+knitr::opts_chunk$set(echo = T, warning=F, message=F, fig.align='center',
+  fig.width=ifelse(knitr::is_html_output(),7,6), fig.height=ifelse(knitr::is_html_output(),5,4))
+if (knitr::is_html_output(excludes = "markdown")) {
+  options(knitr.table.format = "html") # HTML
+} else if (knitr::opts_knit$get('rmarkdown.pandoc.to') == 'docx') {
+  options(knitr.table.format = "markdown") # WORD
+} else if (knitr::is_latex_output()) {
+  options(knitr.table.format = "latex") # PDF
+}
+```
+
+<!-- 
+Research Paper Format: https://academic.oup.com/intqhc/article/16/3/191/1814554
+Pandoc User Guide: http://pandoc.org/MANUAL.html
+Knitr Manual: https://yihui.name/knitr/demo/manual/
+kableExtra Vignette: https://haozhu233.github.io/kableExtra/awesome_table_in_pdf.pdf
+--> 
+
+\newpage
+
+# Abstract
+
+Immigrants come to the United States looking to benefit from opportunities available in the U.S. labor market that they are unable to find in their country of origin. The current presidential administration is proposing immigration reforms focusing on merit-based admissions and enforcement of existing laws that it asserts will benefit the economy. Political opponents claim the proposed policies have racial undertones and are meant to reduce the diversity of Immigrants. This paper conducts correlational research to describe the historic relationships between legislation on immigration, demographics, and the economy. Based on this empirical research, conclusions are then drawn on the likely outcome of the proposed immigration reforms.
+
+# Introduction
+
+## Background
+
+Since the United States passed its first immigration law in 1790,[^1] the U.S. Congress has passed over 200 other immigration laws and amendments an average of once every year.[^2] Legislation has been exclusionary in some cases such as the Chinese Exclusion Act of 1882, and inclusionary on other occasions such as the Chinese Exclusion Repeal Act of 1943. The most recent immigration law passed was the Javier Vega, Jr. Memorial Act of November 2, 2017. The law was named after a Border Patrol checkpoint in Texas. According to the White House, the next round of immigration reforms will focus on enforcement, DACA legalization, sponsorship limitations, and visa restrictions.[^3]  Even though the impact of immigration laws has varied over time, high-impact reforms like those proposed tend to bring racial and/or ethic intent into question. The intent behind the proposed reforms is currently a controversial topic which cannot be quantified, but it is quite clear that a change in direction is definitely happening. On February 23, 2018 the United States Citizenship and Immigration Services removed the phrase "nation of Immigrants" from its mission statement.
+
+\begin{center}
+Table 1: U.S. Citizenship and Immigration Services
+\end{center}
+
+|Former Mission Statement                       |Current Mission Statement                       |
+|:----------------------------------------------|:-----------------------------------------------|
+|USCIS secures America's promise as a *nation of Immigrants* by providing accurate and useful information to our customers, granting immigration and citizenship benefits, promoting an awareness and understanding of citizenship, and ensuring the integrity of our immigration system.[^4]|U.S. Citizenship and Immigration Services administers the nation's lawful immigration system, safeguarding its integrity and promise by efficiently and fairly adjudicating requests for immigration benefits while protecting Americans, securing the homeland, and honoring our values.[^5]|
+
+## Research Question
+
+The current presidential administration is proposing immigration reforms focusing on merit-based admissions and enforcement of existing laws that it asserts will benefit the economy. Political opponents claim the proposed policies have racial undertones and are meant to reduce the diversity of Immigrants. How have immigration reforms impacted the economy and the demographics of the United States historically and what is the likely outcome of the proposed immigration reforms?
+
+## Theory and Hypothesis
+
+In the current political climate, restrictions on immigration are rationalized as means to protect the average worker in the United States from the influx of low-cost labor. Kaufman and Hotchkiss (2006) find however, that the claim has not been supported by empirics.[^6] From an empirical and historical perspective, the proposed restrictions on immigration appear to be motivated by desires to reduce the rate of racial and ethnic diversity in United States. It is true that Immigrants come to the United States looking to benefit from opportunities available in the U.S. labor market that they are unable to find in their country of origin. It is also true that standard economic theories about competitive markets posit that immigration increases the supply of labor which in turn decreases the cost of labor (wages). Yet Kaufman and Hotchkiss note that the impact of immigration on wages has been found to be either nonexistent or small; even when the influx is large and sudden. Kaufman and Hotchkiss show how this contradiction has led to explanations such as those claiming that immigrants are not perfect substitutes for native workers due to language. They also describe researchers examining the same data with techniques that were "sufficiently refined and sophisticated to capture the true [negative] effect of immigration on wages." Nowadays such repeated measures, if not controlled for, would constitute data dredging. Although the impact of immigration on wages is debatable, Kaufman and Hotchkiss are unambiguous about the positive correlation between immigration and economic growth--economic booms and immigration go hand-in-hand. This hypothesis behind this analysis is that the positive correlation that Immigrants share with various sectors of the U.S. economy holds regardless of the demographics of the immigrant. It is further hypothesized that there is a negative relationship between immigration laws and the level of racial and ethnic diversity in the United States. Therefore, the proposed immigration restrictions based on demographics are not likely to have a positive impact to the economy, but are likely to negatively impact the diversity of the United States.
+
+## Significance
+
+The topic is important because of the significance of the United States' economy on the world stage. It is also important because movements opposing demographic shifts are growing in the United States and many news outlets are conflating the proposed immigration policy changes with these factions.
+
+## Originality
+
+There are empirical studies on immigration laws, demographics in the United States, and the economy. Yet there are not many that look at the relationship between immigration laws, demographics, and the economy throughout history. Studies by the U.S. Census Bureau on historic demographics do not address immigration law or the economy. The Migration Policy Institute[^7] has reports on immigration flows based on data from the U.S. Department of Homeland Security, but this information is mostly demographic. A recent study was published in the Washington Post on the impact of the proposed immigration reforms on demographics and the economy, but it does not address anything prior to 2015. This research project looks at the relationship between immigration laws, demographics, and the economy at a very granular level.
+
+# Literature Review
+
+## Prior Research
+
+The U.S. Census Bureau has a demographic study examining the Foreign-born population by country from 1850 to 2010.[^8] Interesting revelations in this study are the steady decline in the Foreign-born population from 1910 to 1970 and then steady increase thereafter. In the last period examined, 2010, the Foreign-born population is still not as high as the period between 1860 and 1910. The study breaks down Natives and Foreign-born by State, Country or Origin, education level, preferred language, participation in the labor force, occupation, income, and age.
+
+An article published by the U.S. National Archives in 2002 by Senior Historian Marian Smith takes an in depth look at demographics and immigration law. *Race, Nationality, and Reality* goes into great detail about how immigration policy is underlined by a long history of racism where Immigrants were excluded based on race and ethnicity. Immigration and nationality were legislated separately in the early years of the United States. Early Immigration laws focused on keeping out the poor and sick. Early Nationality laws focused on granting "free white persons" who immigrated from Europe citizenship while excluding Blacks and untaxed Native Americans. Federal citizenship was not even seen as that important until after the Civil War. So, when immigration and naturalization were placed under the administration of one agency, the coordination and uniform application of different laws designed to restrict race (as defined by color) and geographic origin became a problem. Attempts to mitigate the confusion by focusing only on ethnicity exacerbated the problems. Citizenship was being granted and denied based on color, origin, or ethnicity depending on the individual case. Several pieces of legislation tried, but failed, to codify the "common understanding" of who was entitled to citizenship. Exceptions either for and against citizenship became commonplace. The lack of clarity and guidance was resulting in courts flooded with appeals. Marian states that "there was no settled opinion on what constituted evidence of race [and] as long as nationality law contained racial requirements for naturalization, and immigration law excluded those ineligible to naturalize," there was no way to stop the problem. Then, in 1952, immigration and naturalization laws were finally combined into a more cogent form with racial requirements completely removed.[^9]
+
+Another study published in the Washington Post last on February 26, 2018 looks at how the cuts to legal immigration proposed by the current presidential administration will impact demographics. The report states that the " immigration plan could keep whites in U.S. majority for up to five more years...[by] greatly slashing the number of Hispanic and black African Immigrants entering the United States." This study looks at the proposed immigration policies in combination with population projections, fertility figures, and visa backlog information. It concludes by postulating that the proposed reforms will decrease the size of the population, which will therefore decrease the size of the workforce, which will therefore decrease the size of the economy.[^10]
+
+## Definitions
+
+The U.S. Census Bureau defines Natives as natural born citizens and children born abroad to citizen parent(s). Foreign-born are defined as permanent residents, naturalized citizens, authorized migrants, and unauthorized migrants. The U.S. Department of Homeland Security refers to Foreign-born as aliens and subdivides their population into Immigrants, Nonimmigrants, and Inadmissible. Immigrants are foreigners permanently relocating to the U.S. and Nonimmigrants are foreigners relocating to the U.S. temporarily.[^11] Foreigners who are Inadmissible are those "not permitted by law to enter or remain in the United States." A visa is an authorization to enter the United States. "A citizen of a foreign country who seeks to enter the United States generally must first obtain a U.S. visa."
+
+## Primary Data Sources
+
+### U.S. Census Bureau
+
+The U.S. Census Bureau has wealth of information on their website[^12] regarding the U.S. population going back as far as 1790.[^13] The data compiled on race and Hispanic origin consists of the *Historical Census Statistics on Population Totals by Race and by Hispanic Origin*[^14] which spans 1790 to 1990 on race and 1850 to 1990 on Hispanic origin. Hispanic origin is defined as Spanish mother tongue, culture, surname, or origin regardless of race. More recent observations of these data are available in the *Profile of General Demographic Characteristics* (DP-1) data tables from the 2000 Census[^15] and the 2010 Census.[^16] The most recent observations of these data, from 2011 to 2016, are found in the 1-year *American Community Survey Demographic and Housing Estimates* (DP5) data tables.
+
+The data on Foreign-born population comes from tables in the *Historical Census Statistics on the Foreign-born Population of the United State*s[^17] which spans 1850 to 2000. The Nativity of the Population[^18] table outlines the number of persons that are native and Foreign-born. The *Region of Birth of the Foreign-born Population*[^19] table breaks down the origin of the Foreign-born population into Europe, Asia, Africa, Oceania, Latin America, and Northern America. The details on which countries are sub-regions of these macro geographic regions is outlined on pages 46-47 of the United Nations 2002 Demographic Yearbook.[^20] The most recent observations of these data, from 2011 to 2016, are found in the 1-year *Selected Characteristics of the Native and Foreign-born Populations* (S0501) data tables.
+
+The dataset compiled from all these Census data is quite impressive, but it is not yet ready for use. Several nuances must be addressed.  Although analyzing the cause of these discrepancies is not a subject of this paper, it is worth noting that -while not surprising given the history of the hegemony in the United States-the discrepancies are quite unsettling. Notes from the metadata explain that:
+
+  1.  Although the Census includes data on the free and slave Black population, "information on nativity was not collected for slaves."
+  2.  "The attempt to enumerate all American Indians started in 1890" with earlier estimates being inaccurate because "American Indians not taxed (i.e., living in tribal society) were not included in the enumeration."
+  3.  The 1940 Hispanic population figure only included the "White population of Spanish mother tongue".
+  4.  In 1940 and 1950, there is Foreign-born data missing "because data on the Foreign-born population by country of birth in census publications for these years are limited almost entirely to the White population." 
+
+To address the discrepancy caused by (1), the number of slaves disembarking in the United States[^21] is used as a proxy for Foreign-born Africans entering the United States from 1790 to 1880. To address (2), the American Indian population figures are backfilled using the percent change[^22] of the American Indian population starting from the earliest period without discrepancies which is 1890. Native born and total population figures are also adjusted to reflect the revised American Indian population figures. To address (3), the value was removed since it was not representative of all Hispanics. Then, to complete the dataset, imputation is used. The missing data outlined in (4) for the Foreign-born in 1940 and 1950 is filled in using linear interpolation between 1930 and 1960. 
+
+$$y=y_{ 1 }+\left( x-x_{ 1 } \right) \left( \frac { y_{ 2 }-y_{ 1 } }{ x_{ 2 }-x_{ 1 } }  \right)$$
+
+The remainder of the missing data is filled in using linear regression based on the natural log of the total population and the natural log of the variable being imputed.
+
+$$\hat { y } ={ e }^{ \left( \beta _{ 0 }+\ln { \left( x_{ i } \right)  } \beta _{ 1 } \right)  }$$
+
+The exceptions to the imputation via interpolation and regression are the statistics on Foreign-born persons from Europe and North America. Linear regression is not suited for these nonlinear data. Instead, imputation for other regions are subtracted from the total Foreign-born population and distributed according to weights based on the historical averages for the two regions. The resulting dataset is a complete dataset[^23] from 1790 to 2016 on race, Hispanic origin, nativity, and country of origin for Foreign-born.
+
+```{r cache=F, echo=F}
+github <- "https://raw.githubusercontent.com/jzuniga123"
+file <- "/SPS/master/DATA%20698/DATA698_Project.csv"
+data698 <- read.csv(paste0(github, file), header=1)
+data698 <- data698[order(data698$Year, decreasing=T), ]
+```
+```{r cache=T, echo=F, eval=knitr::is_html_output()}
+na.omit(data.frame(data698[, 3:17], row.names = data698$Year))
+```
+
+### U.S. Department of State
+
+Immigrant visas are issued to foreigners permanently relocating to the U.S. and Nonimmigrant visas are issued to foreigners relocating to the U.S. temporarily. Data regarding visas is available both from the U.S. Department of Homeland Security[^24] and the U.S. Department of State.[^25] The data[^26] from the U.S. Department of State shows every Nonimmigrant visa type[^27] by country from 1997 to 2017. This dataset has an extraordinary amount of detail, but only on Nonimmigrant visas issued by consular offices which is only a fraction of the Nonimmigrant visas. Therefore, these data are not suited for this analysis.
+
+### U.S. Department of Labor
+
+Certain Immigrant and Nonimmigrant employment related visas require approval from the U.S. Department of Labor. Employers "must obtain foreign labor certification from the U.S. Department of Labor, prior to filing a petition" for these workers. The process of obtaining certification from the U.S. Department of Labor involves substantiating[^28] that "there are not sufficient U.S. workers able, willing, qualified and available to accept the job opportunity in the area of intended employment and that employment of the foreign worker will not adversely affect the wages and working conditions of similarly employed U.S. workers." The types of employment related visas subject to this certification process are:
+
+  + **E3**: Australian Free Trade Agreement principal's family.
+  + **H1B**: Temporary workers in specialty occupations.
+  + **H1B1**: Chile and Singapore Free Trade Agreement aliens.
+  + **H2A/H2B**: Agricultural and Nonagricultural workers.
+  + **D1**: Crewman on a marine vessel or aircraft.
+
+The data[^29] maintained by the U.S. Department of Labor on these employment related visas lists all information, including status, on every application from 2008 to 2017. There also exists an external source[^30] that has harvested data dating back to 2000. Although the U.S. Department of Labor data has an extraordinary amount of detail, it only encompasses a small number of the available employment related visas.[^31]
+
+### U.S. Department of Homeland Security
+
+The U.S. Citizenship and Immigration Services division of the U.S. Department of Homeland Security has compiled the most complete list of immigration legislation available for the period between 1790 and 1996. The list is not currently available from the source[^32] but it continues to exist in secondary sources such as the Immigration Daily[^33] website and the book *Immigration, Assimilation, and Border Security* by Yoku Shaw-Taylor from 2012. The list is fairly exhaustive, but it is missing about eight pieces of legislation from a smaller list[^34] maintained by the U.S. National Archives. Legislation from 1997 on can be found by querying a database[^35] maintained by the U.S. Congress. The database contains legislation since the 93rd Congress in 1973. The legislation on immigration that has become law since the 105th Congress in 1997 from this database, when combined with the information from the U.S. Citizenship and Immigration Services and U.S. National Archives, produces complete list[^36] of immigration legislation from 1790 to 2017.
+
+```{r cache=T, echo=F}
+temp_df <- data698[, 1:2] %>% 
+  mutate(Century = floor(data698$Year / 100) * 100) %>% 
+  mutate(Decade = floor((data698$Year %% 100) / 10) * 10) %>% 
+  select(-Year) %>% 
+  group_by(Century, Decade) %>% 
+  summarise(Laws = sum(Laws)) %>% 
+  spread(Century, Laws) %>% 
+  mutate(Decade = ifelse(Decade==0, 
+    paste0("Laws During the 0", Decade, "s"), 
+    paste0("Laws During the ", Decade, "s")))
+```
+```{r cache=F, echo=F, eval=knitr::is_html_output()}
+temp_df
+```
+```{r cache=F, echo = F, eval=!knitr::is_html_output(), results = 'asis'}
+kable(temp_df, booktabs = T, linesep = "", 
+  caption = "Legislation on Immigration (1790-2016)") %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+The U.S. Citizenship and Immigration Services division also maintains data on immigration application forms by type (Naturalization, Employment, Family, Humanitarian, Other) and approval status from 2012 to 2017. Data on I-129 applications used for employment are available since 2009. Combining all years of available data from the U.S. Citizenship and Immigration Services results in an unremarkable dataset.[^37] The most useful data[^38] on immigration relevant to this research are the statistics produced by the U.S. Department of Homeland Security in their annual yearbooks. The data on Immigrant visas form their *Persons Obtaining Lawful Permanent Resident Status by Type and Major Class Of Admission*[^39] tables spans 1986 to 2016. The data on *Nonimmigrant visas from their Nonimmigrant Admissions by Class of Admission*[^40] tables spans 1981 to 2016 with aggregate data on Immigrant visas since 1820. There are also data on *Aliens Apprehended*[^41] from 1925 to 2016, as well as on *Aliens Removed or Returned*[^42] from 1892 To 2016. Apprehensions are foreigner arrests, Removals are compulsory based on a court order, Returns represent immigrants stopped (without a court order) from entering at the borders. From these data, a subset of the below Immigrant and Nonimmigrant employment visas has been carved out for additional analysis:
+
+  + **CW1/CW2**: CNMI-only transitional workers and family.
+  + **E1, E2, E2C**: Treaty traders or investors and family.
+  + **E3**: Australian Free Trade Agreement principal's family.
+  + **H1B**: Temporary workers in specialty occupations.
+  + **H1B1**: Chile and Singapore Free Trade Agreement aliens.
+  + **H1C**: Registered nurses participating in the Nursing Relief for Disadvantaged Areas.
+  + **H2A/H2B/H2R**: Agricultural/Nonagricultural/Returning workers.
+  + **H3/H4**: Trainees and Spouses and children of H1, H2, or H3.
+  + **I1**: Representatives of foreign information media and family.
+  + **L1/L2**: Intracompany transferees and family.
+  + **O1/O2/O3**: Workers with extraordinary ability, assistants, and family.
+  + **P1/P2/P3/P4**: Internationally recognized athletes, entertainers, or artists, and family.
+  + **Q1/Q2/Q3**: Workers in international cultural exchange programs and family.
+  + **R1/R2**: Workers in religious occupations and family.
+  + **TN/TD**: NAFTA professional workers and family.
+
+The full join of these Immigrant and Nonimmigrant visa data are made uniform across their combined time domain by imputing missing years. Nonimmigrant data are imputed for 1982-1984, 1986-1988, and 1997 using linear interpolation between years where the data are present: [[1981, 1985], [1985, 1989], [1996, 1998]]. The missing Immigrant data from 1981 to 1985 is filled in by first imputing total visas issued using the historic average proportion of Nonimmigrant visas relative to total visas, then by subtracting Nonimmigrant visas by the derived number of total visas. The resulting dataset[^43] has complete cases on employment and total visas for both Immigrants and Nonimmigrants from 1981 to 2016. The dataset also includes Removals since 1892, Apprehensions since 1925, and Returns since 1927. No imputation was needed for these three enforcement actions since there are no missing data during the 1981 to 2016 period.
+
+```{r cache=T, echo=F, eval=knitr::is_html_output()}
+na.omit(data.frame(data698[, 19:25], row.names = data698$Year))
+```
+
+### U.S. Bureau of Economic Analysis
+
+The U.S. Bureau of Economic Analysis has data on *Gross Output by Industry*[^44] from 1987 to 2016. The data are very granular and consists almost entirely of complete cases. The exceptions are from 1987 to 1996 in the subcategories of (1) Housing, (2) Other Real Estate, (3) General Government National Defense, (4) General Government Nondefense, and (5) Nursing and Residential Care Facilities. For the (1), (2), (3), and (4) subcategories, imputations are done using the average proportion of the child node under the parent node from the data that are present. This imputation is relatively easy since these subcategories are the only child nodes of Real Estate and General Government. The imputation for (5) is done using the average proportion of the sum of its sibling nodes which were Ambulatory Health Care Services and Hospitals. The two existing sibling nodes that the imputations are based on, are then adjusted downward to reflect the new sibling node under the Health Care parent. Failing to adjust them downward would inflate Health Care. The adjustment of the existing sibling nodes is based on the average proportion of each node relative to each other in the existing data. The data also require format changes as final step. The format they are provided in is great for display purposes, it is not amenable to analysis. The final compilation is a complete dataset[^45] from 1987 to 2016 that breaks down GDP by sector: Agriculture, Mining, Utilities, Construction, Manufacturing, Wholesale, Retail, Transportation, Information, FIRE, Service, Education, Entertainment, Other, Federal, State and Local.
+
+```{r cache=T, echo=F, eval=knitr::is_html_output()}
+na.omit(data.frame(data698[, 27:42], row.names = data698$Year))
+```
+
+# Research Methods
+
+The dataset[^46] constructed from the arduous  data gathering and cleaning process described above consists of Immigration Laws and Census data from 1790 to 2016, employment visa data from 1981 to 2016, enforcement data from 1925 to 2016, and GDP by Industry from 1987 to 2016. Correlational research is being conducted on the dataset to describe relationships between immigration law, demographics, employment visas, and the economy. The significance of the relationships between variables is evaluated using formal statistical tests.
+
+```{r cache=T, echo=knitr::is_html_output()}
+github <- "https://raw.githubusercontent.com/jzuniga123"
+file <- "/SPS/master/DATA%20698/DATA698_Project.csv"
+data698 <- read.csv(paste0(github, file), header=1)
+data698 <- data698[order(data698$Year), ]
+data698 <- ts(data698[, -1], frequency=1, 
+  start=min(data698[, 1]), end=max(data698[, 1]))
+```
+
+## Data Characteristics
+
+### Legislation
+
+```{r cache=T, echo=knitr::is_html_output()}
+Laws <- data698[, 1]
+```
+
+Historic immigration law numbers have an interesting pattern. The period between 1790 and 1931 saw an average of `r round(mean(window(Laws, end = 1931)), 3)` pieces legislation per decade. The relative frequency of legislation did increase around the time of Mexican-American War in 1846, but the number of laws passed continued to remain relatively low. Then in 1932, in the midst the Great Depression, the number and frequency immigration laws started to steadily increase. Since 1932 there have been an average of `r round(mean(window(Laws, start = 1932)), 3)` immigration laws being passed every year. Looking only at the period since 1997 shows an average of `r round(mean(window(Laws, start = 1997)), 3)` immigration laws passed annually. The last 21 years have seen legislation on immigration being enacted at a frequency over 10 times greater than what was witnessed during the first 141 years of Federal legislative action on immigration.
+
+```{r cache=T, echo=knitr::is_html_output(), fig.height=ifelse(knitr::is_html_output(),5,3)}
+ggplot() + ggtitle("Legislation on Immigration (1790-2016)") + 
+  geom_line(aes(y = Laws, x = time(Laws)), stat="identity") +
+  xlab("Year") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+Notable periods of increased legislative activity that were outliers in their era are:
+
+  + **1798**: Three laws passed in response to the Quasi-War with France.
+  + **1882**: Two laws passed, one being the Chinese Exclusion Act.
+  + **1887**: Two laws passed restricting labor contracts and property rights.
+  + **1903**: Two laws passed, one restricting anarchists.
+  + **1932**: Four laws passed, three restricting labor contracts.
+  + **1940**: Four laws passed, three enhancing enforcement activities.
+  + **1950**: Four laws passed, three providing relief to orphans, military, and sheepherders.
+  + **1978**: Seven laws passed, two restrictive to agriculture and travel, five progressive: addressing bias in admissions, expulsion of Nazis, human smuggling, and adoption.
+  + **2000**: Thirteen laws passed during an election year, eleven prior to elections.
+  + **2002**: Ten laws passed in the wake of the September 11, 2001 terrorists attacks.
+  + **2008**: Six laws passed during an election year, all prior to elections.
+
+### Population
+
+```{r cache=T, echo=knitr::is_html_output()}
+Census <- data698[, 2:17]
+```
+
+#### Race and Hispanic Origin (RAHO)
+
+```{r cache=T, echo=knitr::is_html_output()}
+RAHO <- Census[, 2:8]
+RAHO[, 2] <- RAHO[, 2] + RAHO[, 3]
+colnames(RAHO)[2] <- "Black"
+RAHO <- RAHO[, -3]
+```
+
+The purely numerical data from the decennial Census on race and Hispanic origin has two interesting features. As is usual with most social phenomena, the distributions appear mostly exponential. The two exceptions are the White race which can be described as linear since about 1870 and the Native American race which has a positive parabolic shape with a minimum at the year 1900. For the purposes of aggregate analysis, the free and enslaved Black population that the Census counts separately until 1860 is being counted together. 
+
+```{r cache=T, echo=knitr::is_html_output(), fig.height=ifelse(knitr::is_html_output(),5,3)}
+numb_df <- data.frame(na.approx(RAHO), Year=time(RAHO))
+plot_df <- gather(numb_df, "Demographic", "Population", 1:(ncol(numb_df)-1))
+ggplot(plot_df, aes(x=Year, y=Population)) + geom_line() + 
+  facet_wrap(~ Demographic, scales="free_y") + theme_bw() +
+  ggtitle("Race and Hispanic Origin (1790-2016)") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma)
+```
+```{r cache=T, echo=knitr::is_html_output()}
+ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
+  ggtitle("Race and Hispanic Origin (1790-2016)") + xlab("Year") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) + 
+  scale_fill_grey(start = 0.2, end = 0.8) +
+  theme(legend.position="bottom")
+```
+
+When the Census data on race and Hispanic origin are viewed as a percentage of total population however, some striking details emerge. Hispanics, Asians, Pacific Islanders, and Other races grow exponentially as a percentage of total population over time. Native Americans have decreased exponentially as a percentage of total population over time, from 14.2% in 1790 to 0.7% in 2016. The Black percentage of the population has decreased overall but in a cubic manner with a minimum of 9.5% in 1930 and two local maximas of 17.7% in 1810 and 11% in 1990. The White percentage of the population has a negative parabolic shape with a maximum of 89% in 1920 and an all time low of 61.7% in 2016. In aggregate, many of these individual characteristics seem less remarkable, but a demographic shift is clear.
+
+```{r cache=T, echo=knitr::is_html_output(), fig.height=ifelse(knitr::is_html_output(),5,3)}
+Population <- rowSums(RAHO)
+Proportions <- RAHO / Population
+prop_df <- data.frame(na.approx(Proportions), Year=time(Proportions))
+plot_df <- gather(prop_df, "Demographic", "Population", 1:(ncol(prop_df)-1))
+ggplot(plot_df, aes(x=Year, y=Population)) + geom_line() + 
+  facet_wrap(~ Demographic, scales="free_y") + theme_bw() +
+  ggtitle("Race and Hispanic Origin Proportions (1790-2016)") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma)
+```
+```{r cache=T, echo=knitr::is_html_output()}
+ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
+  ggtitle("Race and Hispanic Origin Proportions (1790-2016)") + xlab("Year") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) + 
+  scale_fill_grey(start = 0.2, end = 0.8) +
+  theme(legend.position="bottom")
+```
+```{r cache=T, echo=F, eval=knitr::is_html_output()}
+round(na.omit(data.frame(as.data.frame(Proportions), row.names=time(Proportions))), 6)
+```
+
+#### Native and Foreign-born (NAFB)
+
+```{r cache=T, echo=knitr::is_html_output()}
+NAFB <- Census[, 9:10]
+```
+
+The decennial numbers on the Native and Foreign-born population also follow what can be described as an exponential pattern. There was a decline in the Foreign-born population from 1940 to 1970, but by 1980 the number returns to its prior levels and continues on its prior trajectory. When aggregated, the fluctuation in the Foreign-born population is much less noticeable.
+
+```{r cache=T, echo=knitr::is_html_output(), fig.height=ifelse(knitr::is_html_output(),5,2)}
+numb_df <- data.frame(na.approx(NAFB), Year=time(NAFB))
+plot_df <- gather(numb_df, "Demographic", "Population", 1:(ncol(numb_df)-1))
+ggplot(plot_df, aes(x=Year, y=Population)) + geom_line() + 
+  facet_wrap(~ Demographic, scales="free_y") + theme_bw() +
+  ggtitle("Native and Foreign-born (1790-2016)") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma)
+```
+```{r cache=T, echo=knitr::is_html_output()}
+ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
+  ggtitle("Native and Foreign-born (1790-2016)") + xlab("Year") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) + 
+  scale_fill_grey(start = 0.2, end = 0.8) +
+  theme(legend.position="bottom")
+```
+
+The proportion of Native and Foreign-born persons in the population are mirror images of each other. The median proportion of Foreign-born persons in the United States since 1790 has been 12.4%. In 1850 and 1970 the percentage of Foreign-born persons in the United States reached local minmas of 9.5% and 4.8%, respectively. The proportion of Foreign-born persons in the United States has peaks in 1870, 1890, and 1910 at 14.3%, 14.8%, and 14.7%; respectively. In 2016 the percentage of Foreign-born sits at 13.5%. When viewed in aggregate, the decline in the percentage of Foreign-born persons in the United States in 1970 appears to be significant relative to its proportion over time.
+
+```{r cache=T, echo=knitr::is_html_output(), fig.height=ifelse(knitr::is_html_output(),5,2)}
+Population <- rowSums(NAFB)
+Proportions <- NAFB / Population
+prop_df <- data.frame(na.approx(Proportions), Year=time(Proportions))
+plot_df <- gather(prop_df, "Demographic", "Population", 1:(ncol(prop_df)-1))
+ggplot(plot_df, aes(x=Year, y=Population)) + geom_line() + 
+  facet_wrap(~ Demographic, scales="free_y") + theme_bw() +
+  ggtitle("Native and Foreign-born Proportions (1790-2016)") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma)
+```
+```{r cache=T, echo=knitr::is_html_output()}
+ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
+  ggtitle("Native and Foreign-born Proportions (1790-2016)") + xlab("Year") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) + 
+  scale_fill_grey(start = 0.2, end = 0.8) +
+  theme(legend.position="bottom")
+```
+```{r cache=T, echo=F, eval=knitr::is_html_output()}
+round(na.omit(data.frame(as.data.frame(Proportions), row.names=time(Proportions))), 6)
+```
+
+#### Foreign-born Country of Origin (FBCO)
+
+```{r cache=T, echo=knitr::is_html_output()}
+FBCO <- Census[, 11:16]
+```
+
+The decennial numbers on country of origin for Foreign-born are a little more interesting. Persons from Africa, Asia, Oceania, and Latin America arrive at an exponential rate. Arrivals from Europe and North America however, show exponential growth until around 1930, and then steady declining thereafter. When aggregated, these data have a very interesting characteristic. There is a large hump in the number of Foreign-born Europeans that begins to deflate when race stopped being a factor in admissions around 1950.
+
+```{r cache=T, echo=knitr::is_html_output(), fig.height=ifelse(knitr::is_html_output(),5,3)}
+numb_df <- data.frame(na.approx(FBCO), Year=time(FBCO))
+plot_df <- gather(numb_df, "Demographic", "Population", 1:(ncol(numb_df)-1))
+ggplot(plot_df, aes(x=Year, y=Population)) + geom_line() + 
+  facet_wrap(~ Demographic, scales="free_y") + theme_bw() +
+  ggtitle("Foreign-born Country of Origin (1790-2016)") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma)
+```
+```{r cache=T, echo=knitr::is_html_output()}
+ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
+  ggtitle("Foreign-born Country of Origin (1790-2016)") + xlab("Year") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) + 
+  scale_fill_grey(start = 0.2, end = 0.8) +
+  theme(legend.position="bottom")
+```
+
+The proportion of Foreign-born persons in the United States by country of origin shows exponential increases from Asia, Oceania, and Latin America just like the pure numbers. The large increases start around 1860 for Oceania, and 1970 for Latin America and Asia. Foreign-born persons from Africa follow a less natural pattern that coincides with slavery. The percentage of Foreign-born persons from Africa was high from 1790 to 1820, but relatively low thereafter. Looking at Foreign-born persons from Africa in the post-slavery era shows a more natural exponential pattern with a large increase starting in 1980. The proportion of Foreign-born persons from Europe remained above 80% until 1950 when a permanent and rapid decline started leading to its current low of 10.9% in 2016. The proportion of Foreign-born persons from North America has a very strange and unnatural pattern hovering around 8.9% until 1970 when a rapid decline started leading to its current low of 1.8% in 2016. The rapid decline of Europeans in 1950 and the rapid decline by North Americans starting 1970 are temporally proximate to the when race stopped being a factor in admissions around 1950. When aggregated, the fall from dominance by Foreign-born Europeans and the rise to dominance by Latin Americans and Asians over time is quite remarkable.
+
+```{r cache=T, echo=knitr::is_html_output(), fig.height=ifelse(knitr::is_html_output(),5,3)}
+Population <- rowSums(FBCO)
+Proportions <- FBCO / Population
+prop_df <- data.frame(na.approx(Proportions), Year=time(Proportions))
+plot_df <- gather(prop_df, "Demographic", "Population", 1:(ncol(prop_df)-1))
+ggplot(plot_df, aes(x=Year, y=Population)) + geom_line() + 
+  facet_wrap(~ Demographic, scales="free_y") + theme_bw() +
+  ggtitle("Foreign-born Country of Origin Proportions (1790-2016)") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma)
+```
+```{r cache=T, echo=knitr::is_html_output()}
+ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
+  ggtitle("Foreign-born Country of Origin Proportions (1790-2016)") + xlab("Year") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) + 
+  scale_fill_grey(start = 0.2, end = 0.8) +
+  theme(legend.position="bottom")
+```
+```{r cache=T, echo=F, eval=knitr::is_html_output()}
+round(na.omit(data.frame(as.data.frame(Proportions), row.names=time(Proportions))), 6)
+```
+
+### Immigration
+
+#### Visas
+
+```{r cache=T, echo=knitr::is_html_output()}
+Visas <- data698[, 18:21]
+```
+
+The numeric data on Immigrant Visas since 1820 is best described as chaotic. It has wild swings up and down starting with an upward trend from 1820 to about 1910, followed by a drastic decline until about 1945, and then another trend upward with a similar trajectory until 2016. The graph also shows a huge spike around 1990. When aggregated, a clear upward trend is notable, but fluctuations seem relatively random.
+
+```{r cache=T, echo=knitr::is_html_output(), fig.height=ifelse(knitr::is_html_output(),5,3)}
+IV_All <- na.omit(Visas[, 2])
+numb_df <- data.frame(IV_All, Year=time(IV_All))
+ggplot() + ggtitle("Immigrant Visas (1820-2016)") + xlab("Year") + 
+  geom_line(aes(y = IV_All, x = time(IV_All)), stat="identity") +
+  ylab("Amount") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+Visa data since 1981 has been less chaotic. Employment related Immigrant visas over the last 30 years are not as noisy. The number of Immigrant visas related to employment held steady from 1981 to 1991, was chaotic from 1992 to 2007, and then steady ever since. There were large decreases around 1999 and 2004, and large increases around 1993, 2001, and 2006. Total immigrant visas follow a similar pattern with the exception of the huge spike around 1990 mentioned earlier. Nonimmigrant visas have a less interesting pattern. Employment related visas have a steadily increasing trend with only a slight amount of variability. All Nonimmigrant visas also have an increasing trend, but with less variability. Nonimmigrant visas have made up between 89% and 95% off all visas for the last 30 years.
+
+```{r cache=T, echo=knitr::is_html_output(), fig.height=ifelse(knitr::is_html_output(),5,3)}
+Visa_Types <- window(Visas, start = 1981)
+Visa_Types[,2] <- Visa_Types[,2] - Visa_Types[,1]
+colnames(Visa_Types)[c(2,4)] <- c("IV_NonEmp", "NIV_NonEmp")
+numb_df <- data.frame(Visa_Types, Year=time(Visa_Types))
+plot_df <- gather(numb_df, "Type", "Approved", 1:(ncol(numb_df)-1))
+ggplot(plot_df, aes(x=Year, y=Approved)) + geom_line() + 
+  facet_wrap(~ Type, scales="free_y") + theme_bw() +
+  ggtitle("Immigrant and Nonimmigrant Visas by Type (1981-2016)") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma)
+```
+```{r cache=T, echo=knitr::is_html_output()}
+ggplot(plot_df, aes(x=Year, y=Approved, fill= Type)) + geom_area() +
+  ggtitle("Immigrant and Nonimmigrant Visas by Type (1981-2016)") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) + 
+  scale_fill_grey(start = 0.2, end = 0.8) +
+  theme(legend.position="bottom")
+```
+
+#### Enforcement
+
+```{r cache=T, echo=knitr::is_html_output()}
+Enforce <- data698[, 22:24]
+```
+
+Enforcement data has some interesting patterns. Removals remained at a constant rate until 1996 when they increased substantially. Apprehensions and Returns follow almost identical patterns. There was a large increase in enforcement in the ten-year period between 1945 and 1955 with its peak being reached in 1954. The increase started again in 1965 and has remained elevated ever since with peaks in 1986, 1996, and 2000. Around the time Removals started steadily increasing, Apprehensions and Returns started steadily decreasing. When aggregated, the three enforcement actions follow the pattern of the latter two enforcement actions which make up the bulk of the actions. Another characteristic that emerges in these data when aggregated is the recent decline in Apprehensions and Returns and the recent increase in Removals.
+
+```{r cache=T, echo=knitr::is_html_output(), fig.height=ifelse(knitr::is_html_output(),5,3)}
+Enforce_Window <- window(Enforce, start = 1925)
+numb_df <- data.frame(Enforce_Window, Year=time(Enforce_Window))
+plot_df <- gather(numb_df, "Method", "Actions", 1:(ncol(numb_df)-1))
+ggplot(plot_df, aes(x=Year, y=Actions)) + geom_line() + 
+  facet_wrap(~ Method, scales="free_y") + theme_bw() +
+  ggtitle("Enforcement by Method (1981-2016)") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma)
+```
+```{r cache=T, echo=knitr::is_html_output()}
+ggplot(plot_df, aes(x=Year, y=Actions, fill= Method)) + geom_area() +
+  ggtitle("Enforcement by Method (1981-2016)") + xlab("Year") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) + 
+  scale_fill_grey(start = 0.2, end = 0.8) +
+  theme(legend.position="bottom")
+```
+
+### GDP by Industry
+
+```{r cache=T, echo=knitr::is_html_output()}
+Economy <- data698[, 26:41]
+```
+
+GDP by industry over the past 30 years has the same homoskedastic upward trend for nearly every industry. The exceptions are Agriculture Mining, Utilities and Construction which appear to be more susceptible to business cycles due to their heteroskedasticity. The homoscedastic upward trend dominates aggregated income with the exception of the period encompassing the Great Recession.
+
+```{r cache=T, echo=knitr::is_html_output()}
+Economy_Window <- window(Economy, start = 1987)
+numb_df <- data.frame(Economy_Window, Year=time(Economy_Window))
+plot_df <- gather(numb_df, "Sector", "Income", 1:(ncol(numb_df)-1))
+ggplot(plot_df, aes(x=Year, y=Income)) + geom_line() + 
+  facet_wrap(~ Sector, scales="free_y") + theme_bw() +
+  ggtitle("GDP by Sector (1987-2016)") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma)
+ggplot(plot_df, aes(x=Year, y=Income, fill= Sector)) + geom_area() +
+  ggtitle("GDP by Sector (1987-2016)") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) + 
+  scale_fill_grey(start = 0.2, end = 0.8)
+```
+
+When examining the industries in aggregate as a proportion of the economy, their shares fluctuate slightly but remain relatively constant over the last 30 years. Proportionally, the bulk of GDP by order of share is maintained by the Manufacturing, FIRE (Finance, Insurance, and Real Estate), Service, and Education sectors. Over time there has been a slight decrease in the proportion of the economy captured by the Manufacturing sector and slight increases in the FIRE and Service sectors.
+
+```{r cache=T, echo=knitr::is_html_output()}
+GDP <- rowSums(Economy_Window)
+Proportions <- Economy_Window / GDP
+prop_df <- data.frame(na.approx(Proportions), Year=time(Proportions))
+plot_df <- gather(prop_df, "Sector", "Income", 1:(ncol(prop_df)-1))
+ggplot(plot_df, aes(x=Year, y=Income)) + geom_line() + 
+  facet_wrap(~ Sector, scales="free_y") + theme_bw() +
+  ggtitle("GDP by Sector Proportions (1987-2016)") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma)
+ggplot(plot_df, aes(x=Year, y=Income, fill= Sector)) + geom_area() +
+  ggtitle("GDP by Sector Proportions (1987-2016)") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) + 
+  scale_fill_grey(start = 0.2, end = 0.8)
+```
+```{r cache=T, echo=F, eval=knitr::is_html_output()}
+round(na.omit(data.frame(as.data.frame(Proportions), row.names=time(Proportions))), 6)
+```
+
+## Data Relationships
+
+Correlation measures the relationship between two variables. The most commonly used measure of correlation is Pearson[^47] correlation ($r$). Pearson correlation measures the relationship between normal linear homoskedastic variables. Measuring relationships between variables that are not normal, linear, or homoskedastic (inherently or through transformation) with the Pearson correlation formula produces misleading results. Spearman[^48] correlation ($\rho$) and Kendall[^49] correlation ($\tau$) are non-parametric measures of correlation based on monotonic rank. Spearman correlation is more computationally efficient than Kendall correlation, but less robust. For this analysis, the accuracy of Kendall correlation is being prioritized over the speed of Spearman correlation. 
+
+$$r = \frac{\sum{(x-m_x)(y-m_y)}}{\sqrt{\sum{(x-m_x)^2}\sum{(y-m_y)^2}}} `r ifelse((knitr::opts_knit$get('rmarkdown.pandoc.to') == 'docx'), '\\quad\\textrm', '\\tag')`{Pearson}$$
+
+$$\rho = \frac{\sum(x' - m_{x'})(y'_i - m_{y'})}{\sqrt{\sum(x' - m_{x'})^2 \sum(y' - m_{y'})^2}} `r ifelse((knitr::opts_knit$get('rmarkdown.pandoc.to') == 'docx'), '\\quad\\textrm', '\\tag')`{Spearman}$$
+
+$$\tau = \frac{n_c - n_d}{\frac{1}{2}n(n-1)} `r ifelse((knitr::opts_knit$get('rmarkdown.pandoc.to') == 'docx'), '\\quad\\textrm', '\\tag')`{Kendall}$$
+
+## Other Considerations
+
+### Policy Lag
+
+There is a lag between the enactment of a law and its full implementation. Changes in laws necessitate the adjustment of institutional processes which are mired by the rules and procedures guiding the bureaucracies implementing the laws. It is worth noting that bureaucracies have been maligned with the negative connation behind red tape, but that the bureaucratic adherence to rules is a feature-and not a bug-- that hedges against chaos. The point is that there is no value judgment being made here. It is simply true that Immigration applications are processed on an ongoing basis while laws change and agencies readjust. Applications in progress must be managed around changing immigration laws. When looking at the relationship between legislation and other variables, it is therefore important to also look at the lagged relationships.
+
+### Imputation
+
+The Census data obtained is decennial from 1790 to 2010 and then annual until 2016. All other non-Census data is annual and complete from 1987 until 2016. To conduct a proper analysis of the past 30 years, imputation is required on the Census data for missing periods. This is done with linear interpolation[^50] between periods that there are data points present. Linear interpolation makes no assumption on distribution. It draws a straight line between two known points and returns a value along that line for a given point in the domain.
+
+$$y=y_{ 1 }+\left( x-x_{ 1 } \right) \left( \frac { y_{ 2 }-y_{ 1 } }{ x_{ 2 }-x_{ 1 } }  \right)$$
+
+# Results
+
+## Legislative Correlations
+
+The frequency of legislation regarding immigration fluctuates when matters related to immigration are under review. Therefore, the number of laws being passed on immigration is a useful sentiment indicator for how the United States feels about immigration and how much change is trying to be effected.
+
+```{r cache=F, echo=knitr::is_html_output()}
+Legislation <- window(cbind(Laws_New=Laws, Laws_1yr=stats::lag(Laws, k=-1),
+  Laws_2yr=stats::lag(Laws, k=-2), Laws_3yr=stats::lag(Laws, k=-3)), end=2016)
+```
+
+### Demographic Factors
+
+First the Kendall correlation between the number of new, one-year old, two-year old, and three-year old immigration laws and demographic factors is examined. When it comes to population based on Race and Hispanic Origin, legislation has positive correlations between $\tau=0.51$ and $\tau=0.56$ for Hispanic origin and nearly every race. The exception is Native Americans which has a positive correlation that hoovers around $\tau=0.27$. All of these correlations are significant at $\alpha=0.05$. The number of immigration laws increases with increases in racial and ethnic subsections of the population. The strongest relationship being with Other Races then Asian and Pacific Islanders.
+
+```{r cache=F, echo=knitr::is_html_output()}
+r <- corr.test(na.approx(RAHO), Legislation, use="complete.obs", method="kendall")$r
+p <- corr.test(na.approx(RAHO), Legislation, use="complete.obs", method="kendall")$p < 0.05
+```
+```{r  cache=T, eval=knitr::is_html_output(), eval=T, results = 'asis'}
+table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No"), sep=", "), 
+  nrow=nrow(r), dimnames=dimnames(r) )
+colnames(table_df) <- gsub('_', ' ', colnames(table_df))
+rownames(table_df) <- gsub('_', ' ', rownames(table_df))
+kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Laws with Race and Hispanic Origin") %>%
+  add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+For the Native and Foreign-born population, with the number of immigration laws passed are also moderate. Natives have a positive correlation that hoovers around $\tau=0.52$. Foreign-born have a positive correlation that hoovers around $\tau=0.44$. All of these correlations are significant at $\alpha=0.05$. The number of immigration laws increases with increases in native and foreign-born subsections of the population. The stronger relationship is with Natives.
+
+```{r cache=F, echo=knitr::is_html_output()}
+r <- corr.test(na.approx(NAFB), Legislation, use="complete.obs", method="kendall")$r
+p <- corr.test(na.approx(NAFB), Legislation, use="complete.obs", method="kendall")$p < 0.05
+```
+```{r  cache=T, eval=knitr::is_html_output(), eval=T, results = 'asis'}
+table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No"), sep=", "), 
+  nrow=nrow(r), dimnames=dimnames(r) )
+colnames(table_df) <- gsub('_', ' ', colnames(table_df))
+rownames(table_df) <- gsub('_', ' ', rownames(table_df))
+kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Laws with Native and Foreign-born") %>%
+  add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+The correlations with the number of immigration laws passed and Foreign-born Country of Origin are higher for Asia, Oceania, and Latin America which have correlations between $\tau=0.51$ and $\tau=0.53$. The correlation for Africa is around $\tau=0.4$. The correlations of Europe and North America with immigration law are between $\tau=0.19$ and $\tau=0.26$ with the lower correlations figures being from Europe. All of these correlations are significant at $\alpha=0.05$. The number of immigration laws increases with increases in immigration from various countries of origin. The strongest relationship being with Asia, Oceania, and Latin America.
+
+```{r cache=F, echo=knitr::is_html_output()}
+r <- corr.test(na.approx(FBCO), Legislation, use="complete.obs", method="kendall")$r
+p <- corr.test(na.approx(FBCO), Legislation, use="complete.obs", method="kendall")$p < 0.05
+```
+```{r  cache=T, eval=knitr::is_html_output(), eval=T, results = 'asis'}
+table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No"), sep=", "), 
+  nrow=nrow(r), dimnames=dimnames(r) )
+colnames(table_df) <- gsub('_', ' ', colnames(table_df))
+rownames(table_df) <- gsub('_', ' ', rownames(table_df))
+kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Laws with Foreign-born Country of Origin") %>%
+  add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+### Economic Factors
+
+The Kendall correlation between the number of new, one-year old, two-year old, and three-year old immigration laws and economic factors is examined next. For Visas, the largest correlations are found two years after immigration laws are passed. Although the correlations are larger, they are not very high. The correlations are between $\tau=0.21$ and $\tau=0.31$. Out of these two-year lagged correlations, only one of the correlations is significant at $\alpha=0.05$. The lone significant correlation is between the number of immigration laws passed two years earlier and all Immigrant Visas (regardless of type). The number of two-year old immigration laws increases with increases in permanent relocations by immigrants to the United States. This temporal relationship could also be a statistical anomaly. Within the context of statistical tests, at least one in twenty false positives are expected are a 95% confidence level.
+
+```{r cache=F, echo=knitr::is_html_output()}
+r <- corr.test(Visas, Legislation, use="complete.obs", method="kendall")$r
+p <- corr.test(Visas, Legislation, use="complete.obs", method="kendall")$p < 0.05
+```
+```{r  cache=T, eval=knitr::is_html_output(), eval=T, results = 'asis'}
+table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No"), sep=", "), 
+  nrow=nrow(r), dimnames=dimnames(r) )
+colnames(table_df) <- gsub('_', ' ', colnames(table_df))
+rownames(table_df) <- gsub('_', ' ', rownames(table_df))
+kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Laws with Immigration Visas") %>%
+  add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+Enforcement actions have low correlations with the number of immigration laws passed. The correlations are fairly constant across lags ranging between $\tau=0.19$ and $\tau=0.24$. None of these correlations are significant at $\alpha=0.05$.
+
+```{r cache=F, echo=knitr::is_html_output()}
+r <- corr.test(Enforce, Legislation, use="complete.obs", method="kendall")$r
+p <- corr.test(Enforce, Legislation, use="complete.obs", method="kendall")$p < 0.05
+```
+```{r  cache=T, eval=knitr::is_html_output(), eval=T, results = 'asis'}
+table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No"), sep=", "), 
+  nrow=nrow(r), dimnames=dimnames(r) )
+colnames(table_df) <- gsub('_', ' ', colnames(table_df))
+rownames(table_df) <- gsub('_', ' ', rownames(table_df))
+kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Laws with Immigration Enforcement Actions") %>%
+  add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+The largest correlations with the number of immigration laws passed and GDP by Industry can be found after three years after immigration laws are passed. Just like with Visas however, although these correlations are larger, they are not very high. Excluding the highest and lowest correlations, these correlations range between $\tau=0.25$ and $\tau=0.39$ and none significant at $\alpha=0.05$.
+
+```{r cache=F, echo=knitr::is_html_output()}
+r <- corr.test(Economy, Legislation, use="complete.obs", method="kendall")$r
+p <- corr.test(Economy, Legislation, use="complete.obs", method="kendall")$p < 0.05
+```
+```{r  cache=T, eval=knitr::is_html_output(), eval=T, results = 'asis'}
+table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No"), sep=", "), 
+  nrow=nrow(r), dimnames=dimnames(r) )
+colnames(table_df) <- gsub('_', ' ', colnames(table_df))
+rownames(table_df) <- gsub('_', ' ', rownames(table_df))
+kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Laws with the Economy") %>%
+  add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+## Economic Correlations
+
+As previously mentioned, Kendall correlations between the economy and the number of immigration laws passed are statistically insignificant. This is not true for Kendall correlations between industries in the economy and many other factors. Correlations between industries and Race and Hispanic Origin and are high and statistically significant at $\alpha=0.05$ for every demographic segment. Income for every industry increases with increases in racial and ethnic subsections of the population.
+
+```{r cache=F, echo=knitr::is_html_output()}
+r <- round(corr.test(Economy, na.approx(RAHO), use="complete.obs", method="kendall")$r, 5)
+p <- corr.test(Economy, na.approx(RAHO), use="complete.obs", method="kendall")$p < 0.05
+```
+```{r  cache=T, eval=knitr::is_html_output(), eval=T, results = 'asis'}
+table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No"), sep=", "), 
+  nrow=nrow(r), dimnames=dimnames(r) )
+colnames(table_df) <- gsub('_', ' ', colnames(table_df))
+rownames(table_df) <- gsub('_', ' ', rownames(table_df))
+kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Economy with Race and Hispanic Origin") %>%
+  add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+The same is true for the Native and Foreign-born population and every industry. Correlations are high and statistically significant at $\alpha=0.05$. Income for every industry increases with increases in native and foreign-born subsections of the population.
+
+```{r cache=F, echo=knitr::is_html_output()}
+r <- round(corr.test(Economy, na.approx(NAFB), use="complete.obs", method="kendall")$r, 5)
+p <- corr.test(Economy, na.approx(NAFB), use="complete.obs", method="kendall")$p < 0.05
+```
+```{r  cache=T, eval=knitr::is_html_output(), eval=T, results = 'asis'}
+table_df <- matrix(paste(format(round(r, 2), nsmall = 2), ifelse(p, "Yes", "No"), sep=", "), 
+  nrow=nrow(r), dimnames=dimnames(r) )
+colnames(table_df) <- gsub('_', ' ', colnames(table_df))
+rownames(table_df) <- gsub('_', ' ', rownames(table_df))
+kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Economy with Native and Foreign-born") %>%
+  add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+Country of origin does not show the same overarching relationship with the economy however. At an $\alpha=0.05$ Asia, Africa, Oceania, and Latin America have high and statistically significant correlations with every industry, but Europe and North America have all statistically insignificant correlations. Income for every industry increases with increases in immigration from Asia, Africa, Oceania, and Latin America.
+
+```{r cache=F, echo=knitr::is_html_output()}
+r <- round(corr.test(Economy, na.approx(FBCO), use="complete.obs", method="kendall")$r, 5)
+p <- corr.test(Economy, na.approx(FBCO), use="complete.obs", method="kendall")$p < 0.05
+```
+```{r  cache=T, eval=knitr::is_html_output(), eval=T, results = 'asis'}
+table_df <- matrix(paste(format(round(r, 2), nsmall = 2), ifelse(p, "Yes", "No"), sep=", "), 
+  nrow=nrow(r), dimnames=dimnames(r) )
+colnames(table_df) <- gsub('_', ' ', colnames(table_df))
+rownames(table_df) <- gsub('_', ' ', rownames(table_df))
+kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Economy with Foreign-born Country of Origin") %>%
+  add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+There is also a dichotomy between Immigrant and Nonimmigrant Visas and their relationship with the economy. At an $\alpha=0.05$, Nonimmigrant Visas have statistically significant correlations with every industry, but Immigrant visas have statistically insignificant correlations with every industry except for Utilities. Income for every industry increases with increases in Nonimmigrant Visas. Income for Utilities increases with increases in all Immigrant Visas. Much like the outlier noted in the correlations between Immigrant Visas and the number of immigration laws passed, this could imply either a relationship or be a statistical anomaly because within the context of statistical tests, at least one in twenty false positives are expected are a 95% confidence level.
+
+```{r cache=F, echo=knitr::is_html_output()}
+r <- corr.test(Economy, Visas, use="complete.obs", method="kendall")$r
+p <- corr.test(Economy, Visas, use="complete.obs", method="kendall")$p < 0.05
+```
+```{r  cache=T, eval=knitr::is_html_output(), eval=T, results = 'asis'}
+table_df <- matrix(paste(format(round(r, 2), nsmall = 2), ifelse(p, "Yes", "No"), sep=", "), 
+  nrow=nrow(r), dimnames=dimnames(r) )
+colnames(table_df) <- gsub('_', ' ', colnames(table_df))
+rownames(table_df) <- gsub('_', ' ', rownames(table_df))
+kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Economy with Immigration Visas") %>%
+  add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+Enforcement actions also have mixed results. Apprehensions and Returns have statistically insignificant correlations with every industry in the economy, but Removals have statistically significant positive correlations with every industry in the economy at $\alpha=0.05$. Income for Utilities for every industry increases with increases in Removals. As stated earlier, Removals are compulsory actions based on a court order and Returns represent immigrants stopped (without a court order) from entering at the borders.
+
+```{r cache=F, echo=knitr::is_html_output()}
+r <- corr.test(Economy, Enforce, use="complete.obs", method="kendall")$r
+p <- corr.test(Economy, Enforce, use="complete.obs", method="kendall")$p < 0.05
+```
+```{r  cache=T, eval=knitr::is_html_output(), eval=T, results = 'asis'}
+table_df <- matrix(paste(format(round(r, 2), nsmall = 2), ifelse(p, "Yes", "No"), sep=", "), 
+  nrow=nrow(r), dimnames=dimnames(r) )
+colnames(table_df) <- gsub('_', ' ', colnames(table_df))
+rownames(table_df) <- gsub('_', ' ', rownames(table_df))
+kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Economy with Immigration Enforcement") %>%
+  add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+# Discussion
+
+Kendall correlations between the number of immigration laws passed and the demographic factors examined are statistically significant while the correlations between the number of immigration laws passed and the economic factors are not, with the lone exception being Immigrant Visas.  Tables 3 through 5 show significant positive correlations between the number of immigration laws passed and demographic factors all coming in near $\tau=0.5$ with a few exceptions. The relationship between the number of immigration laws and Native Americans hoovers around $\tau=0.27$. This makes sense intuitively since Native Americans are not generally associated with legislation on immigration. The relationships between the number of immigration laws and foreign-born from Europe and North America hoovers are all $\tau=0.26$ or less. This is likely related to European and North American arrivals having an unnatural distribution that was inflated until race stopped being a factor in admissions around 1950. Tables 6 shows a significant positive correlation of $\tau=0.211$ between the number of immigration laws passed after two years and Immigrant visas. At a 95% confidence level, this temporal relationship could be a statistical anomaly. It seems reasonable however that Immigrant Visas which foreigners obtain to permanently relocate to the United States are associated with legislation enacted two years prior. Planning a move from one country to another is quite an undertaking that may very well be a two-year process. 
+
+The correlations between demographic factors and various industries in the economy contradicts several stereotypes. The findings in Table 9 that every race, Hispanic, Natives, and Foreign-born have a strong and statistically significant positive correlation with every industry in the economy is refreshing. It was a little interesting to see in Table 10 that foreign-born from Europe and North America did not have statistically significant correlations with any industry. As with the relationship with legislation, this is likely related to the unnatural distribution that European and North American arrivals have due to admissions being based on race until around 1950. It was also interesting to see in Table 12 how the temporary Nonimmigrant visas had strong statistically significant correlations with every sector of the economy while the permanent Immigrant visas had statistically insignificant correlations. The exception to theses insignificant findings was the statistically significant relationship between Immigrant Visas and Utilities. This, coupled with how Immigrant visas had the only significant correlation with the number of immigration laws passed, shows that Immigrant Visas may not just be a statistical anomaly at the 95% confidence level. This is indicative of Immigrant Visas being intertwined with multiple facets of the United States. It is easy to see how permanent relocations are associated with increases in Utilities, but it is a little strange to no other statistically significant relationship with the economy. Finally, enforcement actions in Table 13 indicate a strong and statistically significant positive correlation with every industry and Removals, but no other action. At first glance this is strange but it makes sense when looking at the definitions. Apprehensions and Returns are swift actions that involve a limited number of parties. Court ordered removals are prolonged processes that involve several institutions such as government agencies, private prison systems, and law firms.
+
+
+# Conclusion
+
+Historically, legislation on immigration has had a statistically insignificant correlation with the economy. The statistically significant correlations that immigration laws have had are with demographics. Based on history, the economy will improve regardless of the demographic makeup of immigrants. Politicians claiming things will improve if a change is made, knowing that improvement is likely regardless of the change, are exercising political savvy in advancing their interests. Much can be said about the ethics behind such self-serving behavior, [^51] but only a reference to further reading on the topic will be provided in this analysis. Although intent cannot be inferred, this research does show that it is more likely that opponents of the current presidential administration are correct in stating that the proposed reforms will reduce the diversity of Immigrants rather than benefit the economy. The results support the theory in showing a lack of meaningful correlation with changes in the legal flow of immigrants and economic growth over the United States' history.
+
+\newpage
+
+`r if(!knitr::is_html_output()){"# Appendix"}`
+
+`r if(!knitr::is_html_output()){"## Table Reference"}`
+
+```{r  cache=F, echo = F, eval=!knitr::is_html_output(), results = 'asis'}
+github <- "https://raw.githubusercontent.com/jzuniga123"
+file <- "/SPS/master/DATA%20698/DATA698_Project.csv"
+data698 <- read.csv(paste0(github, file), header=1)
+data698 <- data698[order(data698$Year, decreasing=T), ]
+```
+
+```{r  cache=F, echo = F, eval=!knitr::is_html_output(), results = 'asis'}
+table_df1 <- na.omit(data.frame(data698[, 4:10], row.names = data698$Year))
+colnames(table_df1) <- gsub('_', ' ', colnames(table_df1))
+kable(table_df1, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Race and Hispanic Origin (1790-2016)") %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header")) 
+```
+
+\newpage
+
+```{r  cache=F, echo = F, eval=!knitr::is_html_output(), results = 'asis'}
+table_df2 <- na.omit(data.frame(data698[, 11:17], row.names = data698$Year))
+colnames(table_df2) <- gsub('_', ' ', colnames(table_df2))
+kable(table_df2, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Native, Foreign-born, and Origin (1790-2016)") %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+\newpage
+
+```{r  cache=T, echo = F, eval=!knitr::is_html_output(), results = 'asis'}
+table_df <- na.omit(data.frame(data698[, 19:25], row.names = data698$Year))
+colnames(table_df) <- gsub('_', ' ', colnames(table_df))
+kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "Visas and Enforcement (1981-2016)") %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+\newpage
+
+```{r  cache=T, echo = F, eval=!knitr::is_html_output(), results = 'asis'}
+table_df1 <- na.omit(data.frame(data698[, 27:34], row.names = data698$Year))
+colnames(table_df1) <- c("AGRI", "MINE", "UTIL", "CONST", "MFG", "WHOLE", "RETAIL", "TRANS")
+kable(table_df1, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "GDP by Sector Part 1 (1987-2016)") %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+\newpage
+
+```{r  cache=F, echo = F, eval=!knitr::is_html_output(), results = 'asis'}
+table_df2 <- na.omit(data.frame(data698[, 35:42], row.names = data698$Year))
+colnames(table_df2) <- c("INFO", "FIRE", "SRVC", "EDU", "ENT", "OTHR", "FED", "STLOC")
+kable(table_df2, longtable = T, booktabs = T, row.names=T, linesep = "",
+  caption = "GDP by Sector Part 2 (1987-2016)") %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
+```
+
+\newpage
+
+`r if(!knitr::is_html_output()){"## Code Listings"}`
+
+```{r, ref.label=knitr::all_labels(), echo=!knitr::is_html_output(), eval=F}
+```
+
+[^1]: https://www.migrationpolicy.org/research/timeline-1790
+[^2]: https://www.archives.gov/files/research/naturalization/420-major-immigration-laws.pdf
+[^3]: https://www.whitehouse.gov/briefings-statements/white-house-framework-immigration-reform-border-security/
+[^4]: https://web.archive.org/web/20180221163615/https://www.uscis.gov/aboutus
+[^5]: https://www.uscis.gov/aboutus
+[^6]: Kaufman, Bruce E., and Julie L. Hotchkiss. The Economics of Labor Markets. Thomson/South-Western, 2006.
+ [^7]: https://www.migrationpolicy.org/ 
+[^8]: https://www.census.gov/newsroom/pdf/cspan_fb_slides.pdf
+[^9]: https://www.archives.gov/publications/prologue/2002/summer/immigration-law-1.html
+[^10]: [https://www.washingtonpost.com/news/wonk/wp/2018/02/06/immigration-plan](https://www.washingtonpost.com/news/wonk/wp/2018/02/06/trump-immigration-plan-could-keep-whites-in-u-s-majority-for-up-to-five-more-years/?utm_term=.2de44787d217)
+[^11]: [https://help.cbp.gov/app/answers/detail/a_id/72](https://help.cbp.gov/app/answers/detail/a_id/72/~/what-is-the-difference-between-an-immigrant-visa-vs.-nonimmigrant-visa-%3F)
+[^12]: https://factfinder.census.gov/faces/nav/jsf/pages/searchresults.xhtml
+[^13]: https://www.census.gov/prod/www/decennial.html
+[^14]: https://www.census.gov/population/www/documentation/twps0076/twps0076.html
+[^15]: https://www.census.gov/prod/cen2000/dp1/2kh00.pdf 
+[^16]: https://www.census.gov/history/pdf/orangenj-92017.pdf 
+[^17]: https://www.census.gov/population/www/documentation/twps0081/twps0081.html 
+[^18]: https://www.census.gov/population/www/documentation/twps0029/tab01.html 
+[^19]: https://www.census.gov/population/www/documentation/twps0029/tab02.html 
+[^20]: http://unstats.un.org/unsd/demographic/products/dyb/dyb2.htm 
+[^21]: http://www.slavevoyages.org/assessment/estimates 
+[^22]: https://nativestudy.wordpress.com/ 
+[^23]: https://github.com/jzuniga123/SPS/blob/master/DATA%20698/US_Census_Data.csv
+[^24]: https://www.uscis.gov/tools/reports-studies/immigration-forms-data 
+[^25]: https://travel.state.gov/content/travel/en/legal/visa-law0/visa-statistics.html 
+[^26]: https://travel.state.gov/content/travel/en/legal/visa-law0/visa-statistics/nonimmigrant-visa-statistics.html
+[^27]: http://www.ustraveldocs.com/in/in-niv-typeall.asp#
+[^28]: https://www.foreignlaborcert.doleta.gov/perm.cfm 
+[^29]: https://www.foreignlaborcert.doleta.gov/performancedata.cfm 
+[^30]: http://www.flcdatacenter.com/
+[^31]: https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/all-visa-categories.html 
+[^32]: https://guides.law.fsu.edu/c.php?g=84898&p=546805 
+[^33]: https://ilw.com/resources/ 
+[^34]: https://www.archives.gov/files/research/naturalization/420-major-immigration-laws.pdf 
+[^35]: https://www.congress.gov/search 
+[^36]: https://github.com/jzuniga123/SPS/blob/master/DATA%20698/ImmigrationLaws_1790to2012.csv 
+[^37]: https://github.com/jzuniga123/SPS/blob/master/DATA%20698/USCIS_2009to2017.csv 
+[^38]: https://www.dhs.gov/immigration-statistics/yearbook
+[^39]: https://www.dhs.gov/immigration-statistics/yearbook/2016/table6 
+[^40]: https://www.dhs.gov/immigration-statistics/yearbook/2016/table25 
+[^41]: https://www.dhs.gov/immigration-statistics/yearbook/2016/table33 
+[^42]: https://www.dhs.gov/immigration-statistics/yearbook/2016/table39 
+[^43]: https://github.com/jzuniga123/SPS/blob/master/DATA%20698/DHS_1820to2016.csv 
+[^44]: https://www.bea.gov/iTable/iTable.cfm?ReqID=51&step=1#reqid=51&step=2&isuri=1 
+[^45]: https://github.com/jzuniga123/SPS/blob/master/DATA%20698/GDPbyIndustry_1987to2016.csv  
+[^46]: https://github.com/jzuniga123/SPS/blob/master/DATA%20698/DATA698_Project.csv 
+[^47]: http://mathworld.wolfram.com/CorrelationCoefficient.html 
+[^48]: http://mathworld.wolfram.com/SpearmanRankCorrelationCoefficient.html 
+[^49]: https://onlinecourses.science.psu.edu/stat509/node/158 
+[^50]: http://mathworld.wolfram.com/Interpolation.html
+[^51]: http://www.hbs.edu/faculty/Publication%20Files/self-serving+justifications_132c2494-d4a5-4292-94ee-26249cb46b6e.pdf
