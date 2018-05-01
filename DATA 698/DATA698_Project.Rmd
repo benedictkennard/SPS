@@ -4,16 +4,17 @@ subtitle: "A Longitudinal Study of the Relationship of Immigration Laws with Cha
 author: "Jose Zuniga"
 date: "`r format(Sys.Date(), format='%B %d, %Y')`"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: 3
-  word_document:
-    toc: yes
-    toc_depth: 2
   html_document:
+    code_folding: hide
     df_print: paged
     toc: yes
     toc_depth: 2
+  word_document:
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    toc: yes
+    toc_depth: 3
   fontfamily: tnr
   fontsize: 12pt
   geometry: margin=1in
@@ -125,9 +126,8 @@ The dataset compiled from all these Census data is quite impressive, but it is n
   2.  "The attempt to enumerate all American Indians started in 1890" with earlier estimates being inaccurate because "American Indians not taxed (i.e., living in tribal society) were not included in the enumeration."
   3.  The 1940 Hispanic population figure only included the "White population of Spanish mother tongue".
   4.  In 1940 and 1950, there is Foreign-born data missing "because data on the Foreign-born population by country of birth in census publications for these years are limited almost entirely to the White population." 
-  5.  The Census data obtained is decennial from 1790 to 2010 and then annual until 2016. All other non-Census data is annual and complete from 1987 until 2016. 
 
-To address the discrepancy caused by (1), the number of slaves disembarking in the United States[^21] is used as a proxy for Foreign-born Africans entering the United States from 1790 to 1880. To address (2), the Native-American population figures are backfilled using the percent change[^22] of the Native-American population starting from the earliest period without discrepancies which is 1890. Native born and total population figures are also adjusted to reflect the revised Native-American population figures. To address (3), the value was removed since it was not representative of all Hispanics. Then, to complete the dataset, imputation is used. The missing data outlined in (4) for the Foreign-born in 1940 and 1950 is filled in using linear interpolation between 1930 and 1960. To conduct a proper analysis of the past 30 years, the missing data outlined in (5) is also filled in using linear interpolation between periods that there are data points present.
+To address the discrepancy caused by (1), the number of slaves disembarking in the United States[^21] is used as a proxy for Foreign-born Africans entering the United States from 1790 to 1880. To address (2), the Native-American population figures are backfilled using the percent change[^22] of the Native-American population starting from the earliest period without discrepancies which is 1890. Native born and total population figures are also adjusted to reflect the revised Native-American population figures. To address (3), the value was removed since it was not representative of all Hispanics. Then, to complete the dataset, imputation is used. The missing data outlined in (4) for the Foreign-born in 1940 and 1950 is filled in using linear interpolation between 1930 and 1960. Linear interpolation is also used to fill in missing annual Census data. This is because the Census data obtained is decennial from 1790 to 2010 and then annual until 2016 while all the other non-Census data are annual. 
 
 $$y=y_{ 1 }+\left( x-x_{ 1 } \right) \left( \frac { y_{ 2 }-y_{ 1 } }{ x_{ 2 }-x_{ 1 } }  \right)$$
 
@@ -579,7 +579,7 @@ table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Laws with Race and Hispanic Origin") %>%
+  align="c", caption = "Laws with Race and Hispanic Origin") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -596,7 +596,7 @@ table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Laws with Native and Foreign-born") %>%
+  align="c", caption = "Laws with Native and Foreign-born") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -613,7 +613,7 @@ table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Laws with Foreign-born Country of Origin") %>%
+  align="c", caption = "Laws with Foreign-born Country of Origin") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -632,7 +632,7 @@ table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Laws with Immigration Visas") %>%
+  align="c", caption = "Laws with Immigration Visas") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -649,7 +649,7 @@ table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Laws with Immigration Enforcement Actions") %>%
+  align="c", caption = "Laws with Immigration Enforcement Actions") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -666,7 +666,7 @@ table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Laws with the Economy") %>%
+  align="c", caption = "Laws with the Economy") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -685,7 +685,7 @@ table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Economy with Race and Hispanic Origin") %>%
+  align="c", caption = "Economy with Race and Hispanic Origin") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -702,7 +702,7 @@ table_df <- matrix(paste(format(round(r, 2), nsmall = 2), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Economy with Native and Foreign-born") %>%
+  align="c", caption = "Economy with Native and Foreign-born") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -719,7 +719,7 @@ table_df <- matrix(paste(format(round(r, 2), nsmall = 2), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Economy with Foreign-born Country of Origin") %>%
+  align="c", caption = "Economy with Foreign-born Country of Origin") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -736,7 +736,7 @@ table_df <- matrix(paste(format(round(r, 2), nsmall = 2), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Economy with Immigration Visas") %>%
+  align="c", caption = "Economy with Immigration Visas") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -753,7 +753,7 @@ table_df <- matrix(paste(format(round(r, 2), nsmall = 2), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Economy with Immigration Enforcement") %>%
+  align="c", caption = "Economy with Immigration Enforcement") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -785,7 +785,7 @@ rownames(Arima_Orders) <- gsub('_', ' ', colnames(Correlated))
 ```
 ```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output(), results = 'asis'}
 kable(Arima_Orders, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Time Series ARIMA Modeling") %>%
+  align="c", caption = "Time Series ARIMA Modeling") %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
 
@@ -810,7 +810,7 @@ rownames(Causality) <- gsub('_', ' ', colnames(Correlated[,-1]))
 ```
 ```{r cache=F, echo=knitr::is_html_output(), eval=T, results = 'asis'}
 kable(Causality, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Legislation-Demographic Causality Test") %>%
+  align="c", caption = "Legislation-Demographic Causality Test") %>%
   add_header_above(c(" ", "Granger Causality Statistic, Significant" = ncol(Causality))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -857,11 +857,17 @@ tune01 <- train(x = lag(X_train, k=1), y = Y_train,
   preProcess = c("BoxCox","center","scale","knnImpute"),
   method = "rlm", trControl = ctrl)
 ```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+plot(tune01, main=tune01$modelInfo$label)
+```
 ```{r cache=T, echo=knitr::is_html_output()}
 set.seed(698)
 tune02 <- train(x = lag(X_train, k=1), y = Y_train,
   preProcess = c("BoxCox","center","scale","knnImpute"),
   method = "pcr", trControl = ctrl, tuneLength = 25)
+```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+plot(tune02, main=tune02$modelInfo$label)
 ```
 ```{r cache=T, echo=knitr::is_html_output()}
 set.seed(698)
@@ -869,12 +875,18 @@ tune03 <- train(x = lag(X_train, k=1), y = Y_train,
   preProcess = c("BoxCox","center","scale","knnImpute"),
   method = "pls", trControl = ctrl, tuneLength = 25)
 ```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+plot(tune03, main=tune03$modelInfo$label)
+```
 ```{r cache=T, echo=knitr::is_html_output()}
 set.seed(698)
 tg <- expand.grid(lambda = c(0, 0.05, .1), fraction = seq(0.05, 1, length = 25))
 tune04 <- train(x = lag(X_train, k=1), y = Y_train, 
   preProcess = c("BoxCox","center","scale","knnImpute"),
   method = "enet", trControl = ctrl, tuneGrid = tg)
+```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+plot(tune04, main=tune04$modelInfo$label)
 ```
 
 `r if(knitr::is_html_output()){"### Nonlinear Regression Models"}`
@@ -887,12 +899,18 @@ tune05 <- train(x = lag(X_train, k=1), y = Y_train,
   preProcess = c("BoxCox","center","scale","knnImpute"),
   trace = F, MaxNWts = 10 * (ncol(X_train) + 1) + 10 + 1, maxit = 500)
 ```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+plot(tune05, main=tune05$modelInfo$label)
+```
 ```{r cache=T, echo=knitr::is_html_output()}
 set.seed(698)
 tg <- expand.grid(degree = c(1:2), nprune = c(2:10))
 tune06 <- train(x = lag(X_train, k=1), y = Y_train,
   preProcess = c("BoxCox","center","scale","knnImpute"),              
   method = "earth", tuneGrid = tg, trControl = ctrl)
+```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+plot(tune06, main=tune06$modelInfo$label)
 ```
 ```{r cache=T, echo=knitr::is_html_output()}
 set.seed(698)
@@ -901,12 +919,18 @@ tune07 <- train(x = lag(X_train, k=1), y = Y_train,
   preProcess = c("BoxCox","center","scale","knnImpute"),
   method = "svmPoly",  tuneGrid = tg,  trControl = ctrl)
 ```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+plot(tune07, main=tune07$modelInfo$label)
+```
 ```{r cache=T, echo=knitr::is_html_output()}
 set.seed(698)
 tg <- data.frame(.k = 1:20)
 tune08 <- train(x = lag(X_train, k=1), y = Y_train,
   preProcess = c("BoxCox","center","scale","knnImpute"),
   method = "knn", tuneGrid = tg, trControl = trainControl(method = "cv"))
+```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+plot(tune08, main=tune08$modelInfo$label)
 ```
 
 `r if(knitr::is_html_output()){"### Tree-based Regression Models"}`
@@ -918,6 +942,9 @@ tune09 <- train(x = lag(X_train, k=1), y = Y_train,
   preProcess = c("BoxCox","center","scale","knnImpute"),
   method = "rpart2", tuneGrid = tg, trControl = ctrl)
 ```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+plot(tune09, main=tune09$modelInfo$label)
+```
 ```{r cache=T, echo=knitr::is_html_output()}
 set.seed(698)
 P <- ncol(X_train) 
@@ -925,6 +952,9 @@ tg <- expand.grid(mtry=seq(2, P, by = floor(P/5)))
 tune10 <- train(x = lag(X_train, k=1), y = Y_train,
   preProcess = c("BoxCox","center","scale","knnImpute"),
   method = "rf", tuneGrid = tg, trControl = ctrl)
+```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+plot(tune10, main=tune10$modelInfo$label)
 ```
 ```{r cache=T, echo=knitr::is_html_output()}
 set.seed(698)
@@ -934,12 +964,18 @@ tune11 <- train(x = lag(X_train, k=1), y = Y_train,
   preProcess = c("BoxCox","center","scale","knnImpute"),
   method = "gbm", tuneGrid = tg, trControl = ctrl, verbose=F)
 ```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+plot(tune11, main=tune11$modelInfo$label)
+```
 ```{r cache=T, echo=knitr::is_html_output()}
 set.seed(698)
 tg <- expand.grid(committees = c(1,5,10,20,50,100), neighbors = c(0,1,3,5,7))
 tune12 <- train(x = lag(X_train, k=1), y = Y_train,
   preProcess = c("BoxCox","center","scale","knnImpute"),
   method = "cubist", tuneGrid = tg, trControl = ctrl)
+```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+plot(tune12, main=tune12$modelInfo$label)
 ```
 
 All the models perform almost equivalently on these data. As a matter of fact, the optimal RMSE, $R^2$, and MAE training set resampling performance metrics are associated with different models depending on the random seed. The need to validate training set resampling results--which are highly optimistic as a result of the repeated sampling-- with a test set is highlighted by cases such as this where the resampling performance metrics are nearly identical. In this run the respectively optimal linear, nonlinear, and tree-based models based on the RMSE of the training set resampling are the Partial Least Squares (PLS), $K$-Nearest Neighbors (KNN), and Stochastic Gradient Boosting (SGB) models. These training set resampling rankings hold for the PLS and KNN models after running the test set validation. Since the model performance is essentially equivalent and the goal of this modeling process is explanation of relationships between variables rather than prediction, the non-covariance based KNN model which cannot be cleanly summarized will not be used.[^54] The focus will be on covariance based linear models.
@@ -995,28 +1031,18 @@ LawsEffect <- data.frame(LagFwd, demographics)
 colnames(LawsEffect) <- c("LawsFuture", colnames(demographics))
 LawsCause <- data.frame(LagBwd, demographics)
 colnames(LawsCause) <- c("LawsPast", colnames(demographics))
-fit1 <- plsr(LawsFuture ~ ., data = LawsEffect, ncomp = 2, validation = "CV", jackknife = T)
-ctrl <- lmRob.control(weight=c("Bisquare","Bisquare"))
-fit2 <- lmRob(Hispanic ~ LawsPast, data = LawsCause, control=ctrl)
-fit3 <- lmRob(Native_Born ~ LawsPast, data = LawsCause, control=ctrl)
-fit4 <- lmRob(Africa ~ LawsPast, data = LawsCause, control=ctrl)
-fit5 <- lmRob(Latin_Am ~ LawsPast, data = LawsCause, control=ctrl)
-```
-```{r cache=F, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
-summary(fit2)
-shapiro.test(fit2$residuals)
-summary(fit3)
-shapiro.test(fit3$residuals)
-summary(fit4)
-shapiro.test(fit4$residuals)
-summary(fit5)
-shapiro.test(fit5$residuals)
 ```
 
 ### Partial Least Squares (PLS)
 
 The first model attempts to explain the number of laws that will be passed one year in the future based on changes to multiple demographic factors. There exists a very high level of multicollinearity in these demographic factors however. In fact, attempting to remove highly correlated predictors removes nine of the twelve variables leaving only foreign-born from Africa, Native-Americans, and Whites. These were the three variables with very unusual distributions due to slavery, genocide, and admissions being based on race until around 1950. Using a PLS model--which is essentially supervised Principal Component Analysis-- is a regression technique that works well when a high level of multicollinearity is present. Applying the PLS model with two components (determined by the tuning process) to Box-Cox transformations of these data and examining the residuals for normality with a Shapiro-Wilks test suggests that the PLS model provides an appropriate fit for these data at $\alpha=0.05$. Examining legislation as a consequence where the cause is demographic factor changes and the effect is the number of laws enacted one year later, the PLS model suggests that the variation in the number of immigration laws enacted is explained in varying amounts by changes in each of the demographic factors. It is important to note that the PLS coefficients reflect the amount of change explained by the demographic factor and not the direction of the change. All of these jackknife variance estimates are statistically significant at $\alpha=0.05$. 
 
+```{r cache=T, echo=knitr::is_html_output(), eval=T}
+fit1 <- plsr(LawsFuture ~ ., data = LawsEffect, ncomp = 2, validation = "CV", jackknife = T)
+```
+```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+shapiro.test(fit1$residuals)
+```
 ```{r cache=F, echo=knitr::is_html_output(), eval=T, results = 'asis'}
 jack <- jack.test(fit1, ncomp = fit1$ncomp, use.mean = T)
 model <- data.frame(jack[c(1:3,5)])
@@ -1033,13 +1059,26 @@ kable(model, longtable = T, booktabs = T, row.names=T, linesep = "",
 
 The remaining four models attempt to explain changes to four demographic factors based on the number of laws that were passed one year prior. Addressing multicollinearity is unnecessary for these small models with one $X$ variable. There are irregulates in some of the distributions however which suggest the need for a robust method, hence a Robust Linear Model (RLM). Applying the RLM model with bisquare weights and an intercept (determined by the tuning process) to Box-Cox transformations of these data and examining the residuals for normality with a Shapiro-Wilks test suggests that the RLM model provides an appropriate fit for most of these data at $\alpha=0.05$. The exception is the model for foreign-born from Africa which has a Shapiro-Wilks $p$-value of $0.06$ and an unusual distribution due to the period of slavery. Post-slavery the distribution of the transformed Africa variable is more linear and therefore more suited for an RLM model. Examining legislation as an antecedent where the effect is demographic factor changes and the cause is the number of laws enacted one year prior, the RLM suggests that as the number of immigration laws enacted increases, specific demographic elements change such as the number of Native Born $\uparrow$, Hispanics $\uparrow$, and foreign-born from specific countries of origin (Africa $\uparrow$, Latin America $\uparrow$). These relationships are statistically significant at $\alpha=0.05$.
 
-```{r cache=F, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
-par(mfrow=c(2,2))
-plot(LawsCause$Hispanic, type="l")
-plot(LawsCause$Native_Born, type="l")
-plot(LawsCause$Africa, type="l")
-plot(LawsCause$Latin_Am, type="l")
+```{r cache=T, echo=knitr::is_html_output(), eval=T, results = 'hide'}
+ctrl <- lmRob.control(weight=c("Bisquare","Bisquare"))
+fit2 <- lmRob(Hispanic ~ LawsPast, data = LawsCause, control=ctrl)
+fit3 <- lmRob(Native_Born ~ LawsPast, data = LawsCause, control=ctrl)
+fit4 <- lmRob(Africa ~ LawsPast, data = LawsCause, control=ctrl)
+fit5 <- lmRob(Latin_Am ~ LawsPast, data = LawsCause, control=ctrl)
 ```
+```{r cache=F, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
+par(mfrow=c(2, 2), mar = c(0, 0.5, 2, 0), oma = c(0.5, 0.5, 2, 0.5))
+plot(LawsCause$Hispanic, type="l", xaxt = "n", yaxt = "n", main="Hispanic")
+plot(LawsCause$Native_Born, type="l", xaxt = "n", yaxt = "n", main="Native Born")
+plot(LawsCause$Africa, type="l", xaxt = "n", yaxt = "n", main="Africa")
+plot(LawsCause$Latin_Am, type="l", xaxt = "n", yaxt = "n", main="Latin America")
+title("Box-Cox Transformations", outer=TRUE)
+shapiro.test(fit2$residuals)
+shapiro.test(fit3$residuals)
+shapiro.test(fit4$residuals)
+shapiro.test(fit5$residuals)
+```
+
 ```{r cache=F, echo=knitr::is_html_output(), eval=T, results = 'asis'}
 models <- rbind(Hispanic=summary(fit2)$coefficients[-1,], 
   Native_Born=summary(fit3)$coefficients[-1,], 
@@ -1344,7 +1383,7 @@ table_df <- matrix(paste(format(round(r, 3), nsmall = 3), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Economy with Race and Hispanic Origin") %>%
+  align="c", caption = "Economy with Race and Hispanic Origin") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -1358,7 +1397,7 @@ table_df <- matrix(paste(format(round(r, 2), nsmall = 2), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Economy with Native and Foreign-born") %>%
+  align="c", caption = "Economy with Native and Foreign-born") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -1375,7 +1414,7 @@ table_df <- matrix(paste(format(round(r, 2), nsmall = 2), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Economy with Foreign-born Country of Origin") %>%
+  align="c", caption = "Economy with Foreign-born Country of Origin") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -1389,7 +1428,7 @@ table_df <- matrix(paste(format(round(r, 2), nsmall = 2), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Economy with Immigration Visas") %>%
+  align="c", caption = "Economy with Immigration Visas") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
@@ -1406,13 +1445,13 @@ table_df <- matrix(paste(format(round(r, 2), nsmall = 2), ifelse(p, "Yes", "No")
 colnames(table_df) <- gsub('_', ' ', colnames(table_df))
 rownames(table_df) <- gsub('_', ' ', rownames(table_df))
 kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Economy with Immigration Enforcement") %>%
+  align="c", caption = "Economy with Immigration Enforcement") %>%
   add_header_above(c(" ", "Correlation, Significant" = ncol(table_df))) %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
 kable(Arima_Orders, longtable = T, booktabs = T, row.names=T, linesep = "",
-  caption = "Time Series ARIMA Modeling") %>%
+  align="c", caption = "Time Series ARIMA Modeling") %>%
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
 
@@ -1457,86 +1496,62 @@ bwplot(resamples(fits))
 
 \newpage
 
-`r if(!knitr::is_html_output()){tune01$modelInfo$label}`
-
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-plot(tune01)
+plot(tune01, main=tune01$modelInfo$label)
 ```
 
-`r if(!knitr::is_html_output()){tune02$modelInfo$label}`
-
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-plot(tune02)
+plot(tune02, main=tune02$modelInfo$label)
 ```
 
 \newpage
 
-`r if(!knitr::is_html_output()){tune03$modelInfo$label}`
-
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-plot(tune03)
+plot(tune03, main=tune03$modelInfo$label)
 ```
 
-`r if(!knitr::is_html_output()){tune04$modelInfo$label}`
-
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-plot(tune04)
+plot(tune04, main=tune04$modelInfo$label)
 ```
 
 \newpage
 
-`r if(!knitr::is_html_output()){tune05$modelInfo$label}`
-
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-plot(tune05)
+plot(tune05, main=tune05$modelInfo$label)
 ```
 
-`r if(!knitr::is_html_output()){tune06$modelInfo$label}`
-
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-plot(tune06)
+plot(tune06, main=tune06$modelInfo$label)
 ```
 
 \newpage
 
-`r if(!knitr::is_html_output()){tune07$modelInfo$label}`
-
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-plot(tune07)
+plot(tune07, main=tune07$modelInfo$label)
 ```
 
-`r if(!knitr::is_html_output()){tune08$modelInfo$label}`
-
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-plot(tune08)
+plot(tune08, main=tune08$modelInfo$label)
 ```
 
 \newpage
 
-`r if(!knitr::is_html_output()){tune09$modelInfo$label}`
-
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-plot(tune09)
+plot(tune09, main=tune09$modelInfo$label)
 ```
 
-`r if(!knitr::is_html_output()){tune10$modelInfo$label}`
-
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-plot(tune10)
+plot(tune10, main=tune10$modelInfo$label)
 ```
 
 \newpage
 
-`r if(!knitr::is_html_output()){tune11$modelInfo$label}`
-
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-plot(tune11)
+plot(tune11, main=tune11$modelInfo$label)
 ```
 
-`r if(!knitr::is_html_output()){tune12$modelInfo$label}`
-
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-plot(tune12)
+plot(tune12, main=tune12$modelInfo$label)
 ```
 
 \newpage
@@ -1551,11 +1566,12 @@ shapiro.test(fit1$residuals)
 `r if(!knitr::is_html_output()){"Box-Cox Transformations"}`
 
 ```{r  cache=T, echo = F, eval=!knitr::is_html_output()}
-par(mfrow=c(2,2))
-plot(LawsCause$Hispanic, type="l")
-plot(LawsCause$Native_Born, type="l")
-plot(LawsCause$Africa, type="l")
-plot(LawsCause$Latin_Am, type="l")
+par(mfrow=c(2, 2), mar = c(0, 0.5, 2, 0), oma = c(0.5, 0.5, 2, 0.5))
+plot(LawsCause$Hispanic, type="l", xaxt = "n", yaxt = "n", main="Hispanic")
+plot(LawsCause$Native_Born, type="l", xaxt = "n", yaxt = "n", main="Native Born")
+plot(LawsCause$Africa, type="l", xaxt = "n", yaxt = "n", main="Africa")
+plot(LawsCause$Latin_Am, type="l", xaxt = "n", yaxt = "n", main="Latin America")
+title("Box-Cox Transformations", outer=TRUE)
 ```
 
 `r if(!knitr::is_html_output()){"Robust Linear Regressions"}`
@@ -1570,9 +1586,6 @@ shapiro.test(fit4$residuals)
 summary(fit5)
 shapiro.test(fit5$residuals)
 ```
-
-\newpage
-
 
 \newpage
 
