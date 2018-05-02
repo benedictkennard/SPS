@@ -496,7 +496,7 @@ ggplot(plot_df, aes(x=Year, y=Actions, fill= Method)) + geom_area() +
 Economy <- data698[, 26:41]
 ```
 
-GDP by industry over the past 30 years has the same homoskedastic upward trend for nearly every industry. The exceptions are Agriculture Mining, Utilities and Construction which appear to be more susceptible to business cycles due to their heteroskedasticity. The homoscedastic upward trend dominates aggregated income with the exception of the period encompassing the Great Recession.
+GDP by industry over the past 30 years has the same mostly homoskedastic upward trend for nearly every industry. The exceptions are Agriculture, Mining, Utilities, and Construction which appear to be more susceptible to business cycles due to their heteroskedasticity. The homoscedastic upward trend dominates aggregated income with the exception of the period encompassing the Great Recession.
 
 ```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
 Economy_Window <- window(Economy, start = 1987)
@@ -514,7 +514,7 @@ ggplot(plot_df, aes(x=Year, y=Income, fill= Sector)) + geom_area() +
   scale_fill_grey(start = 0.2, end = 0.8)
 ```
 
-When examining the industries in aggregate as a proportion of the economy, their shares fluctuate slightly but remain relatively constant over the last 30 years. Proportionally, the bulk of GDP by order of share is maintained by the Manufacturing, FIRE (Finance, Insurance, and Real Estate), Service, and Education sectors. Over time there has been a slight decrease in the proportion of the economy captured by the Manufacturing sector and slight increases in the FIRE and Service sectors.
+When examining the industries as a proportion of the economy, their individual shares do fluctuate slightly but in aggregate their relative shares remain mostly constant over the last 30 years. Proportionally, the bulk of GDP by order of share is maintained by the Manufacturing, FIRE (Finance, Insurance, and Real Estate), Service, and Education sectors. Over time there has been a slight decrease in the proportion of the economy captured by the Manufacturing sector and slight increases in the FIRE and Service sectors.
 
 ```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
 GDP <- rowSums(Economy_Window)
@@ -548,10 +548,6 @@ $$\rho = \frac{\sum(x' - m_{x'})(y'_i - m_{y'})}{\sqrt{\sum(x' - m_{x'})^2 \sum(
 
 $$\tau = \frac{n_c - n_d}{\frac{1}{2}n(n-1)} `r ifelse((knitr::opts_knit$get('rmarkdown.pandoc.to') == 'docx'), '\\quad\\textrm', '\\tag')`{Kendall}$$
 
-The Census data obtained is decennial from 1790 to 2010 and then annual until 2016. All other non-Census data is annual and complete from 1987 until 2016. To conduct a proper analysis of the past 30 years, imputation is required on the Census data for missing periods. This is done with linear interpolation[^50] between periods that there are data points present. Linear interpolation makes no assumption on distribution. It draws a straight line between two known points and returns a value along that line for a given point in the domain.
-
-$$y=y_{ 1 }+\left( x-x_{ 1 } \right) \left( \frac { y_{ 2 }-y_{ 1 } }{ x_{ 2 }-x_{ 1 } }  \right)$$
-
 ### Bidirectional Impact of Policy Lag
 
 There is a lag between the enactment of a law and its full implementation. Changes in laws necessitate the adjustment of institutional processes which are mired by the rules and procedures guiding the bureaucracies implementing the laws. It is worth noting that bureaucracies have been maligned with the negative connation behind red tape, but the bureaucratic adherence to rules is a feature--and not a bug-- that hedges against chaos. The point is that there is no value judgment being made here. It is simply true that Immigration applications are processed on an ongoing basis while laws change and agencies readjust. Applications in progress must be managed around changing immigration laws. When looking at the relationship between legislation and other variables, it is therefore important to also look at the lagged relationships; and not just in one direction. When laws are reactive rather than proactive, there is also a lag between the motivation for a law and its enactment.
@@ -568,7 +564,7 @@ Legislation <- na.approx(window(cbind(
 
 ### Legislation and Demographic Factors
 
-First the Kendall correlation between the number of new, one- and two-year old, and one- and two-year out immigration laws and demographic factors is examined. When it comes to population based on Race and Hispanic Origin, legislation has positive correlations between $\tau=0.49$ and $\tau=0.56$ for Hispanic origin and nearly every race. The strongest correlations are with the number of laws passed one year in the future. The exception to this pattern is Native-American population which has a positive correlation that hovers around $\tau=0.25$ which is holds the strongest relationship with laws passed two years in the future. All of these correlations are significant at $\alpha=0.05$. Increases in racial and ethnic subsections of the population are associated with future increases in the number of immigration laws. The strongest correlations are with Other Races then Asian and Pacific Islanders.
+First the Kendall correlation between the number of new, one- and two-year old, and one- and two-year out immigration laws and demographic factors is examined. When it comes to population based on Race and Hispanic Origin, legislation has positive correlations between $\tau=0.49$ and $\tau=0.56$ for Hispanic origin and nearly every race. The strongest of these correlations are with the number of laws passed one year in the future. The exception to this pattern is Native-American population which has positive correlations that hover around $\tau=0.25$, the strongest of which is with laws passed two years in the future. All of these correlations are significant at $\alpha=0.05$. Increases in racial and ethnic subsections of the population are associated with future increases in the number of immigration laws. The strongest correlations are with Other Races then Asian and Pacific Islanders.
 
 ```{r cache=T, echo=knitr::is_html_output()}
 r <- corr.test(na.approx(RAHO), Legislation, use="complete.obs", method="kendall")$r
@@ -585,7 +581,7 @@ kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
 
-For the Native and Foreign-born population, the correlations with the number of immigration laws passed are also moderate and statistically significant at $\alpha=0.05$. Natives have positive correlations that hoover around $\tau=0.5$. Foreign-born have positive correlations that hoover around $\tau=0.43$. The strongest correlations are with the number of laws passed one year in the future. Increases in the native and foreign-born subsections of the population are associated with future increases in the number of immigration laws.
+For the Native and Foreign-born population, the correlations with the number of immigration laws passed are also moderate and statistically significant at $\alpha=0.05$. Natives have positive correlations that hoover around $\tau=0.5$. Foreign-born have positive correlations that hoover around $\tau=0.43$. The strongest of these correlations are with the number of laws passed one year in the future. Increases in the native and foreign-born subsections of the population are associated with future increases in the number of immigration laws.
 
 ```{r cache=T, echo=knitr::is_html_output()}
 r <- corr.test(na.approx(NAFB), Legislation, use="complete.obs", method="kendall")$r
@@ -602,7 +598,7 @@ kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
 
-The correlations with the number of immigration laws passed and Foreign-born Country of Origin are higher for Asia, Oceania, and Latin America which have correlations between $\tau=0.49$ and $\tau=0.51$. The strongest correlations are with the number of laws passed one year in the future. The correlations for Africa are around $\tau=0.38$ and exhibit the strongest relationship with laws passed two years in the future. The correlations of Europe and North America with immigration laws are between $\tau=0.18$ and $\tau=0.27$ with the lower correlations being with Europe. The strongest of these correlations are associated with the number of laws passed two years earlier. All of these correlations are significant at $\alpha=0.05$. Increases in the foreign-born population from Asia, Oceania, Latin America, and Africa are associated with future increases in the number of immigration laws. The number of immigration laws passed is associated with future increases in the foreign-born population from Europe and North America.
+The correlations with the number of immigration laws passed and Foreign-born Country of Origin are higher for Asia, Oceania, and Latin America which have correlations between $\tau=0.49$ and $\tau=0.51$. The strongest of these correlations are with the number of laws passed one year in the future. The correlations for Africa are around $\tau=0.38$ and exhibit the strongest relationship with laws passed one year in the future. The same pattern holds for all these demographic factors and laws passed one year prior. The correlations of Europe and North America with immigration laws are between $\tau=0.18$ and $\tau=0.27$ with Europe on the lower end. The strongest of these correlations are associated with the number of laws passed two years earlier. The same pattern holds for these two demographic factors and laws passed two years prior. All of these correlations are significant at $\alpha=0.05$. Increases in the foreign-born population from various regions are associated with future increases in the number of immigration laws; and the number of immigration laws passed is associated with future increases in the foreign-born population from various regions. There exists a bidirectional relationship between immigration laws and demographics.
 
 ```{r cache=T, echo=knitr::is_html_output()}
 r <- corr.test(na.approx(FBCO), Legislation, use="complete.obs", method="kendall")$r
@@ -621,7 +617,7 @@ kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
 
 ### Legislation and Economic Factors
 
-The Kendall correlation between the number of new, one-year old, two-year old, and three-year old immigration laws and economic factors is examined next. The correlations are higher for employment related Visas than they are for non-employment related Visas. Although the correlations are larger, they are not very high. The correlations for employment related Visas are between $\tau=0.16$ and $\tau=0.315$, the largest correlations found two years after immigration laws are passed. Yet none of these correlations are significant at $\alpha=0.05$.
+The Kendall correlation between the number of new, one-year old, two-year old, and three-year old immigration laws and economic factors is examined next. The correlations are higher for employment related Visas than they are for non-employment related Visas. Although these correlations are larger, they are not very high. The correlations for employment related Visas are between $\tau=0.16$ and $\tau=0.315$, the largest correlations found two years after immigration laws are passed. Yet none of these correlations are significant at $\alpha=0.05$.
 
 ```{r cache=T, echo=knitr::is_html_output()}
 r <- corr.test(Visas, Legislation, use="complete.obs", method="kendall")$r
@@ -638,7 +634,7 @@ kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
 
-Enforcement actions have low correlations with the number of immigration laws passed. The correlations are fairly constant across lags ranging between $\tau=0.19$ and $\tau=0.24$. None of these correlations are significant at $\alpha=0.05$.
+Enforcement actions have low correlations with the number of immigration laws passed. The correlations are fairly constant across lags ranging between $\tau=0.167$ and $\tau=0.238$. None of these correlations are significant at $\alpha=0.05$.
 
 ```{r cache=T, echo=knitr::is_html_output()}
 r <- corr.test(Enforce, Legislation, use="complete.obs", method="kendall")$r
@@ -655,7 +651,7 @@ kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
 
-The largest correlations with the number of immigration laws passed and GDP by Industry can be found after three years after immigration laws are passed. Just like with Visas however, although these correlations are larger, they are not very high. Excluding the highest and lowest correlations, these correlations range between $\tau=0.25$ and $\tau=0.39$ and none significant at $\alpha=0.05$.
+The largest absolute correlations with the number of immigration laws passed and GDP by Industry can be found two years after immigration laws are passed. Just like with Visas however, although these correlations are larger, they are not very high. The correlations between immigration laws and GDP by Industry range between $\tau=|0.02|$ and $\tau=|0.305|$; and none significant at $\alpha=0.05$.
 
 ```{r cache=T, echo=knitr::is_html_output()}
 r <- corr.test(Economy, Legislation, use="complete.obs", method="kendall")$r
@@ -674,7 +670,7 @@ kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
 
 ### Demographic and Economic Factors
 
-As previously mentioned, Kendall correlations between the economy and the number of immigration laws passed are statistically insignificant. This is not true for Kendall correlations between industries in the economy and many other factors. Correlations between industries and Race and Hispanic Origin and are high and statistically significant at $\alpha=0.05$ for every demographic segment. Income for every industry increases with increases in racial and ethnic subsections of the population.
+As previously mentioned, Kendall correlations between the economy and the number of immigration laws passed are statistically insignificant. This is not true for Kendall correlations between industries in the economy and many other factors. Correlations between industries in the economy, every race, and Hispanic origin are all high and statistically significant at $\alpha=0.05$. Income for every industry increases with increases these racial and ethnic subsections of the population.
 
 ```{r cache=T, echo=knitr::is_html_output()}
 r <- round(corr.test(Economy, na.approx(RAHO), use="complete.obs", method="kendall")$r, 5)
@@ -708,7 +704,7 @@ kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
 
-Country of origin does not show the same overarching relationship with the economy however. At an $\alpha=0.05$ Asia, Africa, Oceania, and Latin America have high and statistically significant correlations with every industry, but Europe and North America have all statistically insignificant correlations. Income for every industry increases with increases in immigration from Asia, Africa, Oceania, and Latin America.
+Country of origin does not show the same homogeneity in statistical significance with every sector the economy like other demographic factors however. At an $\alpha=0.05$ Asia, Africa, Oceania, and Latin America each have high and statistically significant correlations with every industry, but Europe and North America both have statistically insignificant correlations with every industry. Income for every industry increases with increases in the foreign-born population from Asia, Africa, Oceania, and Latin America.
 
 ```{r cache=T, echo=knitr::is_html_output()}
 r <- round(corr.test(Economy, na.approx(FBCO), use="complete.obs", method="kendall")$r, 5)
@@ -742,7 +738,7 @@ kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
 
-Enforcement actions also have mixed results. Apprehensions and Returns have statistically insignificant correlations with every industry in the economy, but Removals have statistically significant positive correlations with every industry in the economy at $\alpha=0.05$. Income for Utilities for every industry increases with increases in Removals. As stated earlier, Removals are compulsory actions based on a court order and Returns represent immigrants stopped (without a court order) from entering at the borders.
+Enforcement actions also have mixed results. Apprehensions and Returns have statistically insignificant correlations with every industry in the economy, but Removals have strong statistically significant positive correlations with every industry in the economy at $\alpha=0.05$. Income for every industry increases with increases in Removals. As stated earlier, Removals are compulsory actions based on a court order and Returns represent immigrants stopped (without a court order) from entering at the borders.
 
 ```{r cache=T, echo=knitr::is_html_output()}
 r <- corr.test(Economy, Enforce, use="complete.obs", method="kendall")$r
@@ -759,13 +755,13 @@ kable(table_df, longtable = T, booktabs = T, row.names=T, linesep = "",
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
 
-The largest statistically significant correlations are found between the two years after immigration laws are passed and demographics factors. The difference between two-year lagged legislation and new legislation is not very large however, $\tau\pm`r round(mean(0.4919099-0.4771932, 0.4854846-0.4739250, 0.4045040-0.3973628),3)`$ to be exact. 
+The largest statistically significant correlations are between demographics factors and the number of immigration laws passed one year later. The difference between all the lagged correlations is not very large however, it averages around $\tau \pm 0.02$.
 
 ## Causality Analysis
 
-$$Y_{ t }=\left( a_{ 0 }+a_{ 1 }Y_{ t-1 }+\cdots +a_{ p }Y_{ t-p } \right) +\left( b_{ 1 }X_{ t-1 }+\cdots +b_{ p }X_{ t-p } \right) +u_{ t } `r ifelse((knitr::opts_knit$get('rmarkdown.pandoc.to') == 'docx'), '\\quad\\textrm', '\\tag')`{Equation 1}$$$$X_{ t }=\left( c_{ 0 }+c_{ 1 }X_{ t-1 }+\cdots +c_{ p }X_{ t-p } \right) +\left( d_{ 1 }Y_{ t-1 }+\cdots +d_{ p }Y_{ t-p } \right) +v_{ t } `r ifelse((knitr::opts_knit$get('rmarkdown.pandoc.to') == 'docx'), '\\quad\\textrm', '\\tag')`{Equation 2}$$
+$$Y_{ t }=\left( a_{ 0 }+a_{ 1 }Y_{ t-1 }+\cdots +a_{ p }Y_{ t-p } \right) +\left( b_{ 1 }X_{ t-1 }+\cdots +b_{ p }X_{ t-p } \right) +u_{ t } `r ifelse((knitr::opts_knit$get('rmarkdown.pandoc.to') == 'docx'), '\\quad\\textrm', '\\tag')`{Y-Consequence}$$$$X_{ t }=\left( c_{ 0 }+c_{ 1 }X_{ t-1 }+\cdots +c_{ p }X_{ t-p } \right) +\left( d_{ 1 }Y_{ t-1 }+\cdots +d_{ p }Y_{ t-p } \right) +v_{ t } `r ifelse((knitr::opts_knit$get('rmarkdown.pandoc.to') == 'docx'), '\\quad\\textrm', '\\tag')`{Y-Antecedent}$$
 
-Granger Causality tests are useful for evaluating time series pairs for causality such that "$X$ is said to Granger-cause $Y$ if $Y$ can be better predicted using the histories of both $X$ and $Y$ than it can by using the history of $Y$ alone."[^51] Essentially, the test checks whether one variable is useful in predicting the other taking lagging of both variables into consideration. In terms of the above two equations, if in the first equation $H_{ A }: \exists b_{ i } \neq 0$ holds true, then $X$ is a Granger-cause of $Y$. If in the second equation $H_{ A }: \exists d_{ i } \neq 0$ holds true, then $Y$ is a Granger-cause of $X$. The test has limitations in multivariate cases and does not rule out confounding variables, but it remains one of the most useful tools for analyzing causality in model building. To conduct the test effectively, the maximum order of integration $d$ for the time series group must first be determined.
+Granger Causality tests are useful for evaluating time series pairs for causality such that "$X$ is said to Granger-cause $Y$ if $Y$ can be better predicted using the histories of both $X$ and $Y$ than it can by using the history of $Y$ alone."[^51] Essentially, the test checks whether one variable is useful in predicting the other taking lagging of both variables into consideration. In terms of the above two equations, if in the $Y$-Consequence equation $H_{ A }: \exists b_{ i } \neq 0$ holds true, then $X$ is a Granger-cause of $Y$. If in the $Y$-Antecedent equation $H_{ A }: \exists d_{ i } \neq 0$ holds true, then $Y$ is a Granger-cause of $X$. The test has limitations in multivariate cases and does not rule out confounding variables, but it remains one of the most useful tools for analyzing causality in model building. To conduct the test effectively, the maximum order of integration $d$ for the time series group must first be determined.
 
 ```{r cache=T, echo=knitr::is_html_output()}
 Correlated <- data.frame(Laws, RAHO, NAFB, FBCO)
@@ -790,7 +786,7 @@ kable(Arima_Orders, longtable = T, booktabs = T, row.names=T, linesep = "",
   kable_styling(latex_options = c("striped", "hold_position", "repeat_header"))
 ```
 
-The `auto.arima()` function in `R` chooses ARIMA models automatically using a variation of the Hyndman and Khandakar algorithm which combines unit root tests, minimization of the AICc, and MLE to obtain an ARIMA model. The results suggest that the maximum order of integration is $d = `r max(Arima_Orders[,"d"])`$. Using this maximum order of integration, tests are then run to check for the existence of Granger Causality.
+The `auto.arima()` function in `R` chooses ARIMA models automatically using a variation of the Hyndman and Khandakar algorithm which combines unit root tests, minimization of the AICc, and MLEs to obtain an ARIMA model. The results suggest that the maximum order of integration is $d = `r max(Arima_Orders[,"d"])`$. Using this maximum order of integration, tests are then run to check for the existence of Granger Causality.
 
 ```{r cache=F, echo=knitr::is_html_output()}
 Causality <- data.frame(matrix(NA, nrow = ncol(Correlated[,-1]), ncol = 2))
@@ -820,7 +816,7 @@ The test results indicate that changes in most demographics exhibit the characte
 
 ## Model Selection
 
-Based on the strength of the one-year correlations and bidirectional Granger causality for some of the correlated factors, a few models will be constructed and tested. First, a model that attempts to explain the number of laws that will be passed one year in the future based on changes to multiple demographic factors will be constructed. Then, four smaller models that attempt to explain changes to the Hispanic, Native born, foreign-born from Africa, and foreign-born from Latin America population segments based on the number of laws passed one year prior will be constructed. Given the oddities in the distributions of some of these series', multiple regression model types are tuned and examined to see which model type is most suited for these data.
+Based on the strength of the one-year correlations and bidirectional Granger causality for some of the correlated factors, a few models will be constructed and tested. First, a model that attempts to explain the number of laws that will be passed one year in the future based on changes to multiple demographic factors will be constructed. Then, four smaller models that attempt to explain changes to the Hispanic, Native born, foreign-born from Africa, and foreign-born from Latin America population segments based on the number of laws passed one year prior will be constructed. Given the oddities in the distributions of some of these time series', multiple regression model types are tuned and examined to see which model type is most suited for these data.
 
   + Linear Regression Models
     + Robust Linear Regression (RLM)
@@ -979,7 +975,7 @@ tune12 <- train(x = lag(X_train, k=1), y = Y_train,
 plot(tune12, main=tune12$modelInfo$label)
 ```
 
-All the models perform almost equivalently on these data. As a matter of fact, the optimal RMSE, $R^2$, and MAE training set resampling performance metrics are associated with different models depending on the random seed. The need to validate training set resampling results--which are highly optimistic as a result of the repeated sampling-- with a test set is highlighted by cases such as this where the resampling performance metrics are nearly identical. In this run the respectively optimal linear, nonlinear, and tree-based models based on the RMSE of the training set resampling are the Partial Least Squares (PLS), $K$-Nearest Neighbors (KNN), and Stochastic Gradient Boosting (SGB) models. These training set resampling rankings hold for the PLS and KNN models after running the test set validation. Since the model performance is essentially equivalent and the goal of this modeling process is explanation of relationships between variables rather than prediction, the non-covariance based KNN model which cannot be cleanly summarized will not be used.[^54] The focus will be on covariance based linear models.
+All the models perform almost equivalently on these data. As a matter of fact, the optimal RMSE, $R^2$, and MAE training set resampling performance metrics are associated with different models depending on the random seed. The need to validate training set resampling results--which are highly optimistic as a result of the repeated sampling-- with a test set is highlighted by cases such as this where the resampling performance metrics are nearly identical. Based on the RMSE of the training set resampling the respectively optimal linear, nonlinear, and tree-based models based are the Partial Least Squares (PLS), $K$-Nearest Neighbors (KNN), and Stochastic Gradient Boosting (SGB) models. These training set resampling rankings hold for the PLS and KNN models after running the test set validation. Since the model performance is essentially equivalent and the goal of this modeling process is explanation of relationships between variables rather than prediction, the non-covariance based KNN model which cannot be cleanly summarized will not be used.[^54] The focus will be on covariance based linear models.
 
 ```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output(), results = 'asis'}
 metrics <- function(tune) {
@@ -1036,7 +1032,7 @@ colnames(LawsCause) <- c("LawsPast", colnames(demographics))
 
 ### Partial Least Squares (PLS)
 
-The first model attempts to explain the number of laws that will be passed one year in the future based on changes to multiple demographic factors. There exists a very high level of multicollinearity in these demographic factors however. In fact, attempting to remove highly correlated predictors removes nine of the twelve variables leaving only foreign-born from Africa, Native-Americans, and Whites. These were the three variables with very unusual distributions due to slavery, genocide, and admissions being based on race until around 1950. Using a PLS model--which is essentially supervised Principal Component Analysis-- is a regression technique that works well when a high level of multicollinearity is present. Applying the PLS model with two components (determined by the tuning process) to Box-Cox transformations of these data and examining the residuals for normality with a Shapiro-Wilks test suggests that the PLS model provides an appropriate fit for these data at $\alpha=0.05$. Examining legislation as a consequence where the cause is demographic factor changes and the effect is the number of laws enacted one year later, the PLS model suggests that the variation in the number of immigration laws enacted is explained in varying amounts by changes in each of the demographic factors. It is important to note that the PLS coefficients reflect the amount of change explained by the demographic factor and not the direction of the change. The direction of change was however, noted in the Correlation Analysis where all were found to have a positive relationship. Therefore, it can be surmised that when there are increases in these specific demographic elements, the number of immigration laws enacted one year later increases. All of these jackknife variance estimates are statistically significant at $\alpha=0.05$.
+The first model attempts to explain the number of laws that will be passed one year in the future based on changes to multiple demographic factors. There exists a very high level of multicollinearity in these demographic factors however. In fact, attempting to remove highly correlated predictors removes nine of the twelve variables leaving only foreign-born from Africa, Native-Americans, and Whites. These were the three variables with very unusual distributions due to slavery, genocide, and admissions being based on race until around 1950. Using a PLS model--which is essentially supervised Principal Component Analysis-- is a regression technique that works well when a high level of multicollinearity is present. Applying the PLS model with two components (determined by the tuning process) to Box-Cox transformations of these data and examining the residuals for normality with a Shapiro-Wilks test suggests that the PLS model provides an appropriate fit for these data at $\alpha=0.05$. Examining legislation as a consequence where the cause is demographic factor changes and the effect is the number of laws enacted one year later, the PLS model suggests that the variation in the number of immigration laws enacted is explained in varying amounts by earlier changes in each of the demographic factors. It is important to note that the PLS coefficients reflect the amount of change explained by the demographic factor and not the direction of the change. The direction of change was however, noted in the Correlation Analysis where all were found to have a positive relationship. Therefore, it can be surmised that when there are increases in these demographic elements, the number of immigration laws enacted one year later increases. All of these jackknife variance estimates are statistically significant at $\alpha=0.05$.
 
 ```{r cache=T, echo=knitr::is_html_output(), eval=T}
 fit1 <- plsr(LawsFuture ~ ., data = LawsEffect, ncomp = 2, validation = "CV", jackknife = T)
@@ -1058,7 +1054,7 @@ kable(model, longtable = T, booktabs = T, row.names=T, linesep = "",
 
 ### Robust Linear Model (RLM)
 
-The remaining four models attempt to explain changes to four demographic factors based on the number of laws that were passed one year prior. Addressing multicollinearity is unnecessary for these small models with one $X$ variable. There are irregulates in some of the distributions however which suggest the need for a robust method, hence a Robust Linear Model (RLM). Applying the RLM model with bisquare weights and an intercept (determined by the tuning process) to Box-Cox transformations of these data and examining the residuals for normality with a Shapiro-Wilks test suggests that the RLM model provides an appropriate fit for most of these data at $\alpha=0.05$. The exception is the model for foreign-born from Africa which has a Shapiro-Wilks $p$-value of $0.06$ and an unusual distribution due to the period of slavery. Post-slavery the distribution of the transformed Africa variable is more linear and therefore more suited for an RLM model. Examining legislation as an antecedent where the effect is demographic factor changes and the cause is the number of laws enacted one year prior, the RLM suggests that as the number of immigration laws enacted increases, specific demographic elements change such as the number of Native Born $\uparrow$, Hispanics $\uparrow$, and foreign-born from specific countries of origin (Africa $\uparrow$, Latin America $\uparrow$). These relationships are statistically significant at $\alpha=0.05$.
+The remaining four models attempt to explain changes to four demographic factors based on the number of laws that were enacted one year prior. Addressing multicollinearity is unnecessary for these small models with one $X$ variable. There are irregularities in some of the distributions however which suggest the need for a robust method, hence a Robust Linear Model (RLM). Applying the RLM model with bisquare weights and an intercept (determined by the tuning process) to Box-Cox transformations of these data and examining the residuals for normality with a Shapiro-Wilks test suggests that the RLM model provides an appropriate fit for most of these data at $\alpha=0.05$. The exception is the model for foreign-born from Africa which has a Shapiro-Wilks $p$-value of $0.06$ and an unusual distribution due to the period of slavery. Post-slavery the distribution of the transformed Africa variable is more linear and therefore more suited for an RLM model. Examining legislation as an antecedent where the effect is demographic factor changes and the cause is the number of laws enacted one year prior, the RLM suggests that as the number of immigration laws enacted increases, specific demographic elements change such as the number of Native Born $\uparrow$, Hispanics $\uparrow$, and foreign-born from specific countries of origin (Africa $\uparrow$, Latin America $\uparrow$). These relationships are statistically significant at $\alpha=0.05$.
 
 ```{r cache=T, echo=knitr::is_html_output(), eval=T, results = 'hide'}
 ctrl <- lmRob.control(weight=c("Bisquare","Bisquare"))
