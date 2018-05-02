@@ -342,7 +342,7 @@ ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
   theme(legend.position="bottom")
 ```
 
-The proportion of Native and Foreign-born persons in the population are mirror images of each other. The median proportion of Foreign-born persons in the United States since 1790 has been 12.4%. In 1850 and 1970 the percentage of Foreign-born persons in the United States reached local minmas of 9.5% and 4.8%, respectively. The proportion of Foreign-born persons in the United States has peaks in 1870, 1890, and 1910 at 14.3%, 14.8%, and 14.7%; respectively. In 2016 the percentage of Foreign-born sits at 13.5%. When viewed in aggregate, the decline in the percentage of Foreign-born persons in the United States in 1970 appears to be significant relative to its proportion over time.
+The proportion of Native and Foreign-born persons in the population are horizontal reflections (mirror images over the $x$-axis) of each other. The median proportion of Foreign-born persons in the United States since 1790 has been 12.4%. In 1850 and 1970 the percentage of Foreign-born persons in the United States reached local minmas of 9.5% and 4.8%, respectively. The proportion of Foreign-born persons in the United States has peaks in 1870, 1890, and 1910 at 14.3%, 14.8%, and 14.7%; respectively. In 2016 the percentage of Foreign-born sits at 13.5%. When viewed in aggregate, the decline in the percentage of Foreign-born persons in the United States in 1970 appears to be significant relative to its proportion over time.
 
 ```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
 Population <- rowSums(NAFB)
@@ -373,7 +373,7 @@ round(na.omit(data.frame(as.data.frame(Proportions), row.names=time(Proportions)
 FBCO <- Census[, 11:16]
 ```
 
-The decennial numbers on country of origin for Foreign-born are a little more interesting. Persons from Africa, Asia, Oceania, and Latin America arrive at an exponential rate.grangertest(ChickEgg[, 1], ChickEgg[, 2], order = 3) Arrivals from Europe and North America however, show exponential growth until around 1930, and then steady declining thereafter. When aggregated, these data have a very interesting characteristic. There is a large hump in the number of Foreign-born Europeans that begins to deflate when race stopped being a factor in admissions around 1950.
+The decennial numbers on country of origin for Foreign-born are a little more interesting. Persons from Africa, Asia, Oceania, and Latin America arrive at an exponential rate. Arrivals from Europe and North America however, show exponential growth until around 1930, and then steady declining thereafter. When aggregated, these data have a very interesting characteristic. There is a large hump in the number of Foreign-born Europeans that begins to deflate when race stopped being a factor in admissions around 1950.
 
 ```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
 numb_df <- data.frame(na.approx(FBCO), Year=time(FBCO))
@@ -393,7 +393,7 @@ ggplot(plot_df, aes(x=Year, y=Population, fill= Demographic)) + geom_area() +
   theme(legend.position="bottom")
 ```
 
-The proportion of Foreign-born persons in the United States by country of origin shows exponential increases from Asia, Oceania, and Latin America just like the pure numbers. The large increases start around 1860 for Oceania, and 1970 for Latin America and Asia. Foreign-born persons from Africa follow a less natural pattern that coincides with slavery. The percentage of Foreign-born persons from Africa was high from 1790 to 1820, but relatively low thereafter. Looking at Foreign-born persons from Africa in the post-slavery era shows a more natural exponential pattern with a large increase starting in 1980. The proportion of Foreign-born persons from Europe remained above 80% until 1950 when a permanent and rapid decline started leading to its current low of 10.9% in 2016. The proportion of Foreign-born persons from North America has a very strange and unnatural pattern hovering around 8.9% until 1970 when a rapid decline started leading to its current low of 1.8% in 2016. The rapid decline of Europeans in 1950 and the rapid decline by North Americans starting 1970 are temporally proximate to the when race stopped being a factor in admissions around 1950. When aggregated, the fall from dominance by Foreign-born Europeans and the rise to dominance by Latin Americans and Asians over time is quite remarkable.
+The proportion of Foreign-born persons in the United States by country of origin shows exponential increases from Asia, Oceania, and Latin America just like the pure numbers. The large increases start around 1860 for Oceania, and 1970 for Latin America and Asia. Foreign-born persons from Africa follow a less natural pattern that coincides with slavery. The percentage of Foreign-born persons from Africa was high from 1790 to 1820, but relatively low thereafter. Looking at Foreign-born persons from Africa in the post-slavery era shows a more natural exponential pattern with a large increase starting in 1980. The proportion of Foreign-born persons from Europe remained above 80% until 1950 when a permanent and rapid decline started, leading to its current low of 10.9% in 2016. The proportion of Foreign-born persons from North America has a very strange and unnatural pattern hovering around 8.9% until 1970 when a rapid decline started, leading to its current low of 1.8% in 2016. The rapid decline of Europeans in 1950 and the rapid decline by North Americans starting 1970 are temporally proximate to when race stopped being a factor in admissions around 1950. When aggregated, the fall from dominance by Foreign-born Europeans and the rise to dominance by Latin Americans and Asians over time is quite remarkable.
 
 ```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
 Population <- rowSums(FBCO)
@@ -425,11 +425,12 @@ round(na.omit(data.frame(as.data.frame(Proportions), row.names=time(Proportions)
 ```{r cache=T, echo=knitr::is_html_output()}
 Visas <- data698[, 18:21]
 Visas[, 2] <- Visas[, 2] - Visas[, 1]
-Visas[, 4] <- Visas[, 2] - Visas[, 1]
-colnames(Visas) <- c("IV_Emp", "IV_NonEmp", "NIV_Emp", "NIV_NonEmp")
+Visas[, 4] <- Visas[, 4] - Visas[, 3]
+colnames(Visas)[c(2,4)] <- c("IV_NonEmp", "NIV_NonEmp")
+# colnames(Visas) <- c("IV_Emp", "IV_NonEmp", "NIV_Emp", "NIV_NonEmp")
 ```
 
-The numeric data on Immigrant Visas since 1820 is best described as chaotic. It has wild swings up and down starting with an upward trend from 1820 to about 1910, followed by a drastic decline until about 1945, and then another trend upward with a similar trajectory until 2016. The graph also shows a huge spike around 1990. When aggregated, a clear upward trend is notable, but fluctuations seem relatively random.
+The numeric data on Immigrant Visas since 1820 is best described as chaotic. It has wild swings up and down starting with an upward trend from 1820 to about 1910, followed by a drastic decline until about 1945, and then another trend upward until 2016 with a trajectory similar to that of the first upward trend. The graph also shows a huge spike around 1990. 
 
 ```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
 IV_All <- na.omit(data698[, 19])
@@ -439,12 +440,12 @@ ggplot() + ggtitle("Immigrant Visas (1820-2016)") + xlab("Year") +
   ylab("Amount") + theme(plot.title = element_text(hjust = 0.5))
 ```
 
-Visa data since 1981 has been less chaotic. Employment related Immigrant visas over the last 30 years are not as noisy. The number of Immigrant visas related to employment held steady from 1981 to 1991, was chaotic from 1992 to 2007, and then steady ever since. There were large decreases around 1999 and 2004, and large increases around 1993, 2001, and 2006. Total immigrant visas follow a similar pattern with the exception of the huge spike around 1990 mentioned earlier. Nonimmigrant visas have a less interesting pattern. Employment related visas have a steadily increasing trend with only a slight amount of variability. All Nonimmigrant visas also have an increasing trend, but with less variability. Nonimmigrant visas have made up between 89% and 95% off all visas for the last 30 years.
+Visa data since 1981 has been less chaotic. Employment related Immigrant Visas over the last 30 years are not as noisy. The number of Immigrant visas related to employment held steady from 1981 to 1991, was chaotic from 1992 to 2007, and then steady ever since. There were large decreases around 1999 and 2004, and large increases around 1993, 2001, and 2006. Immigrant Visas not related to employment follow a steadier pattern with the exception being the huge spike around 1990 mentioned earlier. Employment related Nonimmigrant Visas have a less remarkable pattern. Employment related Nonimmigrant Visas have a steadily increasing trend with only a slight amount of variability. Nonimmigrant Visas not related to employment have an even steadier increasing trend with less variability. When viewed in aggregate, variability in the different Visa types becomes negligible. The aggregated Visa figures are dominated by Nonimmigrant Visas not related to employment which have continuously made up over 90% of the Visas issued. These Nonimmigrant Visas are temporary Visas for tourists, diplomats, athletes, and other temporary visitors.
 
 ```{r cache=T, echo=knitr::is_html_output(), eval=knitr::is_html_output()}
 Visa_Types <- window(Visas, start = 1981)
-Visa_Types[,2] <- Visa_Types[,2] - Visa_Types[,1]
-colnames(Visa_Types)[c(2,4)] <- c("IV_NonEmp", "NIV_NonEmp")
+# Visa_Types[,2] <- Visa_Types[,2] - Visa_Types[,1]
+# colnames(Visa_Types)[c(2,4)] <- c("IV_NonEmp", "NIV_NonEmp")
 numb_df <- data.frame(Visa_Types, Year=time(Visa_Types))
 plot_df <- gather(numb_df, "Type", "Approved", 1:(ncol(numb_df)-1))
 ggplot(plot_df, aes(x=Year, y=Approved)) + geom_line() + 
