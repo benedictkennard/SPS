@@ -1,0 +1,267 @@
+---
+title: "DATA 624 Project 2"
+author: "Group 3"
+date: "`r format(Sys.Date(), format='%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: show
+    df_print: paged
+    toc: yes
+    toc_depth: 2
+  word_document:
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T, warning=F, message=F, fig.align='center')
+```
+
+# Assignment
+
+**Project #2 (Team) Assignment and Scenario**
+
+This is role playing. I am your new boss. I am in charge of production at ABC Beverage and you are a data scientist reporting to me. My leadership has told me that new regulations are requiring us to understand our manufacturing process, the predictive factors and be able to report to them our predictive model of PH. Please use the historical data set I am providing. Build and report the factors in BOTH a technical and non-technical report. I like to use Word and Excel. Please provide your report in a Word readable format and your predictions in an Excel readable format. I also rely on a colleague for advice. She is very data savvy and can provide info on good code form to me, and just make me feel better about a technical solution. Please provide all your code and technical dialogue so she can review it. She should be able to quickly cut and paste into R studio. NOTE, include R library calls in your code. Questions? We can discuss. As always, I am busy (boss role, not professor) so I really want you to take the ball and run with it the best you can.  But, I will answer as I can. Let's talk more in our weekly meeting next Tuesday. Should be a great project. Don't over think it, pretty straight forward based on what we have been learning. You have MORE than ample time to complete, 5/22/18.  Bonus points for EARLY submissions. Thanks for your dedicated efforts!
+
+  + [StudentData.xlsx](https://raw.githubusercontent.com/jzuniga123/SPS/blob/master/DATA%20624/StudentData.xlsx) - This is your modeling data. 
+  + [StudentEvaluation- TO PREDICT.xlsx](https://raw.githubusercontent.com/jzuniga123/SPS/blob/master/DATA%20624/StudentEvaluation-%20TO%20PREDICT.xlsx) - I want you to predict the PH on this set. I want a prediction for ALL 267 values. Do not eliminate any rows. 
+  + [Data Dictionary(2).xlsx](https://raw.githubusercontent.com/jzuniga123/SPS/blob/master/DATA%20624/Data%20Dictionary(1).xlsx) - Not a full data dictionary, but variable names, data types, etc.
+
+While prediction accuracy is very important. I really want to understand your technique. Note to team leaders, you are responsible to turn in your team's project - late submissions are not accepted. Team members, you should submit your team member scores prior or no later than the due date (you have a total of (n-1)*100 points to distribute to your other members, so if your team has a total of 4 members, you have 300 points to distribute to the other 3 members of your team).  Some Clarifying Points
+
+  1) A Word readable file with a detailed explanation of the problem you are trying to solve, how you are approaching it, your results, interpretation of your results, etc.  You have creative license here.   Preferably you will also include an appendix with the R code I can cut and paste into R Studio and run.  If you already have it embedded in your report and I can still copy/ paste that is okay.
+  2) An Excel readable file with your predictions. Please put your predictions alongside the independent variables.  This is important as there is no case/row identifier.   Also, it will allow me to see your imputation methods that you describe in your report if you chose to go that route.
+  3) Optional - R files (*.R) or Rmd
+
+# System Setup
+
+```{bash eval=F}
+# To use the xlsx package on Linux, RJava and Rgdal must be installed.
+sudo apt-get update
+sudo apt-get install default-jre # Install Java
+sudo apt-get install default-jdk # Install JDK
+sudo R CMD javareconf # Assotiate the JDK installed with R
+sudo apt-get install r-cran-rjava # Install RJava
+sudo apt-get install libgdal-dev libproj-dev # Install Rgdal
+```
+
+# Import Data
+
+```{r cache=T}
+library(xlsx)
+library(caret)
+library(forecast)
+github <- "https://raw.githubusercontent.com/jzuniga123"
+file1 <- "/SPS/master/DATA%20624/StudentData.xlsx"
+file2 <- "/SPS/master/DATA%20624/StudentEvaluation-%20TO%20PREDICT.xlsx"
+download.file(paste0(github, file1), "temp.xlsx", mode="wb")
+model_data <- xlsx::read.xlsx("temp.xlsx", sheetIndex=1, header=T)
+invisible(file.remove("temp.xlsx"))
+download.file(paste0(github, file2), "temp.xlsx", mode="wb")
+fcast_data <- xlsx::read.xlsx("temp.xlsx", sheetIndex=1, header=T)
+invisible(file.remove("temp.xlsx"))
+```
+
+# Pre-Process
+
+```{r cache=T}
+Y <- which(names(model_data) == "PH")
+sample <- model_data[!is.na(model_data[, Y]), ]
+sample[, "Brand.Code"] <- as.numeric(sample[, "Brand.Code"])
+set.seed(624)
+rows_train <- createDataPartition(sample[, Y], p=0.75, list=F)
+X <- sample[rows_train, -Y]
+prepro <- preProcess(X, method=c("nzv", "corr", "BoxCox", "center", "scale", "knnImpute"))
+X_train <- predict(prepro, sample[rows_train, -Y])
+X_test <- predict(prepro, sample[-rows_train, -Y])
+Y_train <- sample[rows_train, Y]
+Y_test <- sample[-rows_train, Y]
+set.seed(624)
+ctrl <- trainControl(method = "cv", number = 10)
+```
+
+# Linear Regression Models
+
+## Robust Linear Model
+
+```{r cache=T, echo=knitr::is_html_output()}
+set.seed(624)
+tune01 <- train(x = X_train, y = Y_train,
+  method = "rlm", trControl = ctrl)
+plot(tune01, main=tune01$modelInfo$label)
+```
+
+## Principal Component Analysis
+
+```{r cache=T, echo=knitr::is_html_output()}
+set.seed(624)
+tune02 <- train(x = X_train, y = Y_train,
+  method = "pcr", trControl = ctrl, tuneLength = 25)
+plot(tune02, main=tune02$modelInfo$label)
+```
+
+## Partial Least Squares
+
+```{r cache=T, echo=knitr::is_html_output()}
+set.seed(624)
+tune03 <- train(x = X_train, y = Y_train, 
+  method = "pls", trControl = ctrl, tuneLength = 25)
+plot(tune03, main=tune03$modelInfo$label)
+```
+
+## Elasticnet
+
+```{r cache=T, echo=knitr::is_html_output()}
+set.seed(624)
+tg <- expand.grid(lambda = c(0, 0.05, .1), fraction = seq(0.05, 1, length = 25))
+tune04 <- train(x = X_train, y = Y_train, 
+  method = "enet", trControl = ctrl, tuneGrid = tg)
+plot(tune04, main=tune04$modelInfo$label)
+```
+
+# Nonlinear Regression Models
+
+## Model Averaged Neural Network
+
+```{r cache=T, echo=knitr::is_html_output()}
+set.seed(624)
+tg <- expand.grid(.decay = c(0, 0.01, .1), .size = c(1:10), .bag = F)
+tune05 <- train(x = X_train, y = Y_train,
+  method = "avNNet", tuneGrid = tg, trControl = ctrl, linout = T, 
+  trace = F, MaxNWts = 10 * (ncol(X_train) + 1) + 10 + 1, maxit = 500)
+plot(tune05, main=tune05$modelInfo$label)
+```
+
+## Multivariate Adaptive Regression Spline
+
+```{r cache=T, echo=knitr::is_html_output()}
+set.seed(624)
+tg <- expand.grid(degree = c(1:2), nprune = c(2:10))
+tune06 <- train(x = X_train, y = Y_train,
+  method = "earth", tuneGrid = tg, trControl = ctrl)
+plot(tune06, main=tune06$modelInfo$label)
+```
+
+## Support Vector Machines with Polynomial Kernel
+
+```{r cache=T, echo=knitr::is_html_output()}
+set.seed(624)
+tg <- expand.grid(C=c(0.01,0.05,0.1), degree=c(1,2), scale=c(0.25,0.5,1))
+tune07 <- train(x = X_train, y = Y_train,
+  method = "svmPoly",  tuneGrid = tg,  trControl = ctrl)
+plot(tune07, main=tune07$modelInfo$label)
+```
+
+## $K$-Nearest Neighbors
+
+```{r cache=T, echo=knitr::is_html_output()}
+set.seed(624)
+tg <- data.frame(.k = 1:20)
+tune08 <- train(x = X_train, y = Y_train,
+  method = "knn", tuneGrid = tg, trControl = trainControl(method = "cv"))
+plot(tune08, main=tune08$modelInfo$label)
+```
+
+# Tree-based Regression Models
+
+## Classification and Regression Tree
+
+```{r cache=T, echo=knitr::is_html_output()}
+set.seed(624)
+tg <- expand.grid(maxdepth= seq(1,10,by=1))
+tune09 <- train(x = X_train, y = Y_train,
+  method = "rpart2", tuneGrid = tg, trControl = ctrl)
+plot(tune09, main=tune09$modelInfo$label)
+```
+
+## Random Forest
+
+```{r cache=T, echo=knitr::is_html_output()}
+set.seed(624)
+P <- ncol(X_train) 
+tg <- expand.grid(mtry=seq(2, P, by = floor(P/5)))
+tune10 <- train(x = X_train, y = Y_train,
+  method = "rf", tuneGrid = tg, trControl = ctrl)
+plot(tune10, main=tune10$modelInfo$label)
+```
+
+## Stochastic Gradient Boosting
+
+```{r cache=T, echo=knitr::is_html_output()}
+set.seed(624)
+tg <- expand.grid(interaction.depth=seq(1,6,by=1), n.trees=c(25,50,100,200),
+  shrinkage=c(0.01,0.05,0.1,0.2), n.minobsinnode=10)
+tune11 <- train(x = X_train, y = Y_train,
+  method = "gbm", tuneGrid = tg, trControl = ctrl, verbose=F)
+plot(tune11, main=tune11$modelInfo$label)
+```
+
+## Rule-Based Cubist
+
+```{r cache=T, echo=knitr::is_html_output()}
+set.seed(624)
+tg <- expand.grid(committees = c(1,5,10,20,50,100), neighbors = c(0,1,3,5,7))
+tune12 <- train(x = X_train, y = Y_train,
+  method = "cubist", tuneGrid = tg, trControl = ctrl)
+plot(tune12, main=tune12$modelInfo$label)
+```
+
+# Training Set Resampling Metrics
+
+```{r cache=T}
+metrics <- function(tune) {
+  RMSE = min(tune$results$RMSE)
+  Rsquared = max(tune$results$Rsquared)
+  MAE = min(tune$results$MAE)
+  return(cbind(RMSE, Rsquared, MAE)) }
+resampling <- data.frame(rbind(metrics(tune01), metrics(tune02), 
+  metrics(tune03), metrics(tune04), metrics(tune05), metrics(tune06), 
+  metrics(tune07), metrics(tune08), metrics(tune09), metrics(tune10), 
+  metrics(tune11), metrics(tune12)), row.names = c("RLM","PCR","PLS",
+  "ENET", "ANN", "MARS", "SVM", "KNN", "CART", "RF", "SGB", "CUBE"))
+resampling
+```
+
+# Test Set Validation Metrics
+
+```{r cache=T}
+validation <- data.frame(row.names = c("RLM","PCR","PLS", "ENET", 
+  "ANN", "MARS",  "SVM", "KNN", "CART", "RF", "SGB", "CUBE"), rbind(
+  postResample(pred = predict(tune01, newdata = X_test), obs = Y_test),
+  postResample(pred = predict(tune02, newdata = X_test), obs = Y_test),
+  postResample(pred = predict(tune03, newdata = X_test), obs = Y_test),
+  postResample(pred = predict(tune04, newdata = X_test), obs = Y_test),
+  postResample(pred = predict(tune05, newdata = X_test), obs = Y_test),
+  postResample(pred = predict(tune06, newdata = X_test), obs = Y_test),
+  postResample(pred = predict(tune07, newdata = X_test), obs = Y_test),
+  postResample(pred = predict(tune08, newdata = X_test), obs = Y_test),
+  postResample(pred = predict(tune09, newdata = X_test), obs = Y_test),
+  postResample(pred = predict(tune10, newdata = X_test), obs = Y_test),
+  postResample(pred = predict(tune11, newdata = X_test), obs = Y_test),
+  postResample(pred = predict(tune12, newdata = X_test), obs = Y_test)))
+validation
+```
+
+# In-Sample Predictions
+
+```{r cache=T}
+dotPlot(varImp(tune12), top=15)
+fit <- predict(tune12, newdata = X_test)
+fcast <- forecast::forecast(fit, h=length(Y_test))
+plot(fcast, ylab="PH", main="PH Predictions", xaxt="n")
+lines(c(rep(NA, length(Y_test)), Y_test), col="red")
+```
+
+# Out-of-Sample Predictions
+
+```{r cache=T}
+sample <- fcast_data[, -Y]
+sample[, "Brand.Code"] <- as.numeric(sample[, "Brand.Code"])
+X_fcast <- predict(prepro, sample)
+fcast <- forecast::forecast(fit, h=length(Y_test))
+xlsx::write.xlsx(fcast, file="DATA624_Project2.xlsx", 
+  sheetName="PH", col.names = T, row.names = T, append = F)
+```
