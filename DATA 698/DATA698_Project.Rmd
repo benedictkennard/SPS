@@ -147,6 +147,22 @@ data698 <- data698[order(data698$Year, decreasing=T), ]
 na.omit(data.frame(data698[, 3:17], row.names = data698$Year))
 ```
 
+#### U.S. Department of State
+
+Immigrant visas are issued to foreigners permanently relocating to the U.S. and Nonimmigrant visas are issued to foreigners relocating to the U.S. temporarily. Data regarding visas is available both from the U.S. Department of Homeland Security[^24] and the U.S. Department of State.[^25] The data[^26] from the U.S. Department of State shows every Nonimmigrant visa type[^27] by country from 1997 to 2017. This dataset has an extraordinary amount of detail, but only on Nonimmigrant visas issued by consular offices which is only a fraction of the Nonimmigrant visas. Therefore, these data are not suited for this analysis.
+
+#### U.S. Department of Labor
+
+Certain Immigrant and Nonimmigrant employment related visas require approval from the U.S. Department of Labor. Employers "must obtain foreign labor certification from the U.S. Department of Labor, prior to filing a petition" for these workers. The process of obtaining certification from the U.S. Department of Labor involves substantiating[^28] that "there are not sufficient U.S. workers able, willing, qualified and available to accept the job opportunity in the area of intended employment and that employment of the foreign worker will not adversely affect the wages and working conditions of similarly employed U.S. workers." The types of employment related visas subject to this certification process are:
+
+  + **E3**: Australian Free Trade Agreement principal's family.
+  + **H1B**: Temporary workers in specialty occupations.
+  + **H1B1**: Chile and Singapore Free Trade Agreement aliens.
+  + **H2A/H2B**: Agricultural and Nonagricultural workers.
+  + **D1**: Crewman on a marine vessel or aircraft.
+
+The data[^29] maintained by the U.S. Department of Labor on these employment related visas lists all information, including status, on every application from 2008 to 2017. There also exists an external source[^30] that has harvested data dating back to 2000. Although the U.S. Department of Labor data has an extraordinary amount of detail, it only encompasses a small number of the available employment related visas.[^31]
+
 #### U.S. Department of Homeland Security
 
 The U.S. Citizenship and Immigration Services division of the U.S. Department of Homeland Security has compiled the most complete list of immigration legislation available for the period between 1790 and 1996. The list is not currently available from the source[^32] but it continues to exist in secondary sources such as the Immigration Daily[^33] website and the book *Immigration, Assimilation, and Border Security* by Yoku Shaw-Taylor from 2012. The list is fairly exhaustive, but it is missing about eight pieces of legislation from a smaller list[^34] maintained by the U.S. National Archives. Legislation from 1997 on can be found by querying a database[^35] maintained by the U.S. Congress. The database contains legislation since the 93rd Congress in 1973. The legislation on immigration that has become law since the 105th Congress in 1997 from this database, when combined with the information from the U.S. Citizenship and Immigration Services and U.S. National Archives, produces complete list[^36] of immigration legislation from 1790 to 2017.
@@ -167,7 +183,7 @@ temp_df <- data698[, 1:2] %>%
 temp_df
 ```
 
-The U.S. Department of Homeland Security maintains immigration in their annual yearbooks. The data on Immigrant visas form their *Persons Obtaining Lawful Permanent Resident Status by Type and Major Class Of Admission*[^39] tables spans 1986 to 2016. The data on *Nonimmigrant visas from their Nonimmigrant Admissions by Class of Admission*[^40] tables spans 1981 to 2016 with aggregate data on Immigrant visas since 1820. There are also data on *Aliens Apprehended*[^41] from 1925 to 2016, as well as on *Aliens Removed or Returned*[^42] from 1892 To 2016. Apprehensions are foreigner arrests, Removals are compulsory based on a court order, and Returns represent immigrants stopped (without a court order) from entering at the borders. From these data, a subset of the below Immigrant and Nonimmigrant employment-related visas has been carved out for additional analysis:
+The U.S. Citizenship and Immigration Services division also maintains data on immigration application forms by type (Naturalization, Employment, Family, Humanitarian, Other) and approval status from 2012 to 2017. Data on I-129 applications used for employment are available since 2009. Combining all years of available data from the U.S. Citizenship and Immigration Services results in an unremarkable dataset.[^37] The most useful data[^38] on immigration relevant to this research are the statistics produced by the U.S. Department of Homeland Security in their annual yearbooks. The data on Immigrant visas form their *Persons Obtaining Lawful Permanent Resident Status by Type and Major Class Of Admission*[^39] tables spans 1986 to 2016. The data on *Nonimmigrant visas from their Nonimmigrant Admissions by Class of Admission*[^40] tables spans 1981 to 2016 with aggregate data on Immigrant visas since 1820. There are also data on *Aliens Apprehended*[^41] from 1925 to 2016, as well as on *Aliens Removed or Returned*[^42] from 1892 To 2016. Apprehensions are foreigner arrests, Removals are compulsory based on a court order, and Returns represent immigrants stopped (without a court order) from entering at the borders. From these data, a subset of the below Immigrant and Nonimmigrant employment-related visas has been carved out for additional analysis:
 
   + **CW1/CW2**: CNMI-only transitional workers and family.
   + **E1, E2, E2C**: Treaty traders or investors and family.
