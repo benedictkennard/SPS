@@ -1,5 +1,5 @@
 ---
-title: "New York Migration Flows"
+title: "Spatial and Longitudinal Data Analysis"
 author: "Jose Zuniga"
 date: "`r format(Sys.Date(), format='%B %d, %Y')`"
 output:
@@ -199,6 +199,9 @@ offline.iplot(fig)
 
 ### Summary
 
+The IRS has a Spatial and Longitudinal dataset that contains U.S. Population Migration Data from 1990 to 2016. The data are “based on year-to-year address changes reported on individual income tax returns filed with the IRS.” These data contain geographic information regarding inflows and outflows to every county in the United States over time along with the number of returns, number of exemptions, and aggregate income associated with those flows. These data are very important to business for gauging demand in sectors such as marketing and real estate as well as supply of labor for human capital management.
+
+These data are easy to find, but not easy to obtain or clean. The dataset is huge with inconsistent file formats, file naming conversions, file structures, and data values. On top of that, to pull one file the data store for the entire year must be downloaded. Data acquisition and cleansing was not trivial. Files were downloaded with [Bash](https://www.gnu.org/software/bash/), sifted manually, renamed with [Bulk Rename Utility](http://www.bulkrenameutility.co.uk/Main_Intro.php), reshaped with [Excel](https://products.office.com/en-us/excel), and then cleaned with [Python](https://www.python.org/) before being saved in an aggregated Spatial and Longitudinal CSV file that was uploaded to (GitHub)[https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20608/IRS_NYc1990to2016io.csv).
 
 
 ## Leaflet Choropleth Map
