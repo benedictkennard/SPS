@@ -1,12 +1,3 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(tigris)
 library(leaflet)
 github = 'https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20608/'
@@ -19,6 +10,9 @@ shapefile <- counties(cb=TRUE, year=2016)
 ui <- bootstrapPage(
   
   navbarPage("IRS Migration Data", id="nav",
+    
+    tabPanel("Overview", includeMarkdown("DATA608_Final.md")),
+    
     tabPanel("Interactive Map",
       div(class="outer",
         tags$head(includeCSS("DATA608_Final.css")),
@@ -35,7 +29,7 @@ ui <- bootstrapPage(
                       step = 1, animate = animationOptions(interval = 1000, loop = T)),
           uiOutput('scope1')
         ),
-        tags$div(id="cite", style="z-index:500;", "IRS New York Migration Flows by Jose Zuniga (May 2016)")
+        tags$div(id="cite", style="z-index:500;", "IRS New York Migration Flows by Jose Zuniga (May 2018)")
       )
     ),
     
