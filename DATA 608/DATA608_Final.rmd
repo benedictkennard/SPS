@@ -213,7 +213,7 @@ With these data, an exploratory Shiny application was created that shows how peo
   6.	**Animation**: Year slider with play button to loops through time.
   7.	**Tooltips**: Display of Returns, Income, and Exemptions on hover.
   8.	**Zooming and Panning**: Can zoom with scroll wheel and pan by dragging.
-  9.	**Web Controls**: Dropdowns, Radio Buttons, and Sliders
+  9.	**Web Controls**: Dropdowns, Radio Buttons, and Sliders.
 
 ## Leaflet Choropleth Map
 
