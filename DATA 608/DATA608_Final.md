@@ -1,6 +1,6 @@
 # Spatial and Longitudinal Data Analysis
 ## Jose Zuniga
-## May 2018
+## May 2018 -- FIX THIS IN CITATION!!!!
 
 ### Summary
 
