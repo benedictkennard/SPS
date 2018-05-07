@@ -18,9 +18,11 @@ knitr::opts_chunk$set(echo = T, warning=F, message=F, fig.align='center')
 
 # Overview
 
-Your final project is to create a public visualization (static or interactive) using data relevant to a current policy, business, or justice issue. You may use any dataset you can find for this assignment, as long as it is either public or you have permission from the data’s owner/administrator to work with it and share it. Recommended data sources are: governmental data, data provided by a non-profit/Nongovernmental organizations, and data available from large, semi-structured data sets (ie social networks, company financials, etc). You must document eachstep of your data analysis process (excluding data acquisition) in code: this will include changing the format of the data and the creation of any images or interactive displays that are made. You must also include a short (2-3 paragraph) write-up on the visualization. This write-up must include the following: the data source, what the parameters of the data set are (geography, timeframe, what the data points are, etc) what the data shows, and why it is Important... Note - The type of deliverable you provide will depend on the strategy you use for this project. If you put together an interactive visualization, you should be able to provide code that I will be able to run and host locally. If you are choosing static visualizations, your write up will be more important to your overall grade, and it may be useful to think about how you’re presenting these visualizations (in a formated `R` Markdown document for example.)
+Your [final project](https://github.com/charleyferrari/CUNY_DATA_608/blob/master/Final%20Project/Final%20Project.pdf) is to create a public visualization (static or interactive) using data relevant to a current policy, business, or justice issue. You may use any dataset you can find for this assignment, as long as it is either public or you have permission from the data’s owner/administrator to work with it and share it. Recommended data sources are: governmental data, data provided by a non-profit/Nongovernmental organizations, and data available from large, semi-structured data sets (i.e. social networks, company financials, etc.). You must document each step of your data analysis process (excluding data acquisition) in code: this will include changing the format of the data and the creation of any images or interactive displays that are made. You must also include a short (2-3 paragraph) write-up on the visualization. This write-up must include the following: the data source, what the parameters of the data set are (geography, timeframe, what the data points are, etc.) what the data shows, and why it is Important... Note: The type of deliverable you provide will depend on the strategy you use for this project. If you put together an interactive visualization, you should be able to provide code that I will be able to run and host locally. If you are choosing static visualizations, your write up will be more important to your overall grade, and it may be useful to think about how you’re presenting these visualizations (in a formatted `R` Markdown document for example.)
 
-## Proposal 
+You must submit a [proposal](https://github.com/charleyferrari/CUNY_DATA608/blob/master/Final%20Project/FinalProject.pdf) for your project. This proposal must include: a link to the data source, an explanation of what you want to show, why this is relevant to a current policy, business, or justice issue, and which technologies you plan to use. Your instructor must approve this proposal: you may have to refine this somewhat. You will present your final project. If you are not able to attend the lecture on [the proposal or final due dates], you must write-up a status report with screenshots of current progress and issues you are experiencing.
+
+# Project Proposal
 
 The IRS has a dataset that contains U.S. Population Migration Data from 1990 to 2016. The data “based on year-to-year address changes reported on individual income tax returns filed with the IRS.” The data shows inflows and outflows to every county in the United States as defined by US Census Bureau FIPS Codes. The flows are in terms of number of returns, number of exemptions, and aggregate income. These data are useful in business for gauging demand and human capital. The project proposed is an interactive visualization where a year, destination State, and destination County are selected, then a map with inflows or outflows by origin State and Origin County is displayed. An example would be selecting 2015 and Kings County in New York State to see a heatmap of the United States identifying from where people migrated by return count. Below are the top 15 rows of the raw data for such a selection.
 
@@ -44,15 +46,21 @@ The IRS has a dataset that contains U.S. Population Migration Data from 1990 to 
 
 I plan on using `R` with `Shiny` unless there is too much data for `R` to handle. In that case, I will try to use `Python` with `plotly`. The data for this analysis are available in `CSV` Format here: [IRS U.S. Population Migration Data](https://www.irs.gov/statistics/soi-tax-stats-migration-data), [US Census Bureau FIPS Codes](https://www.census.gov/geographies/reference-files/2016/demo/popest/2016-fips.html).
 
-## Feedback
+### Instructor Feedback
 
 This is a very interesting dataset, but you still need to flesh out exactly what you're looking to show. For assignment 6, think about what kind of app you want to make (exploratory? purpose driven?), and if it is more narrative or purpose driven, think about what you want your thesis to be (highlighting the characteristics of the largest in / outflows? saying something general about how Americans move?)
 
-## Response
+# Project Draft
+
+### Refinement Instructions
+
+I have given all of you feedback for your final project proposals, and this assignment is meant to be a first step in service of your final project, and an (optional) chance to build your skills in the JavaScript libraries we've covered: D3 or Plotly. Follow the directions in my feedback and create some preliminary graphs for your final project. I encourage all students to attempt to attempt to use JavaScript. Even if you are not planning on using these tools for your final project, the exercise can be used to build your skills above our basic assignments in [Project 5](https://rpubs.com/josezuniga/375399). Since this is in service of your final project however, projects submitted in either Dash or Shiny will be accepted if that's what you'll be using... If you are not using D3 or Plotly.js, then [Project 6](https://github.com/jzuniga123/SPS/blob/master/DATA%20608/DATA608_HW06.ipynb) would be acceptable in whatever format you're using for your final project. If you're using Dash, then you can put some preliminary graphs in a notebook, or if you're using Shiny, you can put some preliminary graphs in an R Markdown file.
+
+### Feedback Response
 
 I am looking to make an exploratory app that shows how Americans move in general. I was planning to do it the whole country but the millions of rows of data will make the visualization unresponsive. I have culled it down to inflows and outflows from NY which is only about a quarter-million rows of data and it still lags a little (depending on RAM), but it is functional. The app will be more purpose driven than narrative based so I plan to focus more on improving the visualization than telling a story about the data. I was a little disappointed to see that county level choropleth maps do not have zoom capabilities, but will add sliders for years and drop downs for both direction (inflow, outflow) and scope (NY to/from where). 
 
-# System Setup
+## System Setup
 
 ```{bash eval=F}
 sudo apt-get update
@@ -65,7 +73,7 @@ pip install pyshp # for cloropleths
 pip install shapely # for cloropleths
 ```
 
-# Import Data
+## Import Data
 
 Brace Expansion is useful for downloading several files via the command line. When downloading annual data where all that exists is year2014to2015.csv and year2015to2016.csv, using `wget` with multiple brace expansions returns errors for the nonexistent files. This is because multiple braces results in a cross (Cartesian) product with every possible combination is returned. Using for loops is an alternative, but can require more coding than using static URLs when a lot of sites are involved. Another issue with Brace Expansions is zero-padding. Any Brace Expansion that passed over “08” returns an errors because numbers with a leading 0 are base 8 octal numbers which return a "too great for base" error.
 
@@ -82,7 +90,7 @@ rm -Rf -- */
 rm *.!(csv,xls)
 ```
 
-# Clean Data
+## Clean Data
 
 Most dat files were cleaned using Pyhton, but data from 1990 to 1992 are in text files in a hierarchical format which is not easily converted to csv. These files were manual converted using Microsoft Excel.
 
@@ -147,7 +155,7 @@ df_irs = pd.concat(df_list, ignore_index=False).iloc[:,[12,13,0,4,2,5,3,9,7,10,8
 df_irs.to_csv('IRS_NYc1990to2016io.csv', index=False)
 ```
 
-# Python Plotly Cloropleth Map
+## Plotly Choropleth Map
 
 This code is not actually being run. Runnable Jupyter Notebook with actual code can be found [here](https://github.com/jzuniga123/SPS/blob/master/DATA%20608/DATA608_HW06.ipynb).
 
@@ -187,7 +195,13 @@ offline.iplot(fig)
 
 ![](DATA608_Final_01.PNG)
 
-# Leaflet Cloropleth Map
+# Final Project 
+
+### Summary
+
+
+
+## Leaflet Cloropleth Map
 
 ```{r cache=T, results='hide'}
 library(tigris)
@@ -239,7 +253,7 @@ m <- leaflet(width = "100%") %>% addProviderTiles(providers$CartoDB.Positron) %>
 m
 ```
 
-# Shiny Application
+## Shiny Application
 
 This code is not actually being run. Actual Shiny application can be found [here](https://jzuniga123.shinyapps.io/DATA608_FInal/).
 
