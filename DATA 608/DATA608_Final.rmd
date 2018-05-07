@@ -75,7 +75,7 @@ pip install shapely # for cloropleths
 
 ## Import Data
 
-Brace Expansion is useful for downloading several files via the command line. When downloading annual data where all that exists is year2014to2015.csv and year2015to2016.csv, using `wget` with multiple brace expansions returns errors for the nonexistent files. This is because multiple braces results in a cross (Cartesian) product with every possible combination is returned. Using for loops is an alternative, but can require more coding than using static URLs when a lot of sites are involved. Another issue with Brace Expansions is zero-padding. Any Brace Expansion that passed over “08” returns an errors because numbers with a leading 0 are base 8 octal numbers which return a "too great for base" error.
+Brace Expansions with `wget` are useful for downloading several files via the command line. When downloading these annual data however, the naming conversions (i.e. `*1993to1994*.csv`) calls for the use of multiple brace expansions (i.e. `*{1993..2003}to{1994..2004}*.csv`) which produces repeated non-critical errors for nonexistent files. This is because multiple Brace Expansions produce cross (Cartesian) products with every possible combination is returned. Using `for` loops is an alternative, but can require more coding than using `wget`. Brace Expansions also encounter issues with zero-padding. When Brace Expansions loop over “08” an error of "too great for base" is returned because numbers with a leading 0 are base 8 octal numbers.
 
 ```{bash eval=F, include=FALSE}
 wget https://www2.census.gov/programs-surveys/popest/geographies/2016/all-geocodes-v2016.xlsx
