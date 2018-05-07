@@ -1,0 +1,479 @@
+---
+title: "New York Migration Flows"
+author: "Jose Zuniga"
+date: "`r format(Sys.Date(), format='%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    toc: yes
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE, results='hide'}
+library(reticulate)
+knitr::knit_engines$set(python = reticulate::eng_python)
+knitr::opts_chunk$set(echo = T, warning=F, message=F, fig.align='center')
+```
+
+# Overview
+
+Your final project is to create a public visualization (static or interactive) using data relevant to a current policy, business, or justice issue. You may use any dataset you can find for this assignment, as long as it is either public or you have permission from the data’s owner/administrator to work with it and share it. Recommended data sources are: governmental data, data provided by a non-profit/Nongovernmental organizations, and data available from large, semi-structured data sets (ie social networks, company financials, etc). You must document eachstep of your data analysis process (excluding data acquisition) in code: this will include changing the format of the data and the creation of any images or interactive displays that are made. You must also include a short (2-3 paragraph) write-up on the visualization. This write-up must include the following: the data source, what the parameters of the data set are (geography, timeframe, what the data points are, etc) what the data shows, and why it is Important... Note - The type of deliverable you provide will depend on the strategy you use for this project. If you put together an interactive visualization, you should be able to provide code that I will be able to run and host locally. If you are choosing static visualizations, your write up will be more important to your overall grade, and it may be useful to think about how you’re presenting these visualizations (in a formated `R` Markdown document for example.)
+
+## Proposal 
+
+The IRS has a dataset that contains U.S. Population Migration Data from 1990 to 2016. The data “based on year-to-year address changes reported on individual income tax returns filed with the IRS.” The data shows inflows and outflows to every county in the United States as defined by US Census Bureau FIPS Codes. The flows are in terms of number of returns, number of exemptions, and aggregate income. These data are useful in business for gauging demand and human capital. The project proposed is an interactive visualization where a year, destination State, and destination County are selected, then a map with inflows or outflows by origin State and Origin County is displayed. An example would be selecting 2015 and Kings County in New York State to see a heatmap of the United States identifying from where people migrated by return count. Below are the top 15 rows of the raw data for such a selection.
+
+|DS|DC|OS|OC|State Name|County Name|Returns|Exemptions|AGI|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|36|47|36|61|NY|New York County|12253|18042|803554000|
+|36|47|36|81|NY|Queens County|8881|16332|305235000|
+|36|47|36|5|NY|Bronx County|2783|5215|74961000|
+|36|47|36|85|NY|Richmond County|1527|2809|64619000|
+|36|47|36|59|NY|Nassau County|1317|2108|60445000|
+|36|47|36|103|NY|Suffolk County|974|1502|42653000|
+|36|47|34|17|NJ|Hudson County|784|1150|39661000|
+|36|47|6|37|CA|Los Angeles County|770|956|31287000|
+|36|47|36|119|NY|Westchester County|677|982|32442000|
+|36|47|42|101|PA|Philadelphia County|568|821|20239000|
+|36|47|17|31|IL|Cook County|535|668|34080000|
+|36|47|6|75|CA|San Francisco County|484|557|25770000|
+|36|47|34|13|NJ|Essex County|454|757|16920000|
+|36|47|12|86|FL|Miami Dade County|436|648|11926000|
+|36|47|34|3|NJ|Bergen County|403|605|17831000|
+
+I plan on using `R` with `Shiny` unless there is too much data for `R` to handle. In that case, I will try to use `Python` with `plotly`. The data for this analysis are available in `CSV` Format here: [IRS U.S. Population Migration Data](https://www.irs.gov/statistics/soi-tax-stats-migration-data), [US Census Bureau FIPS Codes](https://www.census.gov/geographies/reference-files/2016/demo/popest/2016-fips.html).
+
+## Feedback
+
+This is a very interesting dataset, but you still need to flesh out exactly what you're looking to show. For assignment 6, think about what kind of app you want to make (exploratory? purpose driven?), and if it is more narrative or purpose driven, think about what you want your thesis to be (highlighting the characteristics of the largest in / outflows? saying something general about how Americans move?)
+
+## Response
+
+I am looking to make an exploratory app that shows how Americans move in general. I was planning to do it the whole country but the millions of rows of data will make the visualization unresponsive. I have culled it down to inflows and outflows from NY which is only about a quarter-million rows of data and it still lags a little (depending on RAM), but it is functional. The app will be more purpose driven than narrative based so I plan to focus more on improving the visualization than telling a story about the data. I was a little disappointed to see that county level choropleth maps do not have zoom capabilities, but will add sliders for years and drop downs for both direction (inflow, outflow) and scope (NY to/from where). 
+
+# System Setup
+
+```{bash eval=F}
+sudo apt-get update
+pip install --upgrade pip
+sudo apt-get install libudunits2-dev # for reticulate
+sudo apt-get install libffi-dev g++ libssl-dev
+pip install plotly
+pip install geopandas # for cloropleths
+pip install pyshp # for cloropleths
+pip install shapely # for cloropleths
+```
+
+# Import Data
+
+Brace Expansion is useful for downloading several files via the command line. When downloading annual data where all that exists is year2014to2015.csv and year2015to2016.csv, using `wget` with multiple brace expansions returns errors for the nonexistent files. This is because multiple braces results in a cross (Cartesian) product with every possible combination is returned. Using for loops is an alternative, but can require more coding than using static URLs when a lot of sites are involved. Another issue with Brace Expansions is zero-padding. Any Brace Expansion that passed over “08” returns an errors because numbers with a leading 0 are base 8 octal numbers which return a "too great for base" error.
+
+```{bash eval=F, include=FALSE}
+wget https://www2.census.gov/programs-surveys/popest/geographies/2016/all-geocodes-v2016.xlsx
+wget https://www.irs.gov/pub/irs-soi/{1990..2003}to{1991..2004}countymigration.zip
+wget https://www.irs.gov/pub/irs-soi/county{04..10}{05..11}.zip
+wget https://www.irs.gov/pub/irs-soi/countyinflow{11..15}{12..16}.csv
+wget https://www.irs.gov/pub/irs-soi/countyoutflow{11..15}{12..16}.csv
+unzip "*.zip"
+sudo rm *.zip
+sudo find . -mindepth 2 -type f -exec mv -i '{}' . ';'
+rm -Rf -- */
+rm *.!(csv,xls)
+```
+
+# Clean Data
+
+Most dat files were cleaned using Pyhton, but data from 1990 to 1992 are in text files in a hierarchical format which is not easily converted to csv. These files were manual converted using Microsoft Excel.
+
+  1.  **Import Data**: From Text/CSV
+  2.  **Fixed Width**: 0,2,5,9,34,36,46,53,63
+  3.  **Column Headings**:  State1,  County1, State2, County2, State3, County3, Returns, Exemptions, Income
+  4.  **State1 First Row**: TRIM(A2)
+  5.  **County1 First Row**: TRIM(CONCATENATE(TRIM(B2), TRIM(C2)))
+  6.  **State1**: VALUE(IF(ISBLANK(A3), K2, A3))
+  7.  **County1**: VALUE(IF(ISBLANK(A3), L2, CONCATENATE(TRIM(B3), TRIM(C3))))
+  8.  **State2**: IF(COUNT(FIND({0,1,2,3,4,5,6,7,8,9}, IF(ISBLANK(A2), IF(LEN(TRIM(B2))>0, TRIM(B2), TRIM(C2)),"")))>0, IF(ISBLANK(A2), IF(LEN(TRIM(B2))>0, TRIM(B2), TRIM(C2)),""),"")
+  9. **County2**: IF(COUNT(FIND({0,1,2,3,4,5,6,7,8,9}, IF(ISBLANK(A2), IF(LEN(TRIM(B2))>0, TRIM(C2), LEFT(D2, 4)), "")))>0, IF(ISBLANK(A2), IF(LEN(TRIM(B2))>0, TRIM(C2), LEFT(D2, 4)), ""), "")
+  10. **State3**: IF(LEN(TRIM(E2))>0, E2, "XX")
+  11. **County3**: TRIM(IF(COUNT(FIND({0,1,2,3,4,5,6,7,8,9},B2))>0, D2, IF(LEN(TRIM(B2))>0, CONCATENATE(B2,C2,D2), MID(D2,4,LEN(D2)))))
+  12. **Returns**: F2
+  13. **Exemptions**: H2
+  14. **Income**: NULL
+  15. **Fill Handle**: Complete rest but dragging or double-clicking fill handle.
+
+### Python Engine
+
+The run Python code from R Markdown using a specific engine, navigate to the desired location and get the engine path with the below code. The output below is only an example.
+
+```{bash cache=T}
+python -c "import os; print(os.environ['_'])"
+```
+
+```{python engine.path="/home/mrjzuniga/anaconda3/bin/python", eval=F}
+import numpy as np
+import pandas as pd
+
+github = 'https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20608/'
+
+# Federal Information Processing Standards (FIPS) County Codes
+df_fips = pd.read_csv(github + 'FIPS_Codes_2016.csv', encoding ='latin1')
+
+# IRS Statistics of Income Division (SOI) Tax Stats - Migration Data
+col_right = ['State_Name', 'County_Name', 'Returns', 'Exemptions', 'Income']
+col_fips, df_list = (['State_Code', 'County_Code'], [])
+for year, io in [(x, y) for x in range(1990, 2016) for y in ['i','o']]:
+    file = github + 'IRS_NYc' + str(year) + 'to' + str(year + 1) + io
+    col_basis = [('I_' if io == 'i' else 'O_') + c for c in col_fips]
+    col_delta = [('I_' if io == 'o' else 'O_') + c for c in col_fips]
+    cols = col_basis + col_delta + col_right
+    if year <= 1991:
+        df_temp = pd.read_csv(file + '.csv', skiprows=1, names=cols)
+    else:
+        df_temp = pd.ExcelFile(file + '.xls').parse(skiprows=(7 if year<=2008 else 5), names=cols)
+    df_temp.drop(['State_Name', 'County_Name'], axis=1, inplace=True)
+    df_temp['Direction'] = 'Inflow' if (io == 'i') else 'Outflow'
+    df_temp['Year_From'], df_temp['Year_To'] = (year, year+1)
+    for col_irs in [col_basis, col_delta]:
+        df_temp = pd.merge(df_fips, df_temp, left_on=col_fips, right_on=col_irs, how='inner')
+        dic = dict(zip(df_fips.columns[2:], [col_irs[0][:2] + l for l in ['State', 'Abbr', 'County']]))
+        df_temp.rename(columns=dic, inplace=True)
+        fips_left = df_temp[col_irs[0]].astype(int).astype(str).str.zfill(2)
+        fips_right = df_temp[col_irs[1]].astype(int).astype(str).str.zfill(3)
+        df_temp[col_irs[0][:2] + 'FIPS'] = fips_left + fips_right
+        df_temp.drop(col_fips+col_irs, axis=1, inplace=True)
+    df_list.append(df_temp)
+df_irs = pd.concat(df_list, ignore_index=False).iloc[:,[12,13,0,4,2,5,3,9,7,10,8,11,1,6]]
+df_irs.to_csv('IRS_NYc1990to2016io.csv', index=False)
+```
+
+# Python Plotly Cloropleth Map
+
+This code is not actually being run. Runnable Jupyter Notebook with actual code can be found [here](https://github.com/jzuniga123/SPS/blob/master/DATA%20608/DATA608_HW06.ipynb).
+
+```{python engine.path="/home/mrjzuniga/anaconda3/bin/python", eval=F, include=FALSE}
+import plotly.offline as offline
+import plotly.graph_objs as go
+import plotly.figure_factory as ff
+offline.init_notebook_mode(connected=True)
+# BASIS
+year = 2015
+direction = 'Inflow'
+basis = "Kings County"
+# DELTA
+scope = 'USA' # State abbreviation or USA
+basis_col = direction[0:1] + '_County'
+delta_col = 'O_Abbr' if (direction[0:1] == "I") else 'I_Abbr'
+delta_fips = 'O_FIPS' if (direction[0:1] == "I") else 'I_FIPS'
+delta = scope if (scope in df_irs[delta_col].values) else df_irs[delta_col]
+index = (df_irs.Year_From == year) & \
+        (df_irs.Direction == direction) & \
+        (df_irs[basis_col] == basis) & \
+        (df_irs[delta_col] == delta)
+fips = df_irs[index][delta_fips]
+values = df_irs[index].Returns.values
+colorscale = ["#b3d2e9","#9ecae1","#85bcdb","#6baed6","#57a0ce","#4292c6",
+              "#3082be","#2171b5","#1361a9","#08519c","#0b4083","#08306b"]
+fig = ff.create_choropleth(fips=fips, values=values, scope=[scope],
+  binning_endpoints=np.percentile(values,range(0,100,10)).tolist(),
+  state_outline={'color':'black', 'width': 1},
+  county_outline={'color': 'grey', 'width': 1},
+  show_hover=True, show_state_data=True, # state oulines
+  round_legend_values=True, dragmode = 'zoom',
+  colorscale = colorscale, legend_title = direction + 's to ' + scope,
+  title='IRS Migration Data: NY (' + basis + ") " + str(year))
+offline.iplot(fig) 
+```
+
+![](DATA608_Final_01.PNG)
+
+# Leaflet Cloropleth Map
+
+```{r cache=T, results='hide'}
+library(tigris)
+library(leaflet)
+github = 'https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20608/'
+df_irs <- read.csv(paste0(github, "IRS_NYc1990to2016io.csv"))
+df_irs$I_FIPS <- sprintf("%05d", df_irs$I_FIPS)
+df_irs$O_FIPS <- sprintf("%05d", df_irs$O_FIPS)
+shapefile <- counties(cb=TRUE, year=2016)
+```
+
+```{r cache=T, results='hide'}
+input <- data.frame(radio1 = "Inflow", slider1 = 2015, 
+  select1 = "Kings County", select2 = "United States")
+
+delta_col <- if (substr(input$radio1, 1, 1) == "I") "O_State" else "I_State"
+delta_fips <- if (substr(input$radio1, 1, 1) == "I") "O_FIPS" else "I_FIPS"
+basis_col <- paste0(substr(input$radio1, 1, 1), "_County")
+delta <- if (input$select2 %in% df_irs[, delta_col]) input$select2 else levels(df_irs[, delta_col])
+condition1 <- df_irs[, "Year_To"] == input$slider1
+condition2 <- df_irs[, "Direction"] == as.vector(input$radio1)
+condition3 <- df_irs[,basis_col] == as.vector(input$select1)
+condition4 <- df_irs[, delta_col] %in% delta
+rows <- condition1 & condition2 & condition3 & condition4
+map_df <- geo_join(shapefile, df_irs[rows, ], by_sp="GEOID", by_df=delta_fips, how='inner')
+delta_st <- if (substr(input$radio1, 1, 1) == "I") "O_Abbr" else "I_Abbr"
+delta_ct <- if (substr(input$radio1, 1, 1) == "I") "O_County" else "I_County"
+labels <- sprintf("<strong>%s, %s</strong><br/>%g Returns<br/>%g Income<br/>%g Exemptions",
+  map_df[, delta_ct][[1]], map_df[, delta_st][[1]], map_df$Returns, map_df$Income, 
+  map_df$Exemptions ) %>% lapply(htmltools::HTML)
+breaks <- 1 / min(length(unique(map_df$Returns)), 8)
+bins <- unique(floor(quantile(map_df$Returns, seq(0, 1, breaks))))
+pal <- colorBin("Blues", domain = map_df$Returns, bins = bins, right = F)
+abbr <- c("US", state.abb)[c("United States", state.name) == input$select2]
+leg_title <- paste0(input$radio1, if (substr(input$radio1, 1, 1) == "I") "s from " else "s to ", abbr)
+m <- leaflet(width = "100%") %>% addProviderTiles(providers$CartoDB.Positron) %>%
+  addMiniMap(toggleDisplay=T, position="bottomleft", minimized=T) %>%
+  addPolygons(data = map_df, fillColor = ~pal(Returns), weight = 1, 
+    opacity = 1, color = "Black", dashArray = 3, fillOpacity = 0.7, label = labels, 
+    highlight = highlightOptions(weight = 3, color = "Grey", dashArray = NULL, 
+      fillOpacity = 0.9, bringToFront = TRUE)) %>%
+  addLegend(pal = pal, values = NULL,  opacity = 0.7, 
+    position = "bottomleft", title = leg_title) %>%
+  addEasyButton(easyButton(icon="fa-crosshairs", title="Zoom to State Level",
+    onClick=JS("function(btn, map){ map.setZoom(7); }")))
+```
+
+```{r echo=F}
+m
+```
+
+# Shiny Application
+
+This code is not actually being run. Actual Shiny application can be found [here](https://jzuniga123.shinyapps.io/DATA608_FInal/).
+
+```{r eval=F}
+library(tigris)
+library(leaflet)
+github = 'https://raw.githubusercontent.com/jzuniga123/SPS/master/DATA%20608/'
+df_irs <- read.csv(paste0(github, "IRS_NYc1990to2016io.csv"))
+df_irs$I_FIPS <- sprintf("%05d", df_irs$I_FIPS)
+df_irs$O_FIPS <- sprintf("%05d", df_irs$O_FIPS)
+shapefile <- counties(cb=TRUE, year=2016)
+
+# Define UI for application that draws a histogram
+ui <- bootstrapPage(
+  
+  navbarPage("IRS Migration Data", id="nav",
+    tabPanel("Interactive Map",
+      div(class="outer",
+        tags$head(includeCSS("DATA608_Final.css")),
+        leafletOutput("map", width="100%", height="100%"),
+        absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                      draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
+                      width = 330, height = "auto", style="z-index:500;", 
+          h2("New York Migration"),
+          uiOutput('basis1'),
+          radioButtons("radio1", label = "Migration Direction", selected = "Inflow", inline = T,
+                       choices = list("Inflow" = "Inflow", "Outflow" = "Outflow")),
+          sliderInput("slider1", label = "Migration Year", min = min(df_irs$Year_To), 
+                      max = max(df_irs$Year_To), value = max(df_irs$Year_To), sep = "",
+                      step = 1, animate = animationOptions(interval = 1000, loop = T)),
+          uiOutput('scope1')
+        ),
+        tags$div(id="cite", style="z-index:500;", "IRS New York Migration Flows by Jose Zuniga (May 2016)")
+      )
+    ),
+    
+    tabPanel("Data Explorer",
+      h2("New York Migration"),
+      hr(),
+      fluidRow(
+        column(3, uiOutput('basis2')),
+        column(3, radioButtons("radio2", label = "Migration Direction", selected = "Inflow", inline = T,
+                   choices = list("Inflow" = "Inflow", "Outflow" = "Outflow"))),
+        column(3, sliderInput("slider2", label = "Migration Year", min = min(df_irs$Year_To), 
+                  max = max(df_irs$Year_To), value = max(df_irs$Year_To), sep = "", step = 1)),
+        column(3, uiOutput('scope2'))),
+      hr(),
+      dataTableOutput('table')
+    )
+  )
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  
+  # Interactive Map
+  reactive_basis1 <- reactive({ 
+    basis_col <- paste0(substr(input$radio1, 1, 1), "_County")
+    condition1 <- df_irs[, "Year_To"] == input$slider1
+    condition2 <- df_irs[, "Direction"] == input$radio1
+    rows <- condition1 & condition2
+    df <- sort(df_irs[rows, basis_col])
+    return(df) })
+  output$basis1 <- renderUI({  
+    selectInput('select1', label = 'Migration County', width = "auto",
+                choices=reactive_basis1(), selected = 1) })
+  
+  # Data Explorer
+  reactive_basis2 <- reactive({ 
+    basis_col <- paste0(substr(input$radio2, 1, 1), "_County")
+    condition1 <- df_irs[, "Year_To"] == input$slider2
+    condition2 <- df_irs[, "Direction"] == input$radio2
+    rows <- condition1 & condition2
+    df <- sort(df_irs[rows, basis_col])
+    return(df) })
+  output$basis2 <- renderUI({  
+    selectInput('select3', label = 'Migration County', width = "auto",
+                choices=reactive_basis2(), selected = 1) })
+  
+  # Interactive Map
+  reactive_delta1 <- reactive({ 
+    delta_col <- if (substr(input$radio1, 1, 1) == "I") "O_State" else "I_State"
+    basis_col <- paste0(substr(input$radio1, 1, 1), "_County")
+    condition1 <- df_irs[, "Year_To"] == input$slider1
+    condition2 <- df_irs[, "Direction"] == input$radio1
+    condition3 <- df_irs[, basis_col] == input$select1
+    rows <- condition1 & condition2 & condition3
+    df <- rbind("United States", as.vector(sort(df_irs[rows, delta_col])))
+    return(df) })
+  output$scope1 <- renderUI({ 
+    selectInput("select2", label = "Migration Location", width = "auto", 
+                choices=reactive_delta1(), selected = 1) })
+  
+  # Data Explorer
+  reactive_delta2 <- reactive({ 
+    delta_col <- if (substr(input$radio2, 1, 1) == "I") "O_State" else "I_State"
+    basis_col <- paste0(substr(input$radio2, 1, 1), "_County")
+    condition1 <- df_irs[, "Year_To"] == input$slider2
+    condition2 <- df_irs[, "Direction"] == input$radio2
+    condition3 <- df_irs[, basis_col] == input$select3
+    rows <- condition1 & condition2 & condition3
+    df <- rbind("United States", as.vector(sort(df_irs[rows, delta_col])))
+    return(df) })
+  output$scope2 <- renderUI({ 
+    selectInput("select4", label = "Migration Location", width = "auto", 
+                choices=reactive_delta2(), selected = 1) })
+  
+  # Interactive Map 
+  output$map <- renderLeaflet({
+    delta_col <- if (substr(input$radio1, 1, 1) == "I") "O_State" else "I_State"
+    delta_fips <- if (substr(input$radio1, 1, 1) == "I") "O_FIPS" else "I_FIPS"
+    basis_col <- paste0(substr(input$radio1, 1, 1), "_County")
+    delta <- if (input$select2 %in% df_irs[, delta_col]) input$select2 else levels(df_irs[, delta_col])
+    condition1 <- df_irs[, "Year_To"] == input$slider1
+    condition2 <- df_irs[, "Direction"] == input$radio1
+    condition3 <- df_irs[,basis_col] == input$select1
+    condition4 <- df_irs[, delta_col] %in% delta
+    rows <- condition1 & condition2 & condition3 & condition4
+    map_df <- geo_join(shapefile, df_irs[rows, ], by_sp="GEOID", by_df=delta_fips, how='inner')
+    delta_st <- if (substr(input$radio1, 1, 1) == "I") "O_Abbr" else "I_Abbr"
+    delta_ct <- if (substr(input$radio1, 1, 1) == "I") "O_County" else "I_County"
+    labels <- sprintf("<strong>%s, %s</strong><br/>%g Returns<br/>%g Income<br/>%g Exemptions",
+      map_df[, delta_ct][[1]], map_df[, delta_st][[1]], map_df$Returns, map_df$Income, 
+      map_df$Exemptions ) %>% lapply(htmltools::HTML)
+    breaks <- 1 / min(length(unique(map_df$Returns)), 8)
+    bins <- unique(floor(quantile(map_df$Returns, seq(0, 1, breaks))))
+    pal <- colorBin("Blues", domain = map_df$Returns, bins = bins, right = F)
+    abbr <- c("US", state.abb)[c("United States", state.name) == input$select2]
+    leg_title <- paste0(input$radio1, if (substr(input$radio1, 1, 1) == "I") "s from " else "s to ", abbr)
+    leaflet() %>% addProviderTiles(providers$CartoDB.Positron) %>%
+      addMiniMap(toggleDisplay=T, position="bottomleft", minimized=T) %>%
+      addPolygons(data = map_df, fillColor = ~pal(Returns), weight = 1, 
+        opacity = 1, color = "Black", dashArray = 3, fillOpacity = 0.7, label = labels, 
+        highlight = highlightOptions(weight = 3, color = "Grey", dashArray = NULL, 
+          fillOpacity = 0.9, bringToFront = TRUE)) %>%
+      addLegend(pal = pal, values = NULL,  opacity = 0.7, 
+        position = "bottomleft", title = leg_title) %>%
+      addEasyButton(easyButton(icon="fa-crosshairs", title="Zoom to State Level",
+        onClick=JS("function(btn, map){ map.setZoom(7); }"))) })
+  
+  # Data Explorer
+  output$table <- renderDataTable({
+    delta_col <- if (substr(input$radio2, 1, 1) == "I") "O_State" else "I_State"
+    delta_fips <- if (substr(input$radio2, 1, 1) == "I") "O_FIPS" else "I_FIPS"
+    basis_col <- paste0(substr(input$radio2, 1, 1), "_County")
+    delta <- if (input$select4 %in% df_irs[, delta_col]) input$select4 else levels(df_irs[, delta_col])
+    condition1 <- df_irs[, "Year_To"] == input$slider2
+    condition2 <- df_irs[, "Direction"] == input$radio2
+    condition3 <- df_irs[,basis_col] == input$select3
+    condition4 <- df_irs[, delta_col] %in% delta
+    rows <- condition1 & condition2 & condition3 & condition4
+    map_df <- df_irs[rows, ] })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
+```
+
+![](DATA608_Final_02.PNG)
+
+![](DATA608_Final_03.PNG)
+
+```{css eval=F}
+input[type="number"] {
+  max-width: 80%;
+}
+
+.outer {
+  position: fixed;
+  top: 41px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Customize fonts */
+body, label, input, button, select { 
+  font-family: 'Helvetica Neue', Helvetica;
+  font-weight: 200;
+}
+h1, h2, h3, h4 { font-weight: 400; }
+
+#controls {
+  /* Appearance */
+  background-color: white;
+  padding: 0 20px 20px 20px;
+  cursor: move;
+  /* Fade out while not hovering */
+  opacity: 0.65;
+  zoom: 0.9;
+  transition: opacity 500ms 1s;
+}
+#controls:hover {
+  /* Fade in while hovering */
+  opacity: 0.95;
+  transition-delay: 0;
+}
+
+/* Position and style citation */
+#cite {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  font-size: 12px;
+}
+
+/* If not using map tiles, show a white background */
+.leaflet-container {
+  background-color: white !important;
+}
+```
+
+# References
+
+https://rstudio.github.io/leaflet
+
+https://rpubs.com/HunterRatliff1/152226
+
+https://ehbick01.github.io/reported_crime
+
+https://www.shinyapps.io/admin/#/dashboard
+
+https://shiny.rstudio.com/gallery/superzip-example.html
+
+https://cran.r-project.org/web/packages/tigris/tigris.pdf
+
+https://rmarkdown.rstudio.com/authoring_knitr_engines.html
+
+https://www.irs.gov/statistics/soi-tax-stats-migration-data
+
+https://github.com/jzuniga123/SPS/blob/master/DATA%20608/DATA608_HW06.ipynb
+
+https://github.com/rstudio/shiny-examples/blob/master/063-superzip-example/ui.R
+
+https://www.census.gov/geographies/reference-files/2016/demo/popest/2016-fips.html
