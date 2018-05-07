@@ -201,7 +201,7 @@ offline.iplot(fig)
 
 
 
-## Leaflet Cloropleth Map
+## Leaflet Choropleth Map
 
 ```{r cache=T, results='hide'}
 library(tigris)
